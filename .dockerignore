@@ -1,0 +1,11 @@
+.git
+.gitignore
+.idea
+.vscode
+**/.DS_Store
+finanzas-frontend
+notificaciones-service
+**/target
+**/node_modules
+*.log
+

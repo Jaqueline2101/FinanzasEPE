@@ -1,17 +1,28 @@
-# Etapa de compilación con Maven oficial y límite de memoria optimizado para Render
-FROM maven:3.9.6-eclipse-temurin-17 AS build
+# ==========================================
+# Etapa 1: Compilación con Maven y Java 21
+# ==========================================
+FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copiamos todo el repositorio
-COPY . .
+# Copiamos únicamente el código del backend para mantener la imagen limpia
+COPY finanzas-backend/ ./finanzas-backend/
 
-# Nos movemos al backend y compilamos limitando la memoria RAM a 256m para evitar que Render lo cancele
+# Compilamos el backend empaquetando el JAR ejecutable
 WORKDIR /app/finanzas-backend
-RUN MAVEN_OPTS="-Xmx256m" mvn clean package -DskipTests
+ENV MAVEN_OPTS="-Xmx1024m -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+RUN mvn clean package -DskipTests
 
-# Etapa de ejecución ligera
-FROM eclipse-temurin:17-jre-alpine
+# ==========================================
+# Etapa 2: Imagen ligera de ejecución con Java 21 JRE Alpine
+# ==========================================
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+
+# Copiamos el JAR generado desde la etapa de compilación
 COPY --from=build /app/finanzas-backend/target/*.jar app.jar
+
+# Render expone el servicio dinámicamente mediante la variable de entorno PORT
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Control de memoria JVM optimizado para el contenedor en Render (Free tier: 512MB RAM)
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
