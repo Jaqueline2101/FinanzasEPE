@@ -1,0 +1,106 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in"
+    *ngIf="isOpen">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-slide-up">
+
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h3 class="text-lg font-bold text-slate-800">
+                Detalle de Cuenta
+            </h3>
+            <button (click)="close()" class="text-slate-400 hover:text-slate-600 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-4">
+
+            <!-- Banco -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Banco / Entidad</label>
+                <div
+                    class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800 font-medium">
+                    {{ data.banco || '-' }}
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Descripción</label>
+                <div class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800">
+                    {{ data.alias || '-' }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Cuenta Contable -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-500 mb-1">Cuenta Contable</label>
+                    <div
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800 font-mono">
+                        {{ data.cuentaContable || '-' }}
+                    </div>
+                </div>
+
+                <!-- Código SBS -->
+                <div>
+                    <label class="block text-sm font-medium text-slate-500 mb-1">Código SBS</label>
+                    <div
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800 font-mono">
+                        {{ data.codigoSBS || '-' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estado -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Estado</label>
+                <div class="inline-flex items-center px-2 py-1 rounded-lg text-xs font-bold border"
+                    [ngClass]="data.estado === 'A' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'">
+                    <span class="w-1.5 h-1.5 rounded-full mr-1.5"
+                        [ngClass]="data.estado === 'A' ? 'bg-green-500' : 'bg-red-500'"></span>
+                    {{ data.estado === 'A' ? 'ACTIVO' : 'INACTIVO' }}
+                </div>
+            </div>
+
+            <!-- Titular -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Nombre del Titular</label>
+                <div class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800">
+                    {{ data.nombreTitular || '-' }}
+                </div>
+            </div>
+
+            <!-- Número Cuenta -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">Número de Cuenta</label>
+                <div
+                    class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800 font-mono tracking-wider">
+                    {{ data.numeroCuenta || '-' }}
+                </div>
+            </div>
+
+            <!-- CCI -->
+            <div>
+                <label class="block text-sm font-medium text-slate-500 mb-1">CCI (Interbancario)</label>
+                <div
+                    class="w-full px-3 py-2 border border-slate-200 bg-slate-50 rounded-lg text-sm text-slate-800 font-mono tracking-wider">
+                    {{ data.cci || '-' }}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-slate-50 flex justify-end border-t border-slate-100">
+            <button (click)="close()"
+                class="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors border border-slate-300 bg-white">
+                Cerrar
+            </button>
+        </div>
+
+    </div>
+</div>

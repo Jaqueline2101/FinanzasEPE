@@ -1,0 +1,243 @@
+<app-modal [isOpen]="isOpen" [title]="'Detalle de Pago Honorarios - ' + (pago?.nombreRazonSocial || '' )" size="xl"
+    iconType="info" (modalClose)="close()">
+
+    <div *ngIf="pago" class="space-y-8 animate-fadeIn pb-4">
+
+        <!-- 📌 SECCIÓN: INFORMACIÓN GENERAL -->
+        <div class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-file-invoice text-blue-500 text-sm"></i>
+                <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">Información del
+                    Comprobante</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Tipo de Pago</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.tipoPago || '-'
+                        }}</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Serie / Número</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">
+                        {{ (pago.serieComprobante || '') + (pago.numeroRecibo ? ' - ' + pago.numeroRecibo : '-') }}
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Fecha Emisión</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.fechaEmision |
+                        date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Periodo</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">
+                        {{ getMesNombre(pago.periodoMes) }} {{ pago.periodoAnio }}
+                    </span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Concepto de Pago</span>
+                <p
+                    class="text-xs font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                    {{ pago.conceptoPago || '-' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- 📌 SECCIÓN: DATOS DEL BENEFICIARIO -->
+        <div class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-user-tie text-blue-500 text-sm"></i>
+                <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">Datos del
+                    Beneficiario</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Nombre / Razón Social</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase">{{
+                        pago.nombreRazonSocial }}</span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Tipo / N° Documento</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.tipoBeneficiario }} - {{
+                        pago.numeroDocumento }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.areaServicio">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Área / Servicio</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.areaServicio }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.centroCosto">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Centro de Costo</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.centroCosto }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECCIÓN: MONTOS Y CONCEPTOS -->
+        <div class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-coins text-blue-500 text-sm"></i>
+                <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">Resumen
+                    Financiero</h3>
+            </div>
+
+            <div
+                class="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Monto Bruto</span>
+                    <span class="text-sm font-black text-slate-700 dark:text-slate-200">
+                        {{ pago.moneda === 'PEN' ? 'S/' : '$' }} {{ pago.montoBruto | number:'1.2-2' }}
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-red-400 uppercase">Retención (8%)</span>
+                    <span class="text-sm font-black text-red-600 dark:text-red-400">
+                        - {{ pago.moneda === 'PEN' ? 'S/' : '$' }} {{ (pago.retencion || 0) | number:'1.2-2' }}
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-red-400 uppercase">Otros Descuentos</span>
+                    <span class="text-sm font-black text-red-600 dark:text-red-400">
+                        - {{ pago.moneda === 'PEN' ? 'S/' : '$' }} {{ (pago.otrosDescuentos || 0) | number:'1.2-2' }}
+                    </span>
+                </div>
+                <div class="flex flex-col gap-1 bg-blue-600 p-3 rounded-xl shadow-lg shadow-blue-500/20">
+                    <span class="text-[9px] font-bold text-blue-100 uppercase">Importe Neto</span>
+                    <span class="text-base font-black text-white">
+                        {{ pago.moneda === 'PEN' ? 'S/' : '$' }} {{ pago.montoNeto | number:'1.2-2' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📌 SECCIÓN: FORMA DE PAGO -->
+        <div class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-credit-card text-blue-500 text-sm"></i>
+                <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">Detalles de Pago
+                </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Medio de Pago</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase">{{ pago.medioPago ||
+                        '-' }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.bancoDestino">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Banco Destino</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase">{{ pago.bancoDestino
+                        }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.numeroCuenta">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">N° Cuenta / CCI</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.numeroCuenta }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.codigoTransferencia">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Código Transferencia</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 underline">{{
+                        pago.codigoTransferencia }}</span>
+                </div>
+                <div class="flex flex-col gap-1" *ngIf="pago.fechaTransferencia">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase">Fecha Transferencia</span>
+                    <span class="text-xs font-black text-slate-700 dark:text-slate-200">{{ pago.fechaTransferencia |
+                        date:'dd/MM/yyyy' }}</span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-1" *ngIf="pago.observacionPago">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Observaciones</span>
+                <p class="text-xs font-medium text-slate-500 dark:text-slate-400 italic">
+                    "{{ pago.observacionPago }}"
+                </p>
+            </div>
+        </div>
+
+        <!-- 📌 SECCIÓN: DESGLOSE DE LIQUIDACIÓN (SI EXISTE) -->
+        <div *ngIf="pago.detalles && pago.detalles.length > 0" class="space-y-4">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-list-ul text-blue-500 text-sm"></i>
+                <h3 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">Desglose de
+                    Conceptos / Liquidación</h3>
+            </div>
+            <div class="overflow-hidden rounded-2xl border border-slate-100 dark:border-slate-800">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50 font-bold text-[10px] text-slate-400 uppercase">
+                            <th class="px-4 py-3">Concepto / Fechas</th>
+                            <th class="px-4 py-3 text-right">Montos Específicos</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        <tr *ngFor="let det of pago.detalles"
+                            class="text-xs hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+                            <td class="px-4 py-3">
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="font-black text-slate-700 dark:text-slate-200 uppercase">{{
+                                        det.nombreConcepto || 'Liquidación de Beneficios' }}</span>
+                                    <span class="text-[10px] text-slate-400" *ngIf="det.fechaIngreso">
+                                        Periodo: {{ det.fechaIngreso | date:'dd/MM/yyyy' }} - {{ det.fechaCese |
+                                        date:'dd/MM/yyyy' }}
+                                    </span>
+                                    <span class="text-[10px] text-blue-500 font-bold" *ngIf="det.tiempoTrabajado">
+                                        Tiempo Transcurrido: {{ det.tiempoTrabajado }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    <ng-container *ngIf="det.cts">
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">CTS:</span>
+                                        <span class="font-black text-slate-700 dark:text-slate-200">{{ pago.moneda ===
+                                            'PEN' ? 'S/' : '$' }} {{ det.cts | number:'1.2-2' }}</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="det.gratificacion">
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">GRATIF.:</span>
+                                        <span class="font-black text-slate-700 dark:text-slate-200">{{ pago.moneda ===
+                                            'PEN' ? 'S/' : '$' }} {{ det.gratificacion | number:'1.2-2' }}</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="det.vacacionesPendientes">
+                                        <span class="text-[9px] font-bold text-slate-400 uppercase">VACAC.:</span>
+                                        <span class="font-black text-slate-700 dark:text-slate-200">{{ pago.moneda ===
+                                            'PEN' ? 'S/' : '$' }} {{ det.vacacionesPendientes | number:'1.2-2' }}</span>
+                                    </ng-container>
+                                    <ng-container *ngIf="det.totalLiquidacion">
+                                        <span class="text-[9px] font-black text-blue-500 uppercase">SUBTOTAL:</span>
+                                        <span class="font-black text-blue-600 shadow-blue-500/10">{{ pago.moneda ===
+                                            'PEN' ? 'S/' : '$' }} {{ det.totalLiquidacion | number:'1.2-2' }}</span>
+                                    </ng-container>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 📌 SECCIÓN: AUDITORÍA -->
+        <div
+            class="bg-blue-50/50 dark:bg-blue-900/10 p-4 rounded-2xl border border-blue-100/50 dark:border-blue-800/30 flex flex-wrap gap-x-8 gap-y-4">
+            <div class="flex flex-col gap-0.5">
+                <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Registrado por</span>
+                <span class="text-xs font-bold text-blue-900 dark:text-blue-200 uppercase">{{ pago.usuarioRegistro ||
+                    'SISTEMA' }}</span>
+            </div>
+            <div class="flex flex-col gap-0.5" *ngIf="pago.fechaRegistro">
+                <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Fecha de Registro</span>
+                <span class="text-xs font-bold text-blue-900 dark:text-blue-200">{{ pago.fechaRegistro |
+                    date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="flex flex-col gap-0.5" *ngIf="pago.usuarioAprobacion">
+                <span class="text-[9px] font-black text-green-400 uppercase tracking-widest">Aprobado por</span>
+                <span class="text-xs font-bold text-green-700 dark:text-green-300 uppercase">{{ pago.usuarioAprobacion
+                    }}</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div footer>
+        <button (click)="close()"
+            class="px-8 py-2.5 bg-slate-900 hover:bg-black text-white font-black rounded-2xl shadow-xl active:scale-95 transition-all text-xs uppercase tracking-widest">
+            Cerrar Detalle
+        </button>
+    </div>
+
+</app-modal>

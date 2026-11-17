@@ -1,0 +1,75 @@
+<div
+    class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+
+    <!-- Breadcrumb -->
+    <div class="mb-3">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-3">
+        <app-page-header title="Anular Comprobante" [showCounter]="true" [counterValue]="totalElements">
+        </app-page-header>
+    </div>
+
+    <!-- ─── CARD PRINCIPAL ──────────────────────────────────────────────────── -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-4 md:p-6">
+        <!-- FILTROS -->
+        <app-barra-filtros 
+            [searchOptions]="searchOptions"
+            [showStatus]="false" 
+            [showDates]="true"
+            (onFilter)="onFilter($event)">
+        </app-barra-filtros>
+
+        <!-- ─── CONTENEDOR TABLA ─────────────────────────────────────────────── -->
+        <div class="relative min-h-[400px] flex flex-col gap-4 mt-6">
+
+            <!-- Info barra -->
+            <div class="flex justify-between items-center text-sm text-slate-500">
+                <span>
+                    Mostrando <strong class="text-slate-700">{{ ventasPaginadas.length }}</strong>
+                    de <strong class="text-slate-700">{{ totalElements }}</strong> comprobantes anulables
+                </span>
+                <span class="text-xs bg-rose-50 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-full font-semibold">
+                    <i class="fa-solid fa-shield-halved mr-1"></i> Solo ventas de hoy
+                </span>
+            </div>
+
+            <!-- Data Table -->
+            <app-tabla-general 
+                [columnas]="columnas" 
+                [datos]="ventasPaginadas" 
+                [loading]="isLoading"
+                [showActions]="false"
+                [showIndex]="true"
+                [currentPage]="paginaActual"
+                [pageSize]="tamanoPagina"
+                (onActionButton)="onAction($event)">
+            </app-tabla-general>
+
+            <!-- Estado vacío -->
+            <div *ngIf="!isLoading && ventasPaginadas.length === 0"
+                class="flex flex-col items-center justify-center py-16 text-slate-400">
+                <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-3">
+                    <i class="fa-solid fa-receipt text-2xl text-slate-300"></i>
+                </div>
+                <p class="font-semibold text-slate-500 text-sm">No hay comprobantes para anular</p>
+                <p class="text-xs mt-1">Todos los comprobantes del día están anulados o no hay ventas registradas.</p>
+            </div>
+
+            <!-- Paginación -->
+            <div *ngIf="ventasPaginadas.length > 0">
+                <app-pagination [currentPage]="paginaActual" [pageSize]="tamanoPagina" [totalPages]="totalPages"
+                    (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+                </app-pagination>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de anulación — componente separado en modal-anular/ -->
+<app-modal-anular *ngIf="mostrarModal && ventaSeleccionada" [venta]="ventaSeleccionada" [anulando]="anulando"
+    (confirmar)="confirmarAnulacion($event)" (cancelar)="cerrarModal()">
+</app-modal-anular>

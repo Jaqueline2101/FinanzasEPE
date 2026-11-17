@@ -1,0 +1,5 @@
+/* Estilos específicos para la calculadora de precios si fueran necesarios */
+.animate-in {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}

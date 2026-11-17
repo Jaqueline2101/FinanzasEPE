@@ -1,0 +1,326 @@
+<div
+    class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden animate-fadeIn h-auto max-h-[calc(100vh-100px)] flex flex-col">
+
+    <!-- Header del Modal (Integrado) -->
+    <header class="h-10 flex items-center justify-between px-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 sticky top-0 z-10">
+        <div class="flex items-center gap-3">
+            <button (click)="close()"
+                class="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-all group">
+                <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-white" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+            </button>
+            <h1 class="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">
+                {{ pago ? 'Editar Registro de Pago' : 'Nuevo Registro de Pago' }}
+            </h1>
+        </div>
+    </header>
+
+    <!-- Layout de dos columnas -->
+    <div class="form-two-col flex-1 overflow-hidden">
+
+        <!-- COLUMNA IZQUIERDA: Datos Generales + Beneficiario -->
+        <div class="form-col">
+            <form [formGroup]="form">
+
+                <!-- SECCIÓN: DATOS GENERALES -->
+                <section class="animate-fadeIn">
+                    <div class="section-title">
+                        <i class="fas fa-file-invoice text-blue-500 text-xs"></i>
+                        <h2>Datos Generales</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="col-span-2 space-y-1 group">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 group-focus-within:text-blue-500 transition-colors uppercase tracking-wider">TIPO
+                                DE PAGO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <select formControlName="tipoPago"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 outline-none transition-all text-sm font-medium">
+                                <option value="HONORARIO">Recibo por Honorario</option>
+                                <option value="LIQUIDACIÓN">Liquidación</option>
+                                <option value="ADELANTO">Adelanto</option>
+                                <option value="OTRO">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">SERIE</label>
+                            <input type="text" formControlName="serieComprobante" placeholder="E001"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">NÚMERO
+                                RECIBO</label>
+                            <input type="text" formControlName="numeroRecibo" placeholder="000123"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">FECHA
+                                EMISIÓN <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <input type="date" formControlName="fechaEmision"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">PERIODO
+                                (MES)</label>
+                            <select formControlName="periodoMes"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                                <option *ngFor="let m of meses" [value]="m.id">{{ m.nombre }}</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">PERIODO
+                                (AÑO)</label>
+                            <input type="number" formControlName="periodoAnio"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="col-span-2 space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CONCEPTO
+                                DE PAGO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <textarea formControlName="conceptoPago" rows="3"
+                                placeholder="Pago por servicios médicos de guardia..."
+                                class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm resize-none"></textarea>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: BENEFICIARIO -->
+                <section class="animate-fadeIn mt-4">
+                    <div class="section-title">
+                        <i class="fas fa-user-tie text-blue-500 text-xs"></i>
+                        <h2>Beneficiario</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">TIPO
+                                BENEFICIARIO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <select formControlName="tipoBeneficiario"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                                <option value="TRABAJADOR">Trabajador</option>
+                                <option value="MEDICO">Médico</option>
+                                <option value="PROVEEDOR">Proveedor Externo</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">NÚMERO
+                                DOCUMENTO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <input type="text" formControlName="numeroDocumento" placeholder="DNI / RUC"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="col-span-2 space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">NOMBRE
+                                / RAZÓN SOCIAL <span class="text-rose-500 text-xl leading-none">*</span></label>
+                             <input type="text" formControlName="nombreRazonSocial" placeholder="nombre completo"
+                                 class="compact-input name-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm font-bold uppercase">
+                        </div>
+                    </div>
+                </section>
+
+            </form>
+        </div>
+
+        <!-- COLUMNA DERECHA: Montos y Cálculo + Forma de Pago -->
+        <div class="form-col">
+            <form [formGroup]="form">
+
+                <!-- SECCIÓN: MONTOS -->
+                <section class="animate-fadeIn">
+                    <div class="section-title">
+                        <i class="fas fa-calculator text-blue-500 text-xs"></i>
+                        <h2>Montos y Cálculo</h2>
+                    </div>
+                    <div
+                        class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label
+                                    class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">MONTO
+                                    BRUTO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                                <div class="relative">
+                                    <span
+                                        class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">{{
+                                        form.get('moneda')?.value === 'PEN' ? 'S/' : '$' }}</span>
+                                    <input type="number" formControlName="montoBruto"
+                                        (focus)="onFocusInput('montoBruto')" (blur)="onBlurInput('montoBruto')"
+                                        [class.opacity-40]="form.get('montoBruto')?.value === 0"
+                                        class="compact-input w-full pl-9 pr-3 bg-white dark:bg-slate-800 border-2 border-blue-100 dark:border-slate-700 rounded-xl focus:border-blue-500 focus:opacity-100 outline-none transition-all text-base font-black text-slate-800 dark:text-slate-100 shadow-sm">
+                                </div>
+                            </div>
+
+                            <div class="space-y-1">
+                                <label
+                                    class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">RETENCIÓN
+                                </label>
+                                <div class="flex gap-1.5">
+                                    <!-- Select de Porcentaje -->
+                                    <select formControlName="porcentajeRetencion"
+                                        class="compact-input w-24 px-2 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm font-bold text-slate-700">
+                                        <option [value]="3">3%</option>
+                                        <option [value]="5">5%</option>
+                                        <option [value]="6">6%</option>
+                                        <option [value]="7">7%</option>
+                                        <option [value]="8">8%</option>
+                                        <option [value]="9">9%</option>
+                                        <option [value]="10">10%</option>
+                                    </select>
+                                    
+                                    <!-- Monto Calculado -->
+                                    <div class="relative flex-1">
+                                        <input type="number" formControlName="retencion" 
+                                            class="compact-input w-full pl-3 pr-8 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl outline-none text-base font-bold text-red-500 cursor-not-allowed"
+                                            readonly>
+                                        <i class="fas fa-calculator absolute right-3 top-1/2 -translate-y-1/2 text-slate-300 text-[10px]"
+                                            title="Calculado automáticamente"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="space-y-1">
+                                <label
+                                    class="flex items-center gap-1 h-4 compact-label block text-[10px] font-bold text-slate-400 uppercase">MONEDA
+                                    <span class="text-rose-500 text-xl leading-none">*</span></label>
+                                <div class="flex items-center justify-between pt-1">
+                                    <div class="flex gap-2">
+                                        <button type="button" (click)="form.get('moneda')?.setValue('PEN')"
+                                            [class]="form.get('moneda')?.value === 'PEN' ? 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/30' : 'px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-500 rounded-lg text-xs font-bold'">SOL</button>
+                                        <button type="button" (click)="form.get('moneda')?.setValue('USD')"
+                                            [class]="form.get('moneda')?.value === 'USD' ? 'px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold shadow-md shadow-blue-500/30' : 'px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-500 rounded-lg text-xs font-bold'">USD</button>
+                                    </div>
+
+                                    <!-- Importe Neto Aligned Horizontally -->
+                                    <div class="text-right">
+                                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-0">NETO A PAGAR</p>
+                                        <p class="text-2xl font-black text-slate-900 dark:text-white leading-none">
+                                            <span class="text-sm align-top mr-1">{{ form.get('moneda')?.value === 'PEN' ? 'S/' : '$' }}</span>
+                                            {{ form.get('montoNeto')?.value | number:'1.2-2' }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div *ngIf="form.get('moneda')?.value === 'USD'" class="mt-1">
+                                    <label class="inline-block text-[9px] font-bold text-slate-400 uppercase mb-0.5 mr-2">T. CAMBIO:</label>
+                                    <input type="number" formControlName="tipoCambio"
+                                        class="w-16 bg-transparent outline-none font-bold text-sm text-blue-600 border-b border-blue-200">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN: FORMA DE PAGO -->
+                <section class="animate-fadeIn mt-4">
+                    <div class="section-title">
+                        <i class="fas fa-university text-blue-500 text-xs"></i>
+                        <h2>Forma de Pago</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center gap-1 h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">MEDIO
+                                DE PAGO <span class="text-rose-500 text-xl leading-none">*</span></label>
+                            <select formControlName="medioPago"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                                <option value="TRANSFERENCIA">Transferencia Bancaria</option>
+                                <option value="CHEQUE">Cheque</option>
+                                <option value="EFECTIVO">Efectivo</option>
+                                <option value="DEPOSITO">Depósito</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">BANCO
+                                DESTINO</label>
+                            <input type="text" formControlName="bancoDestino"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">NÚMERO
+                                DE CUENTA / CCI</label>
+                            <input type="text" formControlName="numeroCuenta"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">CÓDIGO
+                                DE TRANSFERENCIA</label>
+                            <input type="text" formControlName="codigoTransferencia"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                        <div class="space-y-1">
+                            <label
+                                class="flex items-center h-4 compact-label block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">FECHA
+                                TRANSFERENCIA</label>
+                            <input type="date" formControlName="fechaTransferencia"
+                                class="compact-input w-full px-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl focus:border-blue-500 outline-none transition-all text-sm">
+                        </div>
+
+                    </div>
+                </section>
+
+                          <!-- Sección de Acciones (Relocalizada a la derecha) -->
+                        <div class="mt-4 p-4 actions-panel bg-slate-50/50 dark:bg-slate-800/30 border-2 border-slate-200 dark:border-slate-700 rounded-2xl space-y-4">
+                            <!-- Formatos -->
+                            <div class="flex items-center justify-between px-1">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">FORMATO:</p>
+                                <div class="flex gap-2">
+                                    <div *ngFor="let f of formatOptions" class="relative group flex items-center">
+                                        <button (click)="toggleFormato(f)" type="button"
+                                            [class]="formatoImpresion === f 
+                                                ? 'pl-3 pr-8 py-1.5 bg-indigo-600 text-white rounded-lg text-[10px] font-black shadow-md border-2 border-indigo-400 shadow-indigo-500/30' 
+                                                : 'pl-3 pr-8 py-1.5 bg-white dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 text-slate-500 rounded-lg text-[10px] font-bold hover:bg-slate-100 dark:hover:bg-slate-700 transition-all'"
+                                            class="min-w-[50px] text-center">
+                                            {{ f.replace('TICKET_', '') }}
+                                        </button>
+                                        <button (click)="previsualizar(f, $event)" type="button"
+                                            class="absolute right-1 p-1 text-emerald-500 hover:text-emerald-600 transition-all"
+                                            title="Previsualizar">
+                                            <i class="fas fa-eye text-[10px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="flex gap-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                                <button (click)="close()" type="button"
+                                    class="flex-1 py-2.5 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-xs uppercase tracking-wide">
+                                    CANCELAR
+                                </button>
+                                <button (click)="save()" [disabled]="form.invalid" type="button"
+                                    class="flex-[2] py-2.5 bg-indigo-600 border-2 border-indigo-400 text-white font-black rounded-xl shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 active:scale-95 transition-all text-xs uppercase flex items-center justify-center gap-2 disabled:opacity-50 disabled:shadow-none">
+                                    <i class="fas transition-transform group-hover/btn:scale-110"
+                                        [ngClass]="formatoImpresion ? 'fa-print' : 'fa-save'"></i>
+                                    <span>
+                                        {{ formatoImpresion ? 'GUARDAR E IMPRIMIR' : 'GUARDAR' }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <app-alertas></app-alertas>
+        </div>

@@ -1,0 +1,22 @@
+// Custom theme file - Angular Material removed
+// Basic styling for the application
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+body {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #1f2937;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}

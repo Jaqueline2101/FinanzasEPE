@@ -1,0 +1,91 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6 animate-fadeIn">
+    <ng-container *ngIf="!isFullScreenView">
+        <div class="px-4 sm:px-6 lg:px-8 mb-6">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        </div>
+
+        <div class="px-4 sm:px-6 lg:px-8 mb-8">
+            <app-page-header title="Pago Rec. Honorarios"
+                subtitle="Gestión y registro de pagos a trabajadores, médicos y externos" icon="fas fa-wallet"
+                [counterValue]="registros.length" counterLabel="Registros totales">
+            </app-page-header>
+        </div>
+
+        <div class="px-4 sm:px-6 lg:px-8 pb-8">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+                
+                <!-- Barra de Filtros -->
+                <app-barra-filtros 
+                    placeholder="Buscar por beneficiario, concepto o documento..." 
+                    [searchOptions]="searchOptions"
+                    [estadoOptions]="tipoPagoOptions"
+                    (onFilter)="onFilter($event)">
+                </app-barra-filtros>
+
+                <!-- Acción: Nuevo Pago -->
+                <div class="flex justify-end gap-3 py-2 border-t border-slate-50 dark:border-slate-800/50 pt-6">
+                    <app-primary-button 
+                        label="NUEVO PAGO" 
+                        icon="plus" 
+                        color="brand"
+                        size="lg"
+                        (btnClick)="abrirNuevo()">
+                    </app-primary-button>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <app-tabla-general 
+                    [columnas]="columnas" 
+                    [datos]="paginatedRegistros" 
+                    [loading]="loading"
+                    [showViewDetails]="true" 
+                    (onEdit)="editar($event)" 
+                    (viewDetails)="verDetalle($event)">
+                </app-tabla-general>
+
+                <!-- Paginación -->
+                <div class="p-4">
+                    <app-pagination 
+                        [currentPage]="currentPage" 
+                        [totalPages]="totalPages" 
+                        [pageSize]="pageSize"
+                        (pageChange)="onPageChange($event)" 
+                        (pageSizeChange)="onPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Vista de Formulario (Integrada) -->
+    <ng-container *ngIf="isFullScreenView">
+        <div class="px-4 sm:px-6 lg:px-8 mb-6">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        </div>
+        <div class="mt-4">
+            <app-modal-honorarios [pago]="selectedPago" (onClose)="onCancelForm()" (onSave)="onSave($event)"
+                (onPreview)="onPreview($event)">
+            </app-modal-honorarios>
+        </div>
+    </ng-container>
+
+    <!-- Modal de Detalle -->
+    <app-modal-detalle-honorarios [isOpen]="showDetalleModal" [pago]="selectedPago" (onClose)="cerrarDetalle()">
+    </app-modal-detalle-honorarios>
+
+    <!-- Modal de Previsualización (Estilo Ventas) -->
+    <app-modal [isOpen]="showPreviewModal" (modalClose)="closePreviewModal()"
+        [title]="'Previsualización de Impresión: ' + previewFormat.replace('TICKET_', '')" size="lg">
+        <div class="bg-slate-50 p-4 rounded-xl">
+            <app-pagorec-formato-impresion [formato]="previewFormat" [pago]="selectedPago" [ventaInfo]="printVentaInfo">
+            </app-pagorec-formato-impresion>
+        </div>
+    </app-modal>
+
+    <!-- Componente de Impresión (Oculto) -->
+    <div id="print-section-honorarios" style="display: none;">
+        <app-pagorec-formato-impresion [formato]="selectedPrintFormat" [pago]="selectedPago"
+            [ventaInfo]="printVentaInfo">
+        </app-pagorec-formato-impresion>
+    </div>
+</div>

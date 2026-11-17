@@ -1,0 +1,70 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6">
+    <!-- Breadcrumb -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-4">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <!-- Page Header -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-8">
+        <app-page-header title="Gestión de Operaciones"
+            subtitle="Administra cajas, cuentas y transferencias de la clínica" icon="fas fa-file-invoice-dollar"
+            [showCounter]="false">
+        </app-page-header>
+    </div>
+
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="space-y-6">
+            <!-- Tarjeta Principal de Filtros y Tabla -->
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+
+                <!-- Barra de Filtros Avanzada -->
+                <app-barra-filtros placeholder="Buscar por concepto, banco o comprobante..."
+                    [searchOptions]="searchOptions" [estadoOptions]="estadoOptions" [showDates]="true"
+                    (onFilter)="onFilter($event)">
+                </app-barra-filtros>
+
+                <!-- Acciones Principales -->
+                <div class="flex flex-wrap justify-end gap-3 py-2 border-t border-slate-50 pt-6">
+                    <app-primary-button label="Nueva Operación" icon="plus" color="green"
+                        (btnClick)="openOperacionModal()">
+                    </app-primary-button>
+
+                    <app-primary-button label="Cierre de Caja" icon="save" color="slate"
+                        (btnClick)="openTransferModal(true)">
+                    </app-primary-button>
+
+                    <app-primary-button label="Nueva Transferencia" icon="upload" color="blue"
+                        (btnClick)="openTransferModal(false)">
+                    </app-primary-button>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <app-tabla-general [datos]="movimientosTabla" [columnas]="columnasTabla" [loading]="isLoadingHistorial"
+                    [currentPage]="currentPage" [pageSize]="pageSize" [showEdit]="false" [showDelete]="false"
+                    [showViewDetails]="true" (viewDetails)="onViewDetail($event)">
+                </app-tabla-general>
+
+                <!-- Paginación -->
+                <div class="p-4">
+                    <app-pagination [currentPage]="currentPage + 1" [totalPages]="totalPages" [pageSize]="pageSize"
+                        (pageChange)="onPageChange($event - 1)" (pageSizeChange)="onPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <app-modal-detalle [show]="showDetailModal" [movimiento]="selectedMovimiento" (close)="showDetailModal = false">
+    </app-modal-detalle>
+
+    <app-modal-transferencia [show]="showTransferModal" [cuentas]="cuentas" [transferencia]="transferencia"
+        [isLoading]="isLoading" [isCierreCaja]="transferencia.descripcion === 'CIERRE DE CAJA AUTOMÁTICO'"
+        (close)="closeModal()" (submit)="onSubmitTransfer()">
+    </app-modal-transferencia>
+
+    <app-modal-operacion [show]="showOperacionModal" [cuentas]="cuentas" [movimiento]="movimiento"
+        [isLoading]="isLoading" (close)="closeOperacionModal()" (submit)="onSubmitOperacion()">
+    </app-modal-operacion>
+</div>

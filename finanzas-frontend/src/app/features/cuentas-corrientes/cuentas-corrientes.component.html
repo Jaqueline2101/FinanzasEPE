@@ -1,0 +1,84 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6 animate-fadeIn">
+    <!-- Breadcrumb -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-4">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-8">
+        <app-page-header 
+            title="Cuentas Corrientes" 
+            subtitle="Gestión de Cuentas Bancarias de la Clínica"
+            [counterValue]="allCuentas.length" 
+            [showCounter]="true" 
+            icon="fas fa-university">
+        </app-page-header>
+    </div>
+
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="space-y-6">
+            <!-- Tarjeta Principal de Filtros y Tabla -->
+            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+                
+                <!-- Barra de Filtros avanzada -->
+                <app-barra-filtros 
+                    placeholder="Buscar por banco o n° de cuenta..."
+                    [searchOptions]="searchOptions"
+                    [showDates]="false"
+                    (onFilter)="onFilter($event)">
+                </app-barra-filtros>
+
+                <!-- Acciones Principales (Debajo de los filtros) -->
+                <div class="flex justify-end gap-3 py-2 border-t border-slate-50 pt-6">
+                    <app-primary-button 
+                        label="Nueva Cuenta" 
+                        icon="plus" 
+                        color="brand"
+                        (btnClick)="openModal()">
+                    </app-primary-button>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <app-tabla-general 
+                        [datos]="displayedCuentas()" 
+                        [columnas]="columnas" 
+                        [loading]="loading()" 
+                        [showDelete]="true"
+                        [showViewDetails]="true" 
+                        tituloAcciones="Acciones" 
+                        (onDelete)="deleteCuenta($event.idCuenta)"
+                        (onEdit)="openModal($event)" 
+                        (viewDetails)="openDetail($event)">
+                    </app-tabla-general>
+
+                    <!-- Paginación -->
+                    <div class="p-4 border-t border-slate-50 dark:border-slate-800">
+                        <app-pagination 
+                            [currentPage]="currentPage + 1" 
+                            [totalPages]="totalPages" 
+                            [pageSize]="pageSize"
+                            (pageChange)="onPageChange($event - 1)" 
+                            (pageSizeChange)="onPageSizeChange($event)">
+                        </app-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <app-cuenta-corriente-modal 
+        [isOpen]="isModalOpen" 
+        [isEdit]="isEditMode" 
+        [data]="currentCuenta"
+        (onClose)="closeModal()" 
+        (onSave)="saveCuenta($event)">
+    </app-cuenta-corriente-modal>
+
+    <app-detalle-corrientes 
+        [isOpen]="isDetailOpen" 
+        [data]="detailCuenta" 
+        (onClose)="closeDetail()">
+    </app-detalle-corrientes>
+</div>

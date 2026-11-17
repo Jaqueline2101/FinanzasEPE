@@ -1,0 +1,99 @@
+<div class="min-h-screen bg-linear-to-br from-slate-50 to-blue-50/30 pb-8 pt-6">
+    <!-- BREADCRUMB -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-2">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <!-- HEADER -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-6">
+        <app-page-header title="Cuentas por Pagar" subtitle="Gestión centralizada de compras y vencimientos"
+            [showCounter]="true" counterLabel="Facturas Pendientes" [counterValue]="filteredCompras.length">
+        </app-page-header>
+    </div>
+
+    <!-- STATS DASHBOARD (Nivel Factura/Compra) -->
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <!-- Deuda Total Global -->
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between animate-fade-in-up">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Deuda Total Pendiente</p>
+                    <h3 class="text-2xl font-black text-slate-800 break-all leading-none mt-1">S/ {{ totalDeudaGlobal | number:'1.2-2' }}</h3>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+            </div>
+
+            <!-- Al día -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500 flex items-center justify-between animate-fade-in-up" [style.animation-delay]="'100ms'">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sin Vencimientos Próximos</p>
+                    <h3 class="text-2xl font-black text-slate-800 lowercase leading-none mt-1">{{ countVerde }} <span class="text-xs font-medium text-slate-400">compras</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center">
+                    <i class="fas fa-shield-alt text-lg"></i>
+                </div>
+            </div>
+
+            <!-- Por Vencer -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-amber-400 flex items-center justify-between animate-fade-in-up" [style.animation-delay]="'200ms'">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Vence Pronto (< 3 días)</p>
+                    <h3 class="text-2xl font-black text-slate-800 lowercase leading-none mt-1">{{ countAmbar }} <span class="text-xs font-medium text-slate-400">compras</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center">
+                    <i class="fas fa-clock text-lg"></i>
+                </div>
+            </div>
+
+            <!-- Vencidas -->
+            <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-red-500 flex items-center justify-between animate-fade-in-up" [style.animation-delay]="'300ms'">
+                <div>
+                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Con Cuotas Vencidas</p>
+                    <h3 class="text-2xl font-black text-slate-800 lowercase leading-none mt-1">{{ countRojo }} <span class="text-xs font-medium text-slate-400">compras</span></h3>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle text-lg"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL (Card unificado estilo Productos) -->
+    <div class="px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 animate-fade-in">
+            <div class="space-y-6">
+                <!-- Barra de Filtros -->
+                <app-barra-filtros 
+                    placeholder="Buscar por proveedor o documento..."
+                    [searchOptions]="searchOptions"
+                    [estadoOptions]="estadoOptions"
+                    (onFilter)="onFilter($event)">
+                </app-barra-filtros>
+
+                <!-- Tabla General -->
+                <div class="overflow-hidden rounded-xl border border-slate-200">
+                    <app-tabla-general [columnas]="columnas" [datos]="filteredCompras" [loading]="loading" [showEdit]="false"
+                        [showDelete]="false" [showLinkAction]="true" linkActionLabel="Pagos" linkActionIcon="fa-cog"
+                        (onLinkAction)="onActionClick($event)">
+                    </app-tabla-general>
+                </div>
+
+                <!-- Pagination -->
+                <div>
+                    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                        [pageSizeOptions]="[10, 20, 50, 100]" (pageChange)="onPageChange($event)"
+                        (pageSizeChange)="onPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE DETALLE Y PAGOS -->
+    <app-pagos-modal [isOpen]="showModalDetalle" [compra]="selectedCompra" (onClose)="closeModal()"
+        (onPagoRealizado)="onPagoExitoso()">
+    </app-pagos-modal>
+
+</div>

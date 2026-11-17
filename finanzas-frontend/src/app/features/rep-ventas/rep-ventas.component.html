@@ -1,0 +1,81 @@
+<div class="animate-fadeIn p-6 min-h-screen bg-slate-50 dark:bg-slate-950">
+    
+    <!-- 1. Breadcrumb -->
+    <div class="mb-4">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- 2. Header -->
+    <div class="mb-4">
+        <app-page-header 
+            title="Reporte de Ventas" 
+            [showCounter]="true"
+            counterLabel="Registros"
+            [counterValue]="resumen.detalleVentas.totalElements || 0"
+            iconType="chart">
+        </app-page-header>
+    </div>
+
+    <!-- 3. Acciones Superiores (Exportar Excel) -->
+    <div class="flex justify-end items-center mb-6">
+        <button (click)="exportarExcel()" [disabled]="isLoading || !resumen.detalleVentas.content.length"
+            class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-2 text-[12px] uppercase tracking-wider disabled:opacity-50">
+            <i class="fa-solid fa-file-excel text-lg"></i>
+            <span>Exportar Excel</span>
+        </button>
+    </div>
+
+    <!-- 4. CARD ÚNICO (Filtros + Tabla + Paginación) -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        
+        <!-- Barra de Filtros -->
+        <div class="p-4">
+            <app-barra-filtros 
+                placeholder="Comprobante, DNI o Paciente..."
+                [searchOptions]="searchOptions"
+                [estadoOptions]="ventasEstadoOptions"
+                statusLabel="Estado"
+                (onFilter)="handleFilter($event)">
+            </app-barra-filtros>
+        </div>
+
+        <!-- Table Area -->
+        <div class="overflow-hidden px-4">
+            <app-tabla-general 
+                [datos]="resumen.detalleVentas.content || []" 
+                [columnas]="columnasTabla"
+                [loading]="isLoading"
+                [showIndex]="true"
+                [autoSort]="false"
+                [currentPage]="paginaActual"
+                [pageSize]="tamanoPagina"
+                [showEdit]="false"
+                [showDelete]="false"
+                [showViewDetails]="false"
+                [showActions]="true"
+                [showLinkAction]="true"
+                linkActionLabel="Ver Comprobante"
+                (onLinkAction)="onVerDetalle($event)">
+            </app-tabla-general>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 bg-slate-50/30 dark:bg-slate-800/50">
+            <app-pagination 
+                [currentPage]="paginaActual" 
+                [pageSize]="tamanoPagina" 
+                [totalPages]="resumen.detalleVentas.totalPages || 0"
+                (pageChange)="onPageChange($event)" 
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+
+    <!-- Modal de Detalle -->
+    <app-modal-detalle 
+        *ngIf="selectedVenta" 
+        [venta]="selectedVenta" 
+        (onClose)="selectedVenta = null">
+    </app-modal-detalle>
+
+</div>

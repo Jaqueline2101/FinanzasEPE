@@ -1,0 +1,113 @@
+<div class="p-6 bg-gray-50/50 min-h-screen">
+  
+  <!-- 1. Breadcrumb (SEPARADO) -->
+  <app-breadcrumb 
+    class="block mb-4"
+    [items]="breadcrumbItems" 
+    [showIcon]="true" 
+    [showBackButton]="true">
+  </app-breadcrumb>
+
+  <!-- 2. Encabezado (Page Header) (SEPARADO) -->
+  <app-page-header 
+    class="block mb-8"
+    title="Reporte de Descuentos" 
+    subtitle="Visualiza y audita todas las autorizaciones de descuentos otorgadas en ventas."
+    iconType="audit"
+    [showCounter]="true"
+    [counterValue]="reporteData.length">
+  </app-page-header>
+
+  <!-- Panel de Filtros y Acciones (Tarjeta separada con border y elevación Z para el dropdown) -->
+  <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100 relative z-40 mb-8">
+    <div class="flex flex-col lg:flex-row gap-6 items-end">
+      
+      <!-- Selector de Búsqueda y Estado Combinado -->
+      <div class="flex-1 w-full relative">
+        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Filtro y Búsqueda</label>
+        <app-search-generic 
+          [options]="searchOptions" 
+          placeholder="Buscar por DNI o nombre de paciente..."
+          (onSearch)="onSearch($event)">
+        </app-search-generic>
+      </div>
+
+      <!-- Rango de Fechas -->
+      <div class="w-full md:w-auto space-y-2">
+        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Desde</label>
+        <div class="relative group min-w-[160px]">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 group-hover:text-primary-500 transition-colors">
+            <i class="far fa-calendar-alt text-xs"></i>
+          </span>
+          <input type="date" [(ngModel)]="filtros.fechaInicio" (change)="generarReporte()"
+                 class="block w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-primary-500/20 focus:bg-white transition-all">
+        </div>
+      </div>
+
+      <div class="w-full md:w-auto space-y-2">
+        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Hasta</label>
+        <div class="relative group min-w-[160px]">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 group-hover:text-primary-500 transition-colors">
+            <i class="far fa-calendar-alt text-xs"></i>
+          </span>
+          <input type="date" [(ngModel)]="filtros.fechaFin" (change)="generarReporte()"
+                 class="block w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm text-gray-700 focus:ring-2 focus:ring-primary-500/20 focus:bg-white transition-all">
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="flex items-center gap-3 pb-1">
+        <button (click)="limpiarFiltros()" 
+                class="flex items-center gap-2 px-4 py-2.5 bg-blue-50 border border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 group shadow-sm shadow-blue-100/50"
+                title="Restablecer filtros">
+          <i class="fas fa-undo-alt text-xs group-hover:-rotate-45 transition-transform"></i>
+          <span class="text-[10px] font-bold uppercase tracking-wider">Restablecer</span>
+        </button>
+
+        <div class="h-8 w-px bg-gray-100 mx-1"></div>
+
+        <button (click)="exportarExcel()" 
+                class="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-all duration-300 font-bold shadow-lg shadow-emerald-200/50 text-xs uppercase tracking-wider transform hover:scale-105 active:scale-95">
+          <i class="fas fa-file-excel text-sm"></i>
+          <span>Exportar Excel</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Tabla de Datos -->
+  <div class="relative min-h-[200px]">
+      <!-- Overlay de Carga -->
+      <div *ngIf="isLoading"
+           class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex flex-col items-center justify-center transition-all">
+        <div class="w-12 h-12 border-4 border-slate-200 border-t-primary-600 rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm font-medium text-slate-500">Cargando reporte...</p>
+      </div>
+
+    <!-- 4. Tabla de Resultados (Componente independiente) -->
+    <div class="overflow-x-auto">
+      <app-tabla-general 
+        [datos]="reporteData" 
+        [columnas]="columnasTabla" 
+        [loading]="isLoading"
+        [showEdit]="false"
+        [showDelete]="false"
+        [showViewDetails]="true"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        (viewDetails)="onVerDetalle($event)">
+      </app-tabla-general>
+    </div>
+
+    <!-- 5. Paginación (Solo Frontend) -->
+    <div class="mt-4 px-2">
+      <app-pagination
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)">
+      </app-pagination>
+    </div>
+  </div>
+</div>

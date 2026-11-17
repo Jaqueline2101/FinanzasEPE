@@ -1,0 +1,95 @@
+<!-- Backdrop + centering wrapper — solo visible cuando visible=true -->
+<div *ngIf="visible" class="fixed inset-0 z-50 flex items-center justify-center">
+
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+    <!-- Panel -->
+    <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-base font-semibold text-gray-800">{{ titulo }}</h3>
+            <button (click)="cerrar()"
+                class="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 py-5 flex flex-col gap-4">
+
+            <!-- Código -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">
+                    Código <span class="text-red-500">*</span>
+                </label>
+                <input [(ngModel)]="form.codigo" (input)="formatearCodigo($event)" maxlength="7"
+                    placeholder="Ej: GEN-231"
+                    class="w-full px-3 py-2 border rounded-lg text-sm font-mono tracking-wider transition-colors outline-none"
+                    [ngClass]="codigoValido() || !form.codigo
+                        ? 'border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-200'
+                        : 'border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-200'" />
+                <p class="text-xs text-gray-400">3 letras + guion + 3 números (Ej: GEN-231)</p>
+                <p *ngIf="form.codigo && !codigoValido()" class="text-xs text-red-500">
+                    Formato inválido. Use 3 letras, guión y 3 números.
+                </p>
+            </div>
+
+            <!-- Nombre -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">
+                    Nombre <span class="text-red-500">*</span>
+                </label>
+                <input [(ngModel)]="form.nombre" placeholder="Nombre del descuento" maxlength="100"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-colors" />
+            </div>
+
+            <!-- Fechas -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gray-700">Fecha Inicio</label>
+                    <input type="date" [(ngModel)]="form.fechaInicio"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-colors" />
+                </div>
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-sm font-medium text-gray-700">Fecha Fin</label>
+                    <input type="date" [(ngModel)]="form.fechaFin"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200 transition-colors" />
+                </div>
+            </div>
+
+            <!-- Estado -->
+            <div class="flex flex-col gap-1.5">
+                <label class="text-sm font-medium text-gray-700">Estado</label>
+                <div class="flex items-center gap-3">
+                    <button type="button" (click)="form.estado = form.estado === '1' ? '0' : '1'"
+                        class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none"
+                        [ngClass]="form.estado === '1' ? 'bg-green-500' : 'bg-gray-300'">
+                        <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform"
+                            [ngClass]="form.estado === '1' ? 'translate-x-6' : 'translate-x-1'">
+                        </span>
+                    </button>
+                    <span class="text-sm font-medium"
+                        [ngClass]="form.estado === '1' ? 'text-green-600' : 'text-gray-400'">
+                        {{ form.estado === '1' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <button (click)="cerrar()"
+                class="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                Cancelar
+            </button>
+            <button (click)="guardar()" [disabled]="!formularioValido() || guardando"
+                class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors"
+                [ngClass]="formularioValido() && !guardando ? 'bg-[#1E293B] hover:bg-[#2d3f55] cursor-pointer' : 'bg-gray-300 cursor-not-allowed'">
+                {{ labelBoton }}
+            </button>
+        </div>
+
+    </div>
+</div>

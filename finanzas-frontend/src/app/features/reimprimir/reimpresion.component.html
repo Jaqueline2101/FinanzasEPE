@@ -1,0 +1,143 @@
+<div class="rp-wrapper">
+
+  <!-- Breadcrumb and Page Header -->
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <app-page-header title="Reimpresión de Documentos"
+    subtitle="Busca y descarga documentos ya registrados en el sistema." iconType="document" [showCounter]="true"
+    counterLabel="Documentos" [counterValue]="documentos.length">
+  </app-page-header>
+
+  <!-- Tarjeta Principal Unificada -->
+  <div class="mt-2 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+    
+    <!-- Filtros de Búsqueda -->
+    <div class="relative z-[70]">
+      <app-barra-filtros 
+        placeholder="Escribe serie, número o cliente..."
+        [searchOptions]="moduleOptions"
+        [showDates]="true"
+        [initialDesde]="filtros.fechaDesde || ''"
+        [initialHasta]="filtros.fechaHasta || ''"
+        (onFilter)="onFilter($event)">
+      </app-barra-filtros>
+    </div>
+
+    <!-- Tabla de Resultados -->
+    <div class="relative z-10">
+      <app-tabla-general [datos]="documentosPaginados" [columnas]="columnas" [loading]="loading" [showViewDetails]="true"
+        [showPrint]="true" [showEdit]="false" [showDelete]="false" [currentPage]="currentPage" [pageSize]="pageSize"
+        (viewDetails)="verDetalle($event)" (onPrint)="abrirSelectorFormato($event)">
+      </app-tabla-general>
+
+      <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+        [recordsLabel]="'documentos'" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+      </app-pagination>
+    </div>
+  </div>
+
+</div>
+
+<!-- El modal de detalle ahora se maneja vía app-modal-detalle al final del archivo -->
+
+<!-- Modal Selector de Formato eliminado -->
+
+<!-- Modal de Previsualización de Diseño Real (Ticket / A4) -->
+<div class="rp-overlay !z-[1100]" *ngIf="showFormatPreview" (click)="cerrarPrevisualizacionDiseno()"></div>
+<div class="rp-modal !z-[1101]" *ngIf="showFormatPreview">
+  <div class="rp-modal-content !max-w-5xl" (click)="$event.stopPropagation()">
+    <div class="rp-modal-header !py-4 flex-col sm:flex-row gap-4 items-center justify-between">
+      <div class="rp-modal-title-group">
+        <span class="rp-modal-tag">Vista Previa de Impresión</span>
+        <h4 class="rp-modal-title text-lg">Formato: {{ selectedFormat }}</h4>
+      </div>
+
+      <!-- Formatos Disponibles -->
+      <div class="flex flex-wrap justify-center gap-2 lg:gap-4">
+        <!-- Botón Formato 80 -->
+        <div class="rp-format-pill"
+          [ngClass]="{'!border-[var(--rp-primary)] shadow-md': selectedFormat === 'TICKET_80'}">
+          <button class="rp-format-btn !min-w-[40px] !px-3" (click)="cambiarFormato('TICKET_80')"
+            [ngClass]="{'!text-[var(--rp-primary)]': selectedFormat === 'TICKET_80'}">80</button>
+          <button class="rp-format-eye" (click)="cambiarFormato('TICKET_80')" title="Ver 80"
+            [ngClass]="{'!bg-[#DCFCE7] scale-110': selectedFormat === 'TICKET_80'}">
+            <i class="fas fa-eye"
+              [ngClass]="selectedFormat === 'TICKET_80' ? 'text-emerald-600' : 'text-slate-400'"></i>
+          </button>
+        </div>
+        <!-- Botón Formato 58 -->
+        <div class="rp-format-pill"
+          [ngClass]="{'!border-[var(--rp-primary)] shadow-md': selectedFormat === 'TICKET_58'}">
+          <button class="rp-format-btn !min-w-[40px] !px-3" (click)="cambiarFormato('TICKET_58')"
+            [ngClass]="{'!text-[var(--rp-primary)]': selectedFormat === 'TICKET_58'}">58</button>
+          <button class="rp-format-eye" (click)="cambiarFormato('TICKET_58')" title="Ver 58"
+            [ngClass]="{'!bg-[#DCFCE7] scale-110': selectedFormat === 'TICKET_58'}">
+            <i class="fas fa-eye"
+              [ngClass]="selectedFormat === 'TICKET_58' ? 'text-emerald-600' : 'text-slate-400'"></i>
+          </button>
+        </div>
+        <!-- Botón Formato A4 -->
+        <div class="rp-format-pill" [ngClass]="{'!border-[var(--rp-primary)] shadow-md': selectedFormat === 'A4'}">
+          <button class="rp-format-btn !min-w-[40px] !px-3" (click)="cambiarFormato('A4')"
+            [ngClass]="{'!text-[var(--rp-primary)]': selectedFormat === 'A4'}">A4</button>
+          <button class="rp-format-eye" (click)="cambiarFormato('A4')" title="Ver A4"
+            [ngClass]="{'!bg-[#DCFCE7] scale-110': selectedFormat === 'A4'}">
+            <i class="fas fa-eye" [ngClass]="selectedFormat === 'A4' ? 'text-emerald-600' : 'text-slate-400'"></i>
+          </button>
+        </div>
+        <!-- Botón Formato A5 -->
+        <div class="rp-format-pill" [ngClass]="{'!border-[var(--rp-primary)] shadow-md': selectedFormat === 'A5'}">
+          <button class="rp-format-btn !min-w-[40px] !px-3" (click)="cambiarFormato('A5')"
+            [ngClass]="{'!text-[var(--rp-primary)]': selectedFormat === 'A5'}">A5</button>
+          <button class="rp-format-eye" (click)="cambiarFormato('A5')" title="Ver A5"
+            [ngClass]="{'!bg-[#DCFCE7] scale-110': selectedFormat === 'A5'}">
+            <i class="fas fa-eye" [ngClass]="selectedFormat === 'A5' ? 'text-emerald-600' : 'text-slate-400'"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="rp-modal-close" (click)="cerrarPrevisualizacionDiseno()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="rp-modal-body bg-slate-100 flex justify-center p-8 overflow-auto max-h-[75vh]">
+      <ng-container *ngIf="docToPrint?.moduloOrigen === 'HONORARIOS' || docToPrint?.moduloOrigen === 'PAGO_PERSONAL'">
+        <app-formato-impresion-honorarios [formato]="selectedFormat" [ventaInfo]="printHonorarioInfo"
+          [pago]="pagoDatosOrigen">
+        </app-formato-impresion-honorarios>
+      </ng-container>
+      <ng-container *ngIf="docToPrint?.moduloOrigen === 'VENTAS'">
+        <app-formato-impresion [formato]="selectedFormat" [ventaInfo]="printVentaInfo" [carrito]="carritoVenta">
+        </app-formato-impresion>
+      </ng-container>
+    </div>
+    <div class="rp-modal-footer">
+      <button class="rp-btn rp-btn--ghost" (click)="cerrarPrevisualizacionDiseno()">
+        <i class="fas fa-arrow-left"></i> Volver al Selector
+      </button>
+      <div class="flex-1"></div>
+      <button class="rp-btn rp-btn--primary" (click)="ejecutarImpresion()">
+        <i class="fas fa-print"></i> Imprimir Ahora
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Detalle (Nuevo) -->
+<app-modal-detalle *ngIf="showPreview" [documento]="selectedDocumento" [dataAdicional]="printHonorarioInfo"
+  [carrito]="carritoVenta" (onClose)="cerrarPreview()">
+</app-modal-detalle>
+
+<!-- Sección de impresión oculta -->
+<div id="print-section" class="hidden">
+  <ng-container *ngIf="docToPrint?.moduloOrigen === 'HONORARIOS' || docToPrint?.moduloOrigen === 'PAGO_PERSONAL'">
+    <app-formato-impresion-honorarios *ngIf="printHonorarioInfo" [formato]="selectedFormat"
+      [ventaInfo]="printHonorarioInfo" [pago]="pagoDatosOrigen">
+    </app-formato-impresion-honorarios>
+  </ng-container>
+  <ng-container *ngIf="docToPrint?.moduloOrigen === 'VENTAS'">
+    <app-formato-impresion *ngIf="printVentaInfo" [formato]="selectedFormat" [ventaInfo]="printVentaInfo"
+      [carrito]="carritoVenta">
+    </app-formato-impresion>
+  </ng-container>
+</div>

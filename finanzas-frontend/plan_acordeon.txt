@@ -1,0 +1,1 @@
+El usuario quiere saber si es textualmente posible cambiar la primera vista de la tabla de descuentos por un acordeón con el catálogo (árbol de niveles).

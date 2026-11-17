@@ -1,0 +1,44 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6">
+
+    <!-- Breadcrumb -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-2">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="px-4 sm:px-6 lg:px-8">
+        <app-page-header title="Ajustar Compras" subtitle="Ajuste rápido de RUC, serie y número correlativo"
+            [showCounter]="true" counterLabel="Total" [counterValue]="totalElements">
+        </app-page-header>
+    </div>
+
+    <div class="px-4 sm:px-6 lg:px-8 mt-8 relative z-10">
+        <!-- Content Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <app-tabla-general 
+                [columnas]="columnas" 
+                [datos]="compras" 
+                [loading]="loading" 
+                [showViewDetails]="false"
+                [showEdit]="true" 
+                [showDelete]="false" 
+                (onEdit)="onEdit($event)">
+            </app-tabla-general>
+
+            <app-pagination 
+                [currentPage]="currentPage" 
+                [totalPages]="totalPages" 
+                (pageChange)="onPageChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+
+    <!-- Modal de Ajuste Rápido -->
+    <app-modal-ajustar
+        *ngIf="showEditModal"
+        [isOpen]="showEditModal"
+        [compra]="selectedCompra"
+        (close)="showEditModal = false"
+        (save)="onSaveAjuste($event)">
+    </app-modal-ajustar>
+</div>

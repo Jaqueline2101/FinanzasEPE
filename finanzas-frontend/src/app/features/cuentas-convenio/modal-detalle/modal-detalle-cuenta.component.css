@@ -1,0 +1,12 @@
+:host ::ng-deep .max-h-\[75vh\] {
+    background-color: white !important;
+}
+
+:host ::ng-deep .custom-scroll {
+    padding-right: 8px;
+}
+
+/* Animación suave para hover en los datos */
+.transition-colors {
+    transition: all 0.2s ease-in-out;
+}

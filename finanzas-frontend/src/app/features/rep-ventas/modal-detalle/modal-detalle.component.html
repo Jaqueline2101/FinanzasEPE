@@ -1,0 +1,185 @@
+<app-modal [isOpen]="true" [title]="'Comprobante de Pago'" size="xl" (modalClose)="cerrar()" [showFooter]="true" [customHeader]="true">
+    
+    <!-- Custom Header -->
+    <div header class="flex items-center gap-4 w-full">
+        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-lg">
+            <i class="fas fa-file-invoice-dollar"></i>
+        </div>
+        <div class="flex flex-col">
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mb-1">Detalle de Venta</span>
+            <div class="flex items-center gap-3">
+                <h3 class="text-lg font-black text-slate-800 leading-none">Comprobante de Pago</h3>
+                <span class="px-2 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-xs font-bold border border-slate-200">
+                    {{ venta?.serie }}-{{ venta?.numero }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Columna Izquierda: Info Principal -->
+        <div class="md:col-span-2 space-y-6">
+
+            <!-- Card: Paciente -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-user-circle text-slate-300"></i> Información del Paciente
+                </h5>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Nombre Completo</label>
+                        <p class="text-sm font-bold text-slate-700 uppercase">{{ venta?.paciente || venta?.nombrePac || '---' }}</p>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">DNI / Documento</label>
+                        <p class="text-sm font-semibold text-slate-600 font-mono bg-slate-50 px-2 py-1 rounded border border-slate-100 inline-block">
+                            {{ venta?.nroDni || '---' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Detalle de Ítems -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                    <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-list-ul text-slate-300"></i> Exámenes / Servicios
+                    </h5>
+                    <span class="px-2 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase">
+                        {{ items.length }} Líneas
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="text-[10px] uppercase bg-slate-50 text-slate-500 border-b border-slate-200">
+                            <tr>
+                                <th class="px-5 py-3 font-bold">Descripción</th>
+                                <th class="px-5 py-3 font-bold text-center w-20">Cant.</th>
+                                <th class="px-5 py-3 font-bold text-right w-28">Precio</th>
+                                <th class="px-5 py-3 font-bold text-right w-28">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr *ngFor="let item of items" class="hover:bg-slate-50/50 transition-colors">
+                                <td class="px-5 py-3 align-top">
+                                    <div class="font-bold text-slate-700 text-xs">{{ item.nombreServicio || item.nombre || item.glosa }}</div>
+                                    <div *ngIf="item.descuento > 0" class="flex items-center gap-1.5 mt-1">
+                                        <span class="px-1.5 py-0.5 rounded bg-red-50 text-red-500 text-[9px] font-black border border-red-100">
+                                            DESC: -{{ item.descuento | number:'1.2-2' }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 text-center align-middle font-medium">{{ item.cantidad }}</td>
+                                <td class="px-5 py-3 text-right align-middle text-slate-500">S/ {{ (item.precioUnitario || item.precioFinal || item.precio) | number:'1.2-2' }}</td>
+                                <td class="px-5 py-3 text-right align-middle font-bold text-slate-800">S/ {{ (item.cantidad * (item.precioUnitario || item.precioFinal || item.precio)) | number:'1.2-2' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Card: Métodos de Pago -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-wallet text-slate-300"></i> Desglose de Pago
+                </h5>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
+                        <label class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Efectivo</label>
+                        <span class="text-xs font-black text-slate-700">S/ {{ (venta?.montoEfectivo || 0) | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
+                        <label class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Tarjeta</label>
+                        <span class="text-xs font-black text-slate-700">S/ {{ (venta?.montoTarjeta || 0) | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex flex-col items-center text-center">
+                        <label class="text-[9px] font-bold text-slate-400 uppercase block mb-1">Transfer.</label>
+                        <span class="text-xs font-black text-slate-700">S/ {{ (venta?.montoTransferencia || 0) | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="p-3 rounded-xl bg-blue-50 border border-blue-100 flex flex-col items-center text-center shadow-sm">
+                        <label class="text-[9px] font-bold text-blue-500 uppercase block mb-1">Vuelto</label>
+                        <span class="text-xs font-black text-blue-700">S/ {{ (venta?.vuelto || 0) | number:'1.2-2' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: Auditoría y Totales -->
+        <div class="space-y-6">
+
+            <!-- Card: Auditoría -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <h5 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Registro y Origen</h5>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
+                            <i class="fas fa-calendar-alt text-xs"></i>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-400 uppercase block">Fecha Emisión</label>
+                            <span class="text-xs font-bold text-slate-600">{{ (venta?.fechaRegistro || venta?.fecha) | date:'dd/MM/yyyy HH:mm' }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400 shrink-0 border border-slate-100">
+                            <i class="fas fa-user-tie text-xs"></i>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-400 uppercase block">Cajero / Usuario</label>
+                            <span class="text-xs font-bold text-slate-600 uppercase">{{ venta?.usuarioCrea || venta?.personalNombre || 'USUARIO' }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-blue-500 shrink-0 border border-blue-100 shadow-sm">
+                            <i class="fas fa-user-md text-xs"></i>
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-slate-400 uppercase block">Médico</label>
+                            <span class="text-xs font-bold text-slate-600 uppercase">{{ medicoNombre }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: Pago Total -->
+            <div class="bg-slate-900 p-6 rounded-2xl shadow-xl shadow-slate-200 text-white relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/20 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
+                <label class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mb-2 relative z-10">Total Recaudado</label>
+                <div class="flex items-baseline gap-2 relative z-10">
+                    <span class="text-lg font-medium opacity-50">S/</span>
+                    <span class="text-4xl font-black tracking-tight">{{ (venta?.total || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center relative z-10">
+                    <span class="text-[9px] font-bold uppercase tracking-widest opacity-50">Estado</span>
+                    <span class="px-2 py-0.5 rounded bg-blue-600 text-[10px] font-black uppercase text-white shadow-lg shadow-blue-500/50">
+                        {{ venta?.estado }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Acciones Rápidas -->
+            <div class="grid grid-cols-2 gap-3">
+                <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-white border border-slate-200 hover:border-blue-500 hover:bg-blue-50/30 transition-all gap-2 group">
+                    <i class="fas fa-print text-slate-300 group-hover:text-blue-500 transition-colors"></i>
+                    <span class="text-[9px] font-bold text-slate-500 group-hover:text-blue-600">Imprimir</span>
+                </button>
+                <button class="flex flex-col items-center justify-center p-3 rounded-xl bg-white border border-slate-200 hover:border-red-500 hover:bg-red-50/30 transition-all gap-2 group">
+                    <i class="fas fa-file-pdf text-slate-300 group-hover:text-red-500 transition-colors"></i>
+                    <span class="text-[9px] font-bold text-slate-500 group-hover:text-red-600">PDF</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div footer class="flex items-center gap-2">
+        <button class="px-6 py-2 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors text-xs font-bold flex items-center gap-2" (click)="cerrar()">
+            <i class="fas fa-arrow-left"></i> Volver al Listado
+        </button>
+        <button class="px-6 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 text-xs font-bold flex items-center gap-2" (click)="cerrar()">
+            <i class="fas fa-check"></i> Finalizar Vista
+        </button>
+    </div>
+
+</app-modal>

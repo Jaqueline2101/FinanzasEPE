@@ -1,0 +1,146 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in"
+    *ngIf="autorizacion">
+
+    <div
+        class="bg-white rounded-2xl shadow-xl w-full max-w-lg transform transition-all animate-scale-up border border-gray-100 flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0"
+            [ngClass]="accion === 'APROBAR' ? 'bg-emerald-50' : 'bg-red-50'">
+            <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg"
+                    [ngClass]="accion === 'APROBAR' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'">
+                    <ng-container *ngIf="accion === 'APROBAR'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                    </ng-container>
+                    <ng-container *ngIf="accion === 'RECHAZAR'">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="15" y1="9" x2="9" y2="15" />
+                            <line x1="9" y1="9" x2="15" y2="15" />
+                        </svg>
+                    </ng-container>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">
+                    {{ accion === 'APROBAR' ? 'Aprobar Descuento' : (accion === 'RECHAZAR' ? 'Rechazar Descuento' : 'Resolver Solicitud') }}
+                </h3>
+            </div>
+            <button (click)="cerrar()"
+                class="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 overflow-y-auto custom-scrollbar flex-1 whitespace-pre-wrap">
+            
+            <!-- Comprehensive Identity Info (Manager Visibility) -->
+            <div class="mb-5 p-4 rounded-2xl bg-white border border-gray-100 shadow-sm flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-500">
+                        <i class="fas fa-user-tag text-xl"></i>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5">Identidad del Paciente</span>
+                        <div class="text-sm font-black text-gray-900 leading-none uppercase">
+                            {{ autorizacion.pacienteNombre || 'Paciente No Registrado' }}
+                        </div>
+                        <div class="flex items-center gap-2 mt-1.5">
+                            <span class="px-2 py-0.5 rounded-full bg-blue-100 text-[10px] font-bold text-blue-700">DNI: {{ autorizacion.pacienteDni || '---' }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div *ngIf="autorizacion.doctorNombre" class="text-right">
+                    <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1.5 block">Médico Tratante</span>
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-600 justify-end">
+                        <i class="fas fa-user-md"></i>
+                        <span>{{ autorizacion.doctorNombre }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl mb-4 border border-gray-200">
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Cajero Solicitante</p>
+                        <p class="text-sm font-medium text-gray-900">{{autorizacion.cajeroNombre}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Estado Actual</p>
+                        <p class="text-sm font-medium text-amber-600">{{autorizacion.estado}}</p>
+                    </div>
+                </div>
+                <hr class="my-3 border-gray-200">
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Monto Original</p>
+                        <p class="text-sm font-medium text-gray-900">S/ {{autorizacion.montoOriginal}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Descuento</p>
+                        <p class="text-sm font-bold text-red-600">- S/ {{autorizacion.montoDescuento}}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Monto Final</p>
+                        <p class="text-sm font-bold text-emerald-600">S/ {{autorizacion.montoFinal}}</p>
+                    </div>
+                </div>
+                <hr class="my-3 border-gray-200">
+                <div>
+                    <p class="text-xs text-gray-500 font-semibold mb-1 uppercase">Motivo del Cajero</p>
+                    <p class="text-sm text-gray-800">{{autorizacion.motivoSolicitud}}</p>
+                </div>
+            </div>
+
+            <!-- Motivo de Rechazo (solo si es Rechazar) -->
+            <div *ngIf="accion === 'RECHAZAR'" class="space-y-2 mt-4">
+                <label class="block text-sm font-semibold text-gray-700">Motivo de Rechazo <span
+                        class="text-red-500">*</span></label>
+                <textarea [(ngModel)]="motivoRechazo"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-red-500 focus:ring-2 focus:ring-red-200 outline-none transition-all resize-none"
+                    rows="3"
+                    placeholder="Ingresa el motivo específico por el que se niega este descuento..."></textarea>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-3 shrink-0">
+            <button type="button" (click)="cerrar()"
+                class="px-5 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50">
+                Cancelar
+            </button>
+            
+            <ng-container *ngIf="accion === 'RESOLVER'">
+                <button type="button" (click)="cambiarARechazar()"
+                    class="px-6 py-2.5 rounded-xl text-white font-semibold transition-all shadow-md bg-red-500 hover:bg-red-600 shadow-red-500/20">
+                    Rechazar
+                </button>
+                <button type="button" (click)="guardarAprobacion()" [disabled]="loading"
+                    class="px-6 py-2.5 rounded-xl text-white font-semibold transition-all shadow-md flex items-center gap-2 bg-[#00AEEF] hover:bg-[#0096ce] shadow-sky-500/20">
+                    <span *ngIf="loading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>Aprobar</span>
+                </button>
+            </ng-container>
+
+            <ng-container *ngIf="accion !== 'RESOLVER'">
+                <button type="button" (click)="guardar()" [disabled]="loading"
+                    [ngClass]="accion === 'APROBAR' ? 'bg-[#00AEEF] hover:bg-[#0096ce] shadow-sky-500/20' : 'bg-red-500 hover:bg-red-600 shadow-red-500/20'"
+                    class="px-6 py-2.5 rounded-xl text-white font-semibold transition-all shadow-md flex items-center gap-2">
+                    <span *ngIf="loading"
+                        class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>{{ accion === 'APROBAR' ? 'Confirmar Aprobación' : 'Confirmar Rechazo' }}</span>
+                </button>
+            </ng-container>
+        </div>
+    </div>
+</div>

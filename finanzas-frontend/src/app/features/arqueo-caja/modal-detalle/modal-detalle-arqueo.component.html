@@ -1,0 +1,99 @@
+<app-modal [isOpen]="isOpen" [title]="'Detalle de Arqueo de Caja'" size="lg" [showIcon]="true" iconType="info"
+    (modalClose)="close()">
+
+    <div class="space-y-8" *ngIf="arqueo">
+
+        <!-- ENCABEZADO DE SESIÓN -->
+        <div>
+            <div class="flex items-center gap-2 mb-4">
+                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Sesión y Ubicación</h4>
+                <div class="flex-1 h-px bg-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div
+                    class="flex flex-col p-3 bg-slate-50/50 rounded-xl transition-colors hover:bg-slate-50 border border-transparent hover:border-slate-100">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Fecha y
+                        Hora</label>
+                    <span class="text-sm font-bold text-slate-800">{{ arqueo.fechaHora | date:'dd/MM/yyyy HH:mm:ss'
+                        }}</span>
+                </div>
+                <div
+                    class="flex flex-col p-3 bg-slate-50/50 rounded-xl transition-colors hover:bg-slate-50 border border-transparent hover:border-slate-100">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Usuario
+                        Responsable</label>
+                    <span class="text-sm font-bold text-slate-800">{{ arqueo.nombreUsuario || 'N/A' }}</span>
+                </div>
+                <div
+                    class="flex flex-col p-3 bg-slate-50/50 rounded-xl transition-colors hover:bg-slate-50 border border-transparent hover:border-slate-100">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Punto de
+                        Venta</label>
+                    <span class="text-sm font-bold text-slate-800 text-sky-600">{{ arqueo.nombrePunto || 'General'
+                        }}</span>
+                </div>
+                <div
+                    class="flex flex-col p-3 bg-slate-50/50 rounded-xl transition-colors hover:bg-slate-50 border border-transparent hover:border-slate-100">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-wider">Sucursal</label>
+                    <span class="text-sm font-bold text-slate-800 uppercase">{{ arqueo.nombreSucursal || 'Principal'
+                        }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RESULTADOS FINANCIEROS -->
+        <div>
+            <div class="flex items-center gap-2 mb-4">
+                <h4 class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Balance de Arqueo</h4>
+                <div class="flex-1 h-px bg-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="flex flex-col p-4 bg-slate-900 rounded-2xl shadow-xl shadow-slate-200">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">Saldo Sistema</label>
+                    <span class="text-xl font-black text-white">S/ {{ arqueo.saldoEsperado | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="flex flex-col p-4 bg-white border-2 border-slate-100 rounded-2xl">
+                    <label class="text-[10px] text-slate-400 uppercase font-bold mb-1">Efectivo Físico</label>
+                    <span class="text-xl font-black text-slate-800">S/ {{ arqueo.saldoFisico | number:'1.2-2' }}</span>
+                </div>
+
+                <div class="flex flex-col p-4 rounded-2xl"
+                    [ngClass]="arqueo.diferencia === 0 ? 'bg-emerald-50 text-emerald-700' : (arqueo.diferencia < 0 ? 'bg-red-50 text-red-700' : 'bg-blue-50 text-blue-700')">
+                    <label class="text-[10px] uppercase font-bold mb-1 opacity-70">Diferencia</label>
+                    <span class="text-xl font-black">S/ {{ arqueo.diferencia | number:'1.2-2' }}</span>
+                    <span class="text-[10px] font-bold mt-1 uppercase" *ngIf="arqueo.diferencia < 0">⚠️ Faltante</span>
+                    <span class="text-[10px] font-bold mt-1 uppercase" *ngIf="arqueo.diferencia > 0">⚡ Sobrante</span>
+                    <span class="text-[10px] font-bold mt-1 uppercase" *ngIf="arqueo.diferencia === 0">✅ Cuadrado</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- OBSERVACIONES -->
+        <div class="flex flex-col p-4 bg-amber-50/30 rounded-2xl border border-dashed border-amber-200"
+            *ngIf="arqueo.observaciones">
+            <label class="text-[10px] text-amber-600 uppercase font-bold mb-2 flex items-center gap-1.5">
+                <i class="fas fa-sticky-note"></i>
+                Observaciones del Cierre
+            </label>
+            <p class="text-sm text-slate-700 italic leading-relaxed">
+                "{{ arqueo.observaciones }}"
+            </p>
+        </div>
+
+        <div class="flex items-center justify-between px-2">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-slate-400"
+                    [ngClass]="arqueo.estado === 'CERRADO' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                <span class="text-xs font-bold text-slate-500 uppercase">Estado: {{ arqueo.estado }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div footer class="flex justify-end pt-2">
+        <button (click)="close()"
+            class="px-10 py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl transition-all font-bold text-sm shadow-lg shadow-slate-200 active:scale-[0.98]">
+            Cerrar Detalle
+        </button>
+    </div>
+</app-modal>

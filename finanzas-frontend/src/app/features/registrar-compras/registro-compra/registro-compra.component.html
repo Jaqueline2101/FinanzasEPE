@@ -1,0 +1,527 @@
+<div class="pt-6 space-y-6">
+    <!-- Breadcrumb -->
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
+
+            <!-- SECCION 1: DATOS GENERALES -->
+            <div>
+                <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        Datos del Comprobante
+                    </h3>
+                    <button type="button" (click)="openNuevoProveedorModal()"
+                        class="px-3 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Registrar nuevo proveedor
+                    </button>
+                </div>
+
+                <!-- GRID ÚNICO DE DATOS: Alineado horizontalmente -->
+                <div class="grid grid-cols-12 gap-x-3 gap-y-4 pb-4 border-b border-slate-200">
+
+                    <!-- FILA 1 -->
+                    <!-- Proveedor -->
+                    <div class="relative col-span-3">
+                        <label class="flex items-center gap-1 text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">
+                            Proveedor <span class="text-rose-500 text-xs">*</span>
+                        </label>
+                        <div class="relative">                            <input type="text" [value]="busquedaProveedor"
+                                (input)="filtrarProveedores($any($event.target).value)"
+                                (focus)="onBusquedaFocus()" (blur)="onBusquedaBlur()"
+                                placeholder="Buscar por Razón Social o RUC..."
+                                class="w-full h-10 pl-3 pr-10 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 outline-none transition-all">
+                            
+                            <!-- Botón Limpiar Proveedor -->
+                            <button *ngIf="busquedaProveedor" (mousedown)="limpiarBusquedaProveedor()" 
+                                class="absolute right-8 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 transition-colors">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+
+                            <div class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- Dropdown list omitted for brevity, keeping same logic -->
+                        <div *ngIf="mostrarDropdownProveedores" class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-lg shadow-lg max-h-52 overflow-y-auto">
+                            <ul>
+                                <li *ngFor="let p of proveedoresFiltrados" (mousedown)="seleccionarProveedor(p)" class="px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-slate-100 last:border-0 transition-colors">
+                                    <div class="flex flex-col">
+                                        <span class="text-xs font-bold text-slate-800">{{ p.razonSocial }}</span>
+                                        <span class="text-[10px] text-slate-500 font-semibold" *ngIf="p.numDocIdent">RUC: {{ p.numDocIdent }}</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- RUC -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">RUC / DNI</label>
+                        <input type="text" [value]="rucProveedor" readonly
+                            class="w-full h-9 px-2 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 text-center outline-none">
+                    </div>
+
+                    <!-- Fec. Emisión -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Fec. Emisión <span class="text-rose-500">*</span></label>
+                        <input type="date" formControlName="fechaEmision"
+                            class="w-full h-9 px-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-center outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200">
+                    </div>
+
+                    <!-- Fec. Vencimiento -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Fec. Venc.</label>
+                        <input type="date" formControlName="fechaVencimiento"
+                            class="w-full h-9 px-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-semibold text-center outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-200">
+                    </div>
+
+                    <!-- Condición Pago -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Condición</label>
+                        <select formControlName="condicionPago"
+                            class="w-full h-9 px-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none">
+                            <option value="CONTADO">CONTADO</option>
+                            <option value="CREDITO">CRÉDITO</option>
+                        </select>
+                    </div>
+
+                    <!-- Moneda -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Moneda</label>
+                        <select formControlName="moneda"
+                            class="w-full h-9 px-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none">
+                            <option value="PEN">Soles (S/)</option>
+                            <option value="USD">Dólares ($)</option>
+                        </select>
+                    </div>
+
+                    <!-- Retención -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Reten.</label>
+                        <select formControlName="retencion"
+                            class="w-full h-9 px-1 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none">
+                            <option value="No">No</option>
+                            <option value="3%">3%</option>
+                            <option value="6%">6%</option>
+                        </select>
+                    </div>
+
+                    <!-- Medio de Pago -->
+                    <div class="col-span-2">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">Medio de Pago</label>
+                        <select formControlName="medioPago"
+                            class="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold focus:border-blue-500 outline-none">
+                            <option value="EFECTIVO_DEMAS">EFECTIVO</option>
+                            <option value="DEPOSITO">DEPÓSITO</option>
+                            <option value="TRANSFERENCIA">TRANSFERENCIA</option>
+                        </select>
+                    </div>
+
+                    <!-- FILA 2 -->
+                    <!-- Tipo Comprobante -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">Tipo Comp. <span class="text-rose-500">*</span></label>
+                        <select formControlName="tipoComprobante"
+                            class="w-full h-9 px-1 bg-white border border-slate-300 rounded-lg text-[10px] font-bold focus:border-blue-500 outline-none">
+                            <option value="FACTURA">FACTURA</option>
+                            <option value="BOLETA">BOLETA</option>
+                            <option value="GUIA">GUÍA</option>
+                        </select>
+                    </div>
+
+                    <!-- Serie -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">Serie <span class="text-rose-500">*</span></label>
+                        <input type="text" formControlName="serie" placeholder="F001"
+                            class="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Número -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1">Número <span class="text-rose-500">*</span></label>
+                        <input type="text" formControlName="correlativo" placeholder="000123"
+                            class="w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Imp. Bruto -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Imp. Bruto</label>
+                        <input type="number" formControlName="impBruto" placeholder="0"
+                            class="numero-sin-spinner w-full h-9 px-2 bg-slate-50 border border-slate-300 rounded-lg text-xs font-bold text-center outline-none">
+                    </div>
+
+                    <!-- Descuento -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Desc.</label>
+                        <input type="number" formControlName="descuento" placeholder="0"
+                            class="numero-sin-spinner w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center outline-none">
+                    </div>
+
+                    <!-- IGV -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">I.G.V.</label>
+                        <input type="number" formControlName="igv" readonly
+                            class="numero-sin-spinner w-full h-9 px-2 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-500">
+                    </div>
+
+                    <!-- Imp. Inafecto -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Inafecto</label>
+                        <input type="number" formControlName="valorVentaInafecto" readonly
+                            class="numero-sin-spinner w-full h-9 px-2 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-center text-slate-500">
+                    </div>
+
+                    <!-- Otros Tributos -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Otros</label>
+                        <input type="number" formControlName="otrosTributos" placeholder="0"
+                            class="numero-sin-spinner w-full h-9 px-2 bg-white border border-slate-300 rounded-lg text-xs font-bold text-center outline-none">
+                    </div>
+
+                    <!-- Imp. Total -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Imp. Total</label>
+                        <input type="number" formControlName="totalPagar" readonly
+                            class="numero-sin-spinner w-full h-9 px-2 bg-slate-100 border border-slate-300 rounded-lg text-xs font-bold text-center text-blue-700">
+                    </div>
+
+                    <!-- Detracción -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">Detrac.</label>
+                        <div class="flex items-center justify-center gap-2 h-9 bg-slate-50 border border-dashed border-slate-300 rounded-lg px-1">
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="radio" formControlName="detraccion" [value]="true" class="w-3 h-3 text-blue-600">
+                                <span class="text-[10px] font-bold text-slate-700">SI</span>
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="radio" formControlName="detraccion" [value]="false" class="w-3 h-3 text-blue-600">
+                                <span class="text-[10px] font-bold text-slate-500">NO</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Selector de Tasa IGV -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-blue-700 uppercase tracking-wide mb-1 text-center">Tasa IGV</label>
+                        <select formControlName="porcentajeIgv"
+                            class="w-full h-9 px-1 bg-blue-50 border border-blue-200 rounded-lg text-xs font-bold text-blue-700 focus:border-blue-500 outline-none cursor-pointer transition-all">
+                            <option [value]="18">IGV 18%</option>
+                            <option [value]="10">IGV 10%</option>
+                            <option [value]="8">IGV 8%</option>
+                            <option [value]="4">IGV 4%</option>
+                            <option [value]="0">IGV 0%</option>
+                        </select>
+                    </div>
+
+                    <!-- Precios con IGV Checkbox -->
+                    <div class="col-span-1">
+                        <label class="block text-[10px] font-bold text-slate-700 uppercase tracking-wide mb-1 text-center">&nbsp;</label>
+                        <label class="flex items-center justify-center gap-2 cursor-pointer bg-blue-50/50 px-1 py-1 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors h-9">
+                            <input type="checkbox" formControlName="preciosIncluyenIgv" (change)="recalcularTodo()"
+                                class="w-3.5 h-3.5 text-blue-600 border border-slate-300 rounded focus:ring-blue-500">
+                            <span class="text-[9px] font-bold text-blue-700 select-none leading-tight">PRECIOS<br>C/ IGV</span>
+                        </label>
+                    </div>
+
+                    <!-- CAMPOS DINÁMICOS (USD / CRÉDITO) - Aparecerán debajo si se activan -->
+                    <div *ngIf="form.get('moneda')?.value === 'USD'" class="col-span-12 grid grid-cols-12 gap-3 mt-1">
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">T. Cambio</label>
+                            <input type="number" formControlName="tipoCambio" class="w-full h-8 px-2 border border-blue-400 rounded-lg text-xs font-bold">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Imp. Dólar</label>
+                            <input type="number" formControlName="impDolar" class="w-full h-8 px-2 border border-blue-400 rounded-lg text-xs font-bold">
+                        </div>
+                    </div>
+
+                    <div *ngIf="form.get('condicionPago')?.value === 'CREDITO'" class="col-span-12 grid grid-cols-12 gap-3 mt-1">
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Cuotas</label>
+                            <input type="number" formControlName="cuotas" class="w-full h-8 px-2 border border-orange-400 rounded-lg text-xs font-bold">
+                        </div>
+                        <div class="col-span-1">
+                            <label class="block text-[10px] font-bold text-slate-700 uppercase mb-1">Frec. días</label>
+                            <input type="number" formControlName="diasFrecuencia" class="w-full h-8 px-2 border border-orange-400 rounded-lg text-xs font-bold">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SECCION 2: DETALLES -->
+            <div>
+                <!-- BUSCADOR MAESTRO DE PRODUCTOS -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-search text-blue-500"></i>
+                            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Búsqueda rápida de productos/servicios</h3>
+                        </div>
+                        <button type="button" (click)="agregarDetalle()" 
+                            class="flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold rounded-lg transition-all border border-slate-200">
+                            <i class="fas fa-plus"></i>
+                            Agregar ítem vacío
+                        </button>
+                    </div>
+
+                    <div class="relative max-w-2xl">
+                        <div class="relative group">
+                            <input type="text" [value]="busquedaProductoMaestro"
+                                (input)="filtrarProductosMaestro($any($event.target).value)"
+                                (focus)="onMaestroSearchFocus()"
+                                (blur)="onMaestroSearchBlur()"
+                                placeholder="Escribe el nombre o código del producto para añadirlo a la lista..."
+                                class="w-full h-12 pl-12 pr-12 bg-white border-2 border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:border-blue-500 focus:ring-4 focus:ring-blue-50/50 outline-none transition-all shadow-sm">
+                            
+                            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                <i class="fas fa-search text-lg"></i>
+                            </div>
+
+                            <!-- Botón Limpiar Maestro -->
+                            <button *ngIf="busquedaProductoMaestro" (mousedown)="limpiarBusquedaMaestro()" 
+                                class="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-red-500 transition-colors bg-slate-50 rounded-full">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+
+                        <!-- Dropdown Maestro de Resultados -->
+                        <div *ngIf="mostrarDropdownMaestro" 
+                            class="absolute z-[200] w-full mt-2 bg-white border border-slate-200 rounded-xl shadow-2xl overflow-hidden animate-fade-in">
+                            <div class="max-h-80 overflow-y-auto">
+                                <ul class="divide-y divide-slate-50">
+                                    <li *ngFor="let p of productosFiltradosMaestro" 
+                                        (mousedown)="seleccionarProductoMaestro(p)"
+                                        class="px-4 py-3 hover:bg-blue-50 cursor-pointer transition-colors flex items-center justify-between group">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400 group-hover:bg-blue-100 group-hover:text-blue-500 transition-colors">
+                                                <i class="fas fa-box text-sm"></i>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-[10px] bg-slate-700 text-white px-1.5 py-0.5 rounded font-mono" *ngIf="p.codigo">
+                                                        {{ p.codigo }}
+                                                    </span>
+                                                    <span class="text-sm font-bold text-slate-800">{{ p.nombreProducto }}</span>
+                                                </div>
+                                                <div class="flex items-center gap-3 mt-1.5">
+                                                    <span class="text-[11px] text-slate-500 font-medium" *ngIf="p.codigoBarra">
+                                                        <i class="fas fa-barcode mr-1"></i> {{ p.codigoBarra }}
+                                                    </span>
+                                                    <span class="text-[11px] text-blue-600 font-bold" *ngIf="p.precioCompra">
+                                                        <i class="fas fa-tag mr-1"></i> Ref: {{ p.precioCompra | number:'1.2-2' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="pr-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span class="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-1 rounded">AÑADIR</span>
+                                        </div>
+                                    </li>
+                                </ul>
+                                <div *ngIf="productosFiltradosMaestro?.length === 0" class="px-6 py-8 text-center bg-slate-50">
+                                    <i class="fas fa-search text-slate-300 text-2xl mb-2"></i>
+                                    <p class="text-xs text-slate-500 font-semibold italic">No se encontró ningún producto con ese nombre o código</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border border-slate-300 rounded-lg shadow-sm">
+                    <table class="w-full text-xs text-left">
+                        <thead class="text-[10px] text-slate-600 uppercase bg-slate-100 border-b border-slate-300">
+                            <tr>
+                                <th class="px-2 py-2 w-8 font-bold">#</th>
+                                <th class="px-2 py-2 min-w-[180px] font-bold">Producto</th>
+                                <th class="px-2 py-2 w-20 font-bold">Cant.</th>
+                                <th class="px-2 py-2 w-24 font-bold">Unidad</th>
+                                <th class="px-2 py-2 w-16 font-bold text-center">Factor</th>
+                                <th class="px-2 py-2 w-28 font-bold">Tipo IGV</th>
+                                <th class="px-2 py-2 w-16 text-center font-bold">Bonif.</th>
+                                <th class="px-2 py-2 w-28 font-bold">V. Unitario</th>
+                                <th class="px-2 py-2 w-28 font-bold">V. Total</th>
+                                <th class="px-2 py-2 w-8"></th>
+                            </tr>
+                        </thead>
+                        <tbody formArrayName="detalles">
+                            <tr *ngFor="let det of detalles.controls; let i = index" [formGroupName]="i"
+                                class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+
+                                <td class="px-2 py-3 text-slate-400 font-mono text-[11px] text-center">{{ i + 1 }}</td>
+
+                                <td class="px-3 py-3">
+                                    <div class="flex flex-col gap-1.5">
+                                        <!-- Nombre del Producto Seleccionado (Estático) -->
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded border border-slate-200" *ngIf="det.get('busquedaProducto')?.value">
+                                                {{ det.get('busquedaProducto')?.value.split(' ')[0] }}
+                                            </span>
+                                            <span class="text-xs font-bold text-slate-800" *ngIf="det.get('idProducto')?.value">
+                                                {{ det.get('productoNombre')?.value }}
+                                            </span>
+                                            <input type="text" formControlName="productoNombre" *ngIf="!det.get('idProducto')?.value"
+                                                placeholder="Escriba el nombre del producto..."
+                                                class="w-full h-8 px-2 bg-white border border-blue-200 rounded text-xs font-bold text-slate-800 focus:border-blue-500 outline-none">
+                                        </div>
+                                        
+                                        <!-- Input de Descripción (Siempre visible) -->
+                                        <div class="relative">
+                                            <input type="text" formControlName="descripcion"
+                                                placeholder="Detalle adicional (ej. Mes Enero, características específicas...)"
+                                                class="w-full h-8 px-3 bg-white border border-slate-200 rounded-lg text-[10px] font-medium text-slate-600 focus:border-blue-400 focus:ring-1 focus:ring-blue-100 outline-none transition-all italic">
+                                            <div class="absolute left-0 bottom-[-14px] px-1 pointer-events-none">
+                                                <span class="text-[8px] text-slate-400 uppercase font-bold tracking-tighter">Descripción del ítem</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" formControlName="idProducto">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <input type="number" formControlName="cantidad"
+                                        class="w-full h-9 px-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-center focus:border-blue-500 outline-none transition-all numero-sin-spinner"
+                                        (input)="calcularFila(i)">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <input type="text" formControlName="unidadMedida" [readonly]="true"
+                                        class="w-full h-9 px-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 text-center outline-none">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <input type="number" formControlName="factorConversion" [readonly]="true"
+                                        class="w-full h-9 px-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 text-center outline-none numero-sin-spinner">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <select formControlName="tipoAfectacion" (change)="calcularFila(i)"
+                                        class="w-full h-9 pl-2 pr-6 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-700 focus:border-blue-500 outline-none transition-all appearance-none cursor-pointer">
+                                        <option value="GRAVADO_ONEROSO">Gravado</option>
+                                        <option value="EXONERADO_ONEROSO">Exonerado</option>
+                                        <option value="INAFECTO_ONEROSO">Inafecto</option>
+                                    </select>
+                                </td>
+
+                                <td class="px-2 py-3 text-center">
+                                    <input type="checkbox" formControlName="esBonificacion" (change)="calcularFila(i)"
+                                        class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 transition-all cursor-pointer">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <input type="number" formControlName="precioUnitario"
+                                        class="w-full h-9 px-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 text-right focus:border-blue-500 outline-none transition-all numero-sin-spinner"
+                                        (input)="calcularFila(i)">
+                                </td>
+
+                                <td class="px-2 py-3">
+                                    <div class="w-full h-9 flex items-center justify-end px-3 bg-slate-50 border border-slate-100 rounded-lg text-xs font-bold text-blue-700">
+                                        {{ det.get('valorVenta')?.value | number:'1.2-2' }}
+                                    </div>
+                                </td>
+
+                                <td class="px-2 py-3 text-center">
+                                    <button type="button" (click)="eliminarDetalle(i)"
+                                        class="p-2 text-red-500 hover:text-red-700 transition-colors bg-white hover:bg-red-50 rounded-lg">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="border-t border-slate-300">
+                            <tr class="bg-slate-50">
+                                <td colspan="7" class="px-2 py-2 text-right text-xs font-bold text-slate-700">OP. GRAVADAS:</td>
+                                <td class="px-2 py-2 text-right text-xs font-bold text-green-900">{{ form.get('valorVentaGravado')?.value | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                            <tr class="bg-slate-50">
+                                <td colspan="7" class="px-2 py-2 text-right text-xs font-bold text-slate-700">OP. INAFECTAS:</td>
+                                <td class="px-2 py-2 text-right text-xs font-bold text-orange-900">{{ form.get('valorVentaInafecto')?.value | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                            <tr class="bg-slate-50">
+                                <td colspan="7" class="px-2 py-2 text-right text-xs font-bold text-slate-700">IGV ({{ form.get('porcentajeIgv')?.value }}%):</td>
+                                <td class="px-2 py-2 text-right text-xs font-bold text-slate-900">{{ form.get('igv')?.value | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                             <tr class="bg-blue-50 border-t border-blue-300">
+                                <td colspan="7" class="px-2 py-3 text-right">
+                                    <span class="text-sm font-bold text-blue-800">TOTAL PAGAR:</span>
+                                </td>
+                                <td class="px-2 py-3 text-right text-sm font-bold text-blue-900">{{ form.get('totalPagar')?.value | number:'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div *ngIf="detalles.length === 0" class="py-12 flex flex-col items-center justify-center bg-white border border-t-0 border-slate-200 rounded-b-xl">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                        <i class="fas fa-shopping-cart text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-slate-500 font-bold">No hay productos en el detalle</p>
+                    <p class="text-xs text-slate-400 mt-1">Usa el buscador superior para añadir productos o servicios</p>
+                </div>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="flex justify-end gap-3 pt-3 border-t border-slate-200">
+                <button type="button" routerLink="/admin/procesos/compras"
+                    class="px-5 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                    Cancelar
+                </button>
+                <button type="button" (click)="onSubmit()"
+                    class="px-5 py-2 text-xs font-bold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-sm">
+                    <svg *ngIf="loading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                        </path>
+                    </svg>
+                    <svg *ngIf="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Guardar Compra
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<app-modal-proveedor *ngIf="showProveedorModal" [isOpen]="showProveedorModal" (onClose)="showProveedorModal = false" (onSave)="onProveedorSaved($event)">
+</app-modal-proveedor>
+
+<app-alertas></app-alertas>
+
+<style>
+    .numero-sin-spinner::-webkit-outer-spin-button,
+    .numero-sin-spinner::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .numero-sin-spinner[type=number] {
+        -moz-appearance: textfield;
+        appearance: textfield;
+    }
+
+    .numero-sin-spinner::placeholder {
+        color: #cbd5e1;
+        opacity: 0.6;
+    }
+</style>

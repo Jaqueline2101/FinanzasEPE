@@ -1,0 +1,105 @@
+<app-modal [isOpen]="isOpen" (modalClose)="close()" [title]="'Detalle de Pago'" [size]="'md'">
+    <div class="space-y-4" *ngIf="payment">
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Fecha</label>
+                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    {{ displayDate | date:'dd/MM/yyyy' }}
+                </div>
+            </div>
+            <div class="col-span-1">
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Tipo Persona</label>
+                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    {{ payment.tipoPersona }}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Nombre / Razón Social</label>
+            <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                {{ payment.beneficiario }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">DNI</label>
+                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    {{ payment.dni || '-' }}
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Monto (S/)</label>
+                <div
+                    class="w-full px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-sm font-bold text-blue-700">
+                    {{ payment.monto | currency:'S/ ' }}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Método de Pago</label>
+            <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                {{ payment.metodoPago }}
+            </div>
+        </div>
+
+        <!-- New Fields for Donation Ticket -->
+        <div *ngIf="payment.nombreCampana">
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Campaña / Destino</label>
+            <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                {{ payment.nombreCampana }}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Teléfono</label>
+                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    {{ payment.telefono || '-' }}
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+                    {{ payment.email || '-' }}
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 py-2" *ngIf="payment.esAnonimo">
+            <div class="w-4 h-4 bg-blue-600 rounded flex items-center justify-center">
+                <i class="fas fa-check text-white text-[10px]"></i>
+            </div>
+            <label class="text-sm text-slate-700 font-medium select-none">Donación Anónima</label>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Concepto / Observación</label>
+            <div
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 min-h-[80px]">
+                {{ payment.concepto || '-' }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Component -->
+    <app-impresion-pagos [visible]="showPrintModal" [data]="payment" (onClose)="closePrint()">
+    </app-impresion-pagos>
+
+    <!-- Footer Actions -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <button (click)="close()"
+            class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors rounded-lg hover:bg-slate-100">
+            Cerrar
+        </button>
+
+        <!-- Print Button in View Mode -->
+        <button (click)="printTicket()"
+            class="px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg shadow-lg shadow-slate-200 transition-all font-bold text-sm flex items-center gap-2">
+            <i class="fas fa-print"></i> Imprimir Ticket
+        </button>
+    </div>
+</app-modal>

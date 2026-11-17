@@ -1,0 +1,56 @@
+<div class="animate-fadeIn p-6">
+    <div class="mb-6">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <div class="mb-8">
+        <app-page-header title="Reporte de Recibos por Honorarios"
+            subtitle="Análisis detallado de pagos, retenciones y montos netos" 
+            iconType="document">
+        </app-page-header>
+    </div>
+
+    <!-- Acciones Superiores -->
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-4">
+            <!-- Espacio para otros botones si fuera necesario -->
+        </div>
+        <div class="flex items-center gap-3">
+            <button (click)="exportarExcel()" 
+                    class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-2 text-[12px] uppercase tracking-wider">
+                <i class="fa-solid fa-file-excel text-lg"></i>
+                <span>Exportar Excel</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Unified Card (Filters + Table) -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        
+        <!-- Barra de Filtros -->
+        <div class="p-4 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30">
+            <app-barra-filtros 
+                [searchOptions]="searchOptions"
+                [estadoOptions]="tipoPagoOptions"
+                statusLabel="Tipo de Pago"
+                [initialDesde]="fechaInicio"
+                [initialHasta]="fechaFin"
+                (onFilter)="onFilter($event)">
+            </app-barra-filtros>
+        </div>
+
+        <!-- Table Area -->
+        <div class="overflow-hidden">
+            <app-tabla-general [columnas]="columnas" [datos]="resumen?.detallePagos?.content || []" [loading]="loading"
+                [showEdit]="false" [showDelete]="false" [showViewDetails]="false" [showActions]="false">
+            </app-tabla-general>
+        </div>
+
+        <!-- Pagination -->
+        <div class="p-4 border-t border-slate-50 dark:border-slate-800 bg-slate-50/30">
+            <app-pagination [currentPage]="currentPage" [totalPages]="resumen?.detallePagos?.totalPages || 0"
+                [pageSize]="pageSize" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>

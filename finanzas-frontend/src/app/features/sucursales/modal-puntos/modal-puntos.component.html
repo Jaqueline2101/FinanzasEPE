@@ -1,0 +1,76 @@
+<app-modal [isOpen]="isVisible" [title]="modalTitle" size="md" [showIcon]="true" [iconType]="isEditMode ? 'edit' : 'document'"
+    [showFooter]="true" (modalClose)="close()">
+
+    <form (ngSubmit)="save()" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Código del Punto -->
+            <div class="group">
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 transition-colors group-focus-within:text-sky-600">
+                    Código del Punto <span class="text-rose-500 text-sm">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.punto" name="punto" maxlength="10" required
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
+                    placeholder="Ej: P001" />
+            </div>
+
+            <!-- Tipo -->
+            <div class="group">
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 transition-colors group-focus-within:text-sky-600">
+                    Tipo de Punto
+                </label>
+                <select [(ngModel)]="formData.tipo" name="tipo"
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all cursor-pointer">
+                    <option value="F">Venta / Facturación</option>
+                    <option value="A">Administrativo</option>
+                </select>
+            </div>
+
+            <!-- Nombre Descriptivo (Full Width) -->
+            <div class="group md:col-span-2">
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-1.5 transition-colors group-focus-within:text-sky-600">
+                    Nombre Descriptivo <span class="text-rose-500 text-sm">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.nombre" name="nombre" maxlength="100" required
+                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-none transition-all"
+                    placeholder="Ej: Caja de Cobranza Central" />
+            </div>
+
+            <!-- Otros checks y configs (Grid) -->
+            <div class="md:col-span-2 bg-slate-50/50 p-4 rounded-2xl border border-slate-100 grid grid-cols-2 gap-4">
+                <div class="flex items-center gap-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [checked]="formData.valido === '1'" 
+                            (change)="formData.valido = $any($event.target).checked ? '1' : '0'"
+                            name="valido" class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        <span class="ml-2 text-[10px] font-bold text-slate-600 uppercase">Activo</span>
+                    </label>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" [checked]="formData.imprimeComp === '1'"
+                            (change)="formData.imprimeComp = $any($event.target).checked ? '1' : '0'"
+                            name="imprimeComp" class="sr-only peer">
+                        <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-sky-500"></div>
+                        <span class="ml-2 text-[10px] font-bold text-slate-600 uppercase whitespace-nowrap">Imprime Comp.</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botón invisible para Enter -->
+        <button type="submit" class="hidden"></button>
+    </form>
+
+    <div footer class="flex justify-end gap-3 w-full">
+        <button type="button" (click)="close()"
+            class="px-5 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-500 hover:bg-slate-50 transition-all active:scale-95">
+            Cancelar
+        </button>
+        <button type="button" (click)="save()" [disabled]="isLoading"
+            class="px-8 py-2.5 bg-[#00AEEF] hover:bg-[#0096ce] text-white rounded-xl text-sm font-bold shadow-lg shadow-sky-500/20 transition-all active:scale-95 flex items-center gap-2">
+            <div *ngIf="isLoading" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            {{ isLoading ? 'Procesando...' : (isEditMode ? 'Actualizar Punto' : 'Registrar Punto') }}
+        </button>
+    </div>
+</app-modal>

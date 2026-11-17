@@ -1,0 +1,193 @@
+<app-modal [isOpen]="isOpen"
+    [title]="isEditMode ? 'Editar Producto / Insumo' : (productFound ? 'Registrar Lote - ' + productoForm.get('nombreProducto')?.value : 'Nuevo Producto / Insumo')"
+    [size]="'2xl'" [showFooter]="true" [iconType]="isEditMode ? 'edit' : (productFound ? 'success' : 'document')"
+    [closeOnBackdrop]="false" (modalClose)="close()">
+
+    <div *ngIf="productFound && !isEditMode"
+        class="mb-4 px-4 py-2 bg-blue-50 border border-blue-200 rounded-xl flex items-center gap-3 animate-pulse">
+        <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white">
+            <i class="fas fa-check text-xs"></i>
+        </div>
+        <div>
+            <p class="text-xs font-bold text-blue-800">Producto detectado en el Catálogo Maestro</p>
+            <p class="text-[10px] text-blue-600">Los datos base se han bloqueado para mantener la integridad.</p>
+        </div>
+        <button type="button" (click)="resetMasterData()"
+            class="ml-auto text-[10px] font-bold text-blue-500 hover:text-blue-700 underline">
+            Limpiar y crear nuevo
+        </button>
+    </div>
+
+    <form [formGroup]="productoForm" class="space-y-6">
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+            <input type="hidden" formControlName="idCatalogo">
+
+            <div class="md:col-span-3 space-y-1">
+                <label class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
+                    Código Interno / SKU
+                    <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" formControlName="codigo" placeholder="ej: PROD-001"
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-bold text-blue-600 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div class="md:col-span-9 space-y-1">
+                <label class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
+                    Nombre de Producto / Bien
+                    <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" formControlName="nombreProducto"
+                    placeholder="ej: Silla de Oficina, Jeringa 5ml, etc."
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div class="md:col-span-3 space-y-1">
+                <label class="flex items-center gap-1 text-[10px] font-bold text-slate-500 uppercase">
+                    Categoría
+                    <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <select formControlName="categoria"
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+                    <option value="" disabled>Seleccionar...</option>
+                    <option value="Mobiliario">Mobiliario (Sillas, Mesas)</option>
+                    <option value="Equipo_Medico">Equipo Médico</option>
+                    <option value="Insumo">Insumo General</option>
+                    <option value="Medicamento">Medicamento</option>
+                    <option value="Limpieza">Limpieza</option>
+                    <option value="Otros">Otros Bienes</option>
+                </select>
+            </div>
+
+            <div class="md:col-span-3 space-y-1">
+                <label class="flex items-center text-[10px] font-bold text-slate-500 uppercase">Código de Barras</label>
+                <input type="text" formControlName="codigoBarra" placeholder="Escanear..."
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-mono text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div class="md:col-span-3 space-y-1">
+                <label class="flex items-center text-[10px] font-bold text-slate-500 uppercase">Modelo</label>
+                <input type="text" formControlName="modelo" placeholder="ej: Ergonómica XL"
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+
+            <div class="md:col-span-3 space-y-1">
+                <label class="flex items-center text-[10px] font-bold text-slate-500 uppercase">Marca / Lab</label>
+                <input type="text" formControlName="marcaLaboratorio" placeholder="ej: Roche, Halmed"
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t border-slate-100">
+            <h4
+                class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center justify-between">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-boxes text-blue-400"></i>
+                    Gestión de Stock e Inventario
+                </span>
+            </h4>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div
+                    class="md:col-span-8 bg-slate-50/50 p-4 rounded-2xl border border-slate-200 grid grid-cols-3 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-500 uppercase">
+                            {{ productoForm.get('factorCompra')?.value > 1 ? 'Cant. (Cajas/Packs)' : 'Cant. (Unidades)'
+                            }}
+                        </label>
+                        <input type="number" formControlName="cantCompra"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-black text-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-500 uppercase">Unid. x Caja</label>
+                        <input type="number" formControlName="factorCompra"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-black text-indigo-600 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-indigo-500 uppercase text-center block">Stock
+                            Real</label>
+                        <div class="h-9 flex items-center justify-center bg-indigo-600 rounded-lg shadow-sm">
+                            <span class="text-sm font-black text-white">{{ productoForm.get('stockReal')?.value
+                                }}</span>
+                            <span class="text-[8px] font-bold text-indigo-200 ml-1">UNID.</span>
+                        </div>
+                    </div>
+
+                    <div class="col-span-3 grid grid-cols-4 gap-3 pt-2">
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-400 uppercase">Lote / Serie</label>
+                            <input type="text" formControlName="registroInvimaLote" placeholder="B-2024"
+                                class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none border-l-4 border-l-amber-400">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-400 uppercase">Vencimiento</label>
+                            <input type="date" formControlName="fechaVencimiento"
+                                class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-400 uppercase">Almacenamiento</label>
+                            <select formControlName="almacenamiento"
+                                class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-black text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                <option value="Normal">Normal</option>
+                                <option value="Refrigerado">Refrigerado</option>
+                                <option value="Congelado">Congelado</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black text-slate-400 uppercase">Ubicación</label>
+                            <input type="text" formControlName="ubicacion" placeholder="Estante A"
+                                class="w-full px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-[10px] font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="md:col-span-4 bg-slate-50/50 p-4 rounded-2xl border border-slate-200 space-y-4">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-500 uppercase">Unidad Medida</label>
+                        <select formControlName="unidadMedida"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none">
+                            <option value="Unidad">Unidad (Base)</option>
+                            <option value="Frasco">Frasco</option>
+                            <option value="Caja">Caja</option>
+                            <option value="Ampolla">Ampolla</option>
+                            <option value="Tableta">Tableta</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-black text-slate-500 uppercase">Reg. Sanitario</label>
+                        <input type="text" formControlName="regSanitario" placeholder="RS-XXXX"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRECIO DE COMPRA (Único campo de precio permitido) -->
+        <div class="pt-4 border-t border-slate-100">
+            <div class="bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100/50 flex items-center justify-between">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <label class="text-[10px] text-indigo-600 font-black uppercase tracking-widest">Precio de Compra</label>
+                        <span class="text-[8px] font-bold text-indigo-400 px-1.5 bg-white rounded border border-indigo-50">Inc. IGV</span>
+                    </div>
+                    <p class="text-[9px] text-slate-400 font-medium italic">Este precio se usará para el costeo de inventario y Kardex.</p>
+                </div>
+                <div class="relative w-48">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-lg font-black text-indigo-300">S/</span>
+                    <input type="number" formControlName="precioCompra"
+                        class="w-full bg-white border border-indigo-100 px-4 py-3 pl-10 rounded-xl text-2xl font-black text-indigo-900 focus:ring-2 focus:ring-indigo-500 outline-none shadow-sm">
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div footer class="flex justify-end gap-3 w-full">
+        <button (click)="close()"
+            class="px-6 py-2.5 bg-white border border-slate-200 text-slate-600 text-sm font-bold rounded-xl hover:bg-slate-50 transition-colors">
+            Cancelar
+        </button>
+        <app-primary-button label="Guardar Producto" color="brand" (btnClick)="save()">
+        </app-primary-button>
+    </div>
+</app-modal>

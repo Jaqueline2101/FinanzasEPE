@@ -1,0 +1,55 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+
+    <!-- Breadcrumb -->
+    <div class="pt-0 pb-1">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-3">
+        <app-page-header title="Anular falta autorizar" subtitle="Visualiza el estado de las solicitudes enviadas." [showCounter]="true" [counterValue]="totalElements">
+        </app-page-header>
+    </div>
+
+    <!-- CARD PRINCIPAL -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 overflow-hidden p-4 md:p-6">
+        
+        <div class="flex justify-between items-center mb-6 gap-4">
+            <app-barra-filtros 
+                class="flex-1"
+                [searchOptions]="searchOptions"
+                [showStatus]="false" 
+                [showDates]="false"
+                (onFilter)="onFilter($event)">
+            </app-barra-filtros>
+
+            <button (click)="cargarTodo()" [disabled]="isLoading" 
+                class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2 disabled:opacity-50 shrink-0">
+                <i class="fa-solid fa-rotate-right" [class.fa-spin]="isLoading"></i>
+                Actualizar
+            </button>
+        </div>
+
+        <app-tabla-general 
+            [datos]="solicitudesPaginadas" 
+            [columnas]="columnasUnificadas" 
+            [loading]="isLoading"
+            [showIndex]="true"
+            [showActions]="false"
+            [currentPage]="paginaActual"
+            [pageSize]="tamanoPagina">
+        </app-tabla-general>
+
+        <!-- Paginación -->
+        <div class="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+            <app-pagination 
+                [currentPage]="paginaActual" 
+                [pageSize]="tamanoPagina" 
+                [totalPages]="totalPages"
+                (pageChange)="onPageChange($event)" 
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+
+    </div>
+</div>

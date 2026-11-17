@@ -1,0 +1,185 @@
+:host {
+    --rp-primary: #2563EB;
+    --rp-text: #0F1C3F;
+    --rp-text-2: #475569;
+    --rp-border: #E2E8F0;
+    --rp-radius-lg: 24px;
+    --rp-font: 'DM Sans', sans-serif;
+    --rp-mono: 'JetBrains Mono', monospace;
+    --rp-shadow-md: 0 10px 40px rgba(15, 28, 63, 0.15);
+}
+
+.rp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 28, 63, 0.5);
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    animation: rp-fade-in 0.3s ease;
+}
+
+.rp-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    pointer-events: none;
+}
+
+.rp-modal-content {
+    pointer-events: all;
+    background: #fff;
+    border-radius: var(--rp-radius-lg);
+    box-shadow: var(--rp-shadow-md);
+    width: 100%;
+    max-width: 900px;
+    animation: rp-modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+@keyframes rp-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes rp-modal-in {
+    from {
+        opacity: 0;
+        transform: translateY(30px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.rp-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 28px 32px;
+    border-bottom: 1px solid var(--rp-border);
+}
+
+.rp-modal-title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-modal-tag {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--rp-primary);
+    margin-bottom: 2px;
+}
+
+.rp-modal-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--rp-text);
+    margin: 0;
+}
+
+.rp-modal-serie {
+    font-family: var(--rp-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: #94A3B8;
+    margin-top: 2px;
+}
+
+.rp-modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    border: 1.5px solid var(--rp-border);
+    background: transparent;
+    color: var(--rp-text-2);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: all 0.2s;
+}
+
+.rp-modal-close:hover {
+    background: #FEF2F2;
+    border-color: #F87171;
+    color: #EF4444;
+}
+
+.rp-modal-body {
+    padding: 32px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.rp-modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px 32px;
+    background: white;
+}
+
+/* Scrollbar aesthetic */
+.rp-modal-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rp-modal-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.rp-modal-body::-webkit-scrollbar-thumb {
+    background: #E2E8F0;
+    border-radius: 10px;
+}
+
+/* Global rp classes fallback inside host */
+.rp-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 24px;
+    height: 46px;
+    font-family: var(--rp-font);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.rp-btn--ghost {
+    background: #F8FAFC;
+    color: #64748B;
+    border: 1.5px solid #E2E8F0;
+}
+
+.rp-btn--ghost:hover {
+    background: #F1F5F9;
+    color: #475569;
+}
+
+.rp-btn--primary {
+    background: var(--rp-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.rp-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}

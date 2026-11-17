@@ -1,0 +1,58 @@
+::ng-deep .registrar-paciente-dialog {
+    .p-dialog-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+    }
+
+    .p-dialog-header .p-dialog-title {
+        color: white;
+    }
+
+    .p-dialog-header-icon {
+        color: white !important;
+    }
+
+    .p-dialog-header-icon:hover {
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+}
+
+.field label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.ng-invalid.ng-touched {
+    border-color: #f44336 !important;
+}
+
+.text-primary {
+    color: #667eea !important;
+}
+
+.bg-green-50 {
+    background-color: #f0fdf4;
+}
+
+.text-green-600 {
+    color: #16a34a;
+}
+
+.text-green-700 {
+    color: #15803d;
+}
+
+.bg-red-50 {
+    background-color: #fef2f2;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.text-red-700 {
+    color: #b91c1c;
+}

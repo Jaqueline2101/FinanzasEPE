@@ -1,0 +1,319 @@
+/* Overlay & Modal Styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(2px);
+}
+
+.modal-container {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 900px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Header Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.format-selector button {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.format-selector button.active {
+    background: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.actions button {
+    padding: 8px 20px;
+    margin-left: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: none;
+    font-weight: bold;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-whatsapp {
+    background: #25D366;
+    color: white;
+}
+
+.btn-email {
+    background: #007bff;
+    color: white;
+}
+
+.btn-print {
+    background: #28a745;
+    color: white;
+}
+
+/* Preview Area */
+.preview-area {
+    flex: 1;
+    overflow: auto;
+    background: #525659;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.ticket-container {
+    background: white;
+    padding: 10px;
+    /* Reduced padding for thermal printers */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    font-family: 'Courier New', Courier, monospace;
+    /* Thermal printer style */
+    color: black;
+}
+
+/* Internal Ticket Stying */
+.header {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.logo img {
+    max-width: 150px;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.header h2 {
+    font-size: 14px;
+    margin: 5px 0;
+    text-transform: uppercase;
+}
+
+.company-name {
+    font-weight: bold;
+    font-size: 12px;
+    margin: 2px 0;
+}
+
+.ruc,
+.address {
+    font-size: 10px;
+    margin: 2px 0;
+}
+
+.ticket-info {
+    margin-top: 10px;
+    font-size: 11px;
+    text-align: left;
+}
+
+.divider {
+    border: none;
+    border-top: 1px dashed #000;
+    margin: 5px 0;
+}
+
+.body {
+    font-size: 11px;
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.label {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.value {
+    text-align: right;
+    flex: 1;
+    word-break: break-word;
+}
+
+.totals {
+    margin: 10px 0;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.footer {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.signature-box {
+    margin-top: 40px;
+}
+
+.signature-box .line {
+    border-top: 1px solid #000;
+    width: 80%;
+    margin: 0 auto 5px auto;
+}
+
+.thank-you {
+    margin-top: 20px;
+    border-top: 1px dashed #000;
+    padding-top: 5px;
+    font-size: 10px;
+}
+
+/* FORMAT SPECIFIC STYLES */
+
+/* 80mm Thermal */
+.ticket-container.format-80mm {
+    width: 80mm;
+    min-height: 200mm;
+    font-size: 12px;
+}
+
+/* 58mm Thermal */
+.ticket-container.format-58mm {
+    width: 58mm;
+    min-height: 200mm;
+    font-size: 10px;
+    padding: 5px;
+}
+
+.ticket-container.format-58mm .logo img {
+    max-width: 100px;
+}
+
+/* A4 */
+.ticket-container.A4 {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 40px;
+    font-family: Arial, sans-serif;
+    /* A4 looks better with Arial */
+}
+
+.ticket-container.A4 .header h2 {
+    font-size: 24px;
+}
+
+.ticket-container.A4 .body {
+    font-size: 14px;
+}
+
+.ticket-container.A4 .total-row {
+    font-size: 18px;
+}
+
+.ticket-container.A4 .signature-box {
+    display: inline-block;
+    width: 45%;
+    margin-top: 100px;
+}
+
+/* A5 */
+.ticket-container.A5 {
+    width: 148mm;
+    min-height: 210mm;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.ticket-container.A5 .header h2 {
+    font-size: 18px;
+}
+
+.ticket-container.A5 .body {
+    font-size: 12px;
+}
+
+
+/* PRINT MEDIA QUERIES */
+@media print {
+
+    /* Hide everything else */
+    body * {
+        visibility: hidden;
+    }
+
+    /* Show modal content */
+    .modal-container,
+    .modal-container * {
+        visibility: visible;
+    }
+
+    /* Position the print area */
+    .modal-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        background: white;
+        box-shadow: none;
+    }
+
+    .overlay {
+        background: white;
+        position: absolute;
+    }
+
+    /* Hide controls */
+    .no-print {
+        display: none !important;
+    }
+
+    .preview-area {
+        background: white;
+        padding: 0;
+        display: block;
+    }
+
+    .ticket-container {
+        box-shadow: none;
+        margin: 0;
+    }
+
+    /* Force page sizes */
+    @page {
+        margin: 0;
+    }
+}

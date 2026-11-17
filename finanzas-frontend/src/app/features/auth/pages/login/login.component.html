@@ -1,0 +1,131 @@
+<div class="min-h-screen flex items-center justify-center relative">
+    <!-- Fondo con gradiente moderno -->
+    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#1E293B]">
+    </div>
+
+    <!-- Contenido centrado (tu card de login) -->
+    <div class="relative z-10 w-full px-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-auto">
+            <h1 class="text-center pt-6 text-[#0F172A] text-2xl font-semibold mb-6">
+                ¡Bienvenido(a) a Finanzas!
+            </h1>
+
+            <p class="text-center text-[#475569] text-sm mb-6">
+                Inicio de sesión
+            </p>
+
+            <form (ngSubmit)="onSubmit($event)" class="space-y-4 px-2">
+                <!-- Campo Usuario -->
+                <div>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2" [class.text-red-500]="error"
+                            [class.text-gray-400]="!error">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input type="text" [(ngModel)]="usuario" name="usuario" placeholder="Usuario"
+                            [disabled]="isBlocked"
+                            class="w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors"
+                            [class.border-red-500]="error" [class.text-red-500]="error"
+                            [class.placeholder-red-300]="error" [class.border-[#CBD5E1]]="!error"
+                            [class.focus:ring-2]="!error" [class.focus:ring-[#1D4ED8]]="!error"
+                            [class.focus:border-transparent]="!error" />
+                    </div>
+                    <p *ngIf="error" class="text-red-500 text-sm mt-1">
+                        Usuario inválido
+                    </p>
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2" [class.text-red-500]="error"
+                            [class.text-gray-400]="!error">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <input [type]="mostrarContrasena ? 'text' : 'password'" [(ngModel)]="contrasena"
+                            name="contraseña" placeholder="Contraseña" [disabled]="isBlocked"
+                            class="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none transition-colors"
+                            [class.border-red-500]="error" [class.text-red-500]="error"
+                            [class.placeholder-red-300]="error" [class.border-[#CBD5E1]]="!error"
+                            [class.focus:ring-2]="!error" [class.focus:ring-[#1D4ED8]]="!error"
+                            [class.focus:border-transparent]="!error" />
+                        <button type="button" (click)="toggleMostrarContrasena()"
+                            class="absolute right-3 top-1/2 transform -translate-y-1/2 hover:text-gray-600 transition-colors"
+                            [class.text-red-500]="error" [class.text-gray-400]="!error">
+                            <svg *ngIf="!mostrarContrasena" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                            <svg *ngIf="mostrarContrasena" class="w-5 h-5" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p *ngIf="error" class="text-red-500 text-sm mt-1">
+                        Contraseña incorrecta
+                    </p>
+                </div>
+
+                <!-- Enlace Olvidé mi contraseña -->
+                <div class="text-right">
+                    <a href="#" class="text-[#1D4ED8] text-sm hover:underline hover:text-[#1E40AF] transition-colors">
+                        Olvidé mi contraseña
+                    </a>
+                </div>
+
+                <!-- Botón de Login -->
+                <button type="submit" [disabled]="cargando"
+                    class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md">
+                    <span *ngIf="!cargando">Ingresar</span>
+                    <span *ngIf="cargando" class="flex items-center justify-center">
+                        <svg class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Cargando...
+                    </span>
+                </button>
+
+                <!-- Mensaje de bloqueo con contador -->
+                <div *ngIf="isBlocked" class="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+                    <div class="flex items-center">
+                        <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                        <div>
+                            <p class="text-red-800 text-sm font-medium">
+                                ⏱️ Bloqueado por intentos excesivos
+                            </p>
+                            <p class="text-red-600 text-xs mt-1">
+                                Podrás intentar nuevamente en: <span class="font-bold">{{ remainingTimeString }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Decoración inferior -->
+            <div class="absolute -bottom-3 left-1/2 -translate-x-1/2
+              w-6 h-6 bg-white rotate-45 shadow-xl">
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicador de carga flotante -->
+    <div *ngIf="cargando" class="absolute inset-0 bg-[#0F172A]/90 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="inline-block animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white mb-4"></div>
+            <p class="text-white text-lg">Cargando...</p>
+        </div>
+    </div>
+</div>

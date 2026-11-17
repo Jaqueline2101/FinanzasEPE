@@ -1,0 +1,184 @@
+<!-- src/app/pages/niveles/niveles.component.html -->
+<div
+  class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+  <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true"></app-breadcrumb>
+
+  <div class="mb-6">
+    <app-page-header title="Gestión de Niveles" subtitle="Gestión de estructura de niveles y departamentos"
+      iconType="custom" [counterValue]="totalElements" counterLabel="Total" [showCounter]="true">
+    </app-page-header>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+    <!-- Columna de Niveles (3/4 del ancho) -->
+    <div
+      class="lg:col-span-3 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-6">
+      <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+        <div
+          class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 w-fit">
+          <button (click)="cambiarVista('tabla')" [ngClass]="
+                    vistaActual === 'tabla'
+                      ? 'bg-[#1E293B] dark:bg-blue-600 text-white shadow-md'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-slate-800/50'
+                  "
+            class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+            Tabla
+          </button>
+
+          <button (click)="cambiarVista('arbol')" [ngClass]="
+                    vistaActual === 'arbol'
+                      ? 'bg-[#1E293B] dark:bg-blue-600 text-white shadow-md'
+                      : 'text-slate-500 dark:text-slate-400 hover:text-[#1E293B] dark:hover:text-blue-400 hover:bg-white/50 dark:hover:bg-slate-800/50'
+                  "
+            class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center gap-2.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Árbol
+          </button>
+
+          <div *ngIf="vistaActual === 'tabla'" class="w-px h-6 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+
+          <button *ngIf="vistaActual === 'tabla'" (click)="toggleMostrarSoloRaiz()" [ngClass]="
+                    mostrarSoloRaiz
+                      ? 'bg-emerald-600 text-white shadow-md'
+                      : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+                  "
+            class="px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-200 flex items-center gap-2.5">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            {{ mostrarSoloRaiz ? 'Solo Raíces' : 'Ver Todos' }}
+          </button>
+        </div>
+        <!-- openCreateModal sin argumentos para raíz -->
+        <app-primary-button label="Nuevo Nivel" icon="plus" size="md" (btnClick)="openCreateModal()">
+        </app-primary-button>
+      </div>
+
+      <div *ngIf="vistaActual === 'tabla'" class="w-full overflow-hidden">
+        <div class="overflow-x-auto w-full block custom-scrollbar min-h-[400px]">
+          <div class="inline-block min-w-full align-middle">
+            <app-tabla-general [datos]="niveles" [currentPage]="currentPage" [columnas]="columnasNiveles"
+              (onEdit)="openEditModal($event)" (onDelete)="deleteNivel($event)" (onNivel)="openCreateModal($event)"
+              [showCreateNivel]="true">
+            </app-tabla-general>
+          </div>
+        </div>
+
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+          [pageSizeOptions]="[10, 25, 50, 100]" (pageChange)="changePage($event)"
+          (pageSizeChange)="changePageSize($event)">
+        </app-pagination>
+      </div>
+
+      <!-- VISTA ÁRBOL -->
+      <div *ngIf="vistaActual === 'arbol'" class="bg-gray-50 dark:bg-slate-900/50 rounded-xl p-6 min-h-[400px]">
+        <div class="space-y-2">
+          <ng-container *ngTemplateOutlet="arbolTemplate; context: { niveles: arbolNiveles, nivel: 0 }">
+          </ng-container>
+        </div>
+
+        <div *ngIf="arbolNiveles.length === 0" class="text-center py-12 text-gray-500 dark:text-slate-400">
+          No hay niveles en el árbol
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna de Tipos de Atención -->
+    <div class="lg:col-span-1">
+      <app-tipo-atencion></app-tipo-atencion>
+    </div>
+
+  </div>
+</div>
+
+
+<ng-template #arbolTemplate let-niveles="niveles" let-nivel="nivel">
+  <div *ngFor="let item of niveles" [class.ml-8]="nivel > 0" class="relative">
+    <div *ngIf="nivel > 0" class="absolute left-[-20px] top-0 bottom-0 w-px bg-slate-200 dark:bg-slate-700"></div>
+
+    <div
+      class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group cursor-pointer"
+      [class.bg-white]="item.expandido" [class.dark:bg-slate-800]="item.expandido" [class.shadow-sm]="item.expandido"
+      [class.border]="item.expandido" [class.border-slate-100]="item.expandido"
+      [class.dark:border-slate-700]="item.expandido">
+      <button *ngIf="item.tieneHijos" (click)="toggleNivel(item)"
+        class="p-1 hover:bg-[#1E293B] hover:text-white dark:hover:bg-blue-600 rounded-md transition-all duration-200 text-slate-400">
+        <svg class="w-4 h-4 transition-transform duration-300" [class.rotate-90]="item.expandido" fill="none"
+          stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+      <div *ngIf="!item.tieneHijos" class="w-6"></div>
+
+      <div (click)="toggleNivel(item)" class="p-2 rounded-xl border transition-colors shadow-sm cursor-pointer"
+        [ngClass]="
+          item.expandido
+            ? 'bg-[#1E293B] dark:bg-blue-600 text-white border-[#1E293B] dark:border-blue-600'
+            : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500 hover:text-blue-500 dark:hover:text-blue-400'
+        ">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        </svg>
+      </div>
+
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span (click)="toggleNivel(item)"
+            class="font-bold text-sm tracking-tight truncate transition-colors cursor-pointer"
+            [class.text-[#1E293B]]="!item.expandido" [class.dark:text-white]="!item.expandido"
+            [class.text-blue-600]="item.expandido" [class.dark:text-blue-400]="item.expandido"
+            [class.hover:text-blue-600]="true" [class.dark:hover:text-blue-400]="true">
+            {{ item.nombre }}
+          </span>
+
+          <span *ngIf="item.numNivel"
+            class="px-2 py-0.5 text-[10px] font-black bg-slate-100 dark:bg-slate-700 text-[#1E293B] dark:text-slate-200 rounded-full border border-slate-200 dark:border-slate-600 uppercase">
+            {{ item.numNivel }}
+          </span>
+        </div>
+        <div *ngIf="item.rutaCompleta"
+          class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 font-medium truncate">
+          {{ item.rutaCompleta }}
+        </div>
+      </div>
+
+      <div
+        class="opacity-0 group-hover:opacity-100 transition-all flex items-center gap-1 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm pl-2">
+        <button (click)="openCreateModal({ idNivel: item.idNivel, nombre: item.nombre })"
+          class="p-1.5 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+          title="Añadir subnivel">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+        </button>
+        <button (click)="openEditModal(item)"
+          class="p-1.5 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-colors"
+          title="Editar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="item.expandido && item.hijos && item.hijos.length > 0">
+      <ng-container *ngTemplateOutlet="arbolTemplate; context: { niveles: item.hijos, nivel: nivel + 1 }">
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Modales -->
+<app-modal-nivel [tiposArea]="tiposArea" (onSaved)="cargarDatos()"></app-modal-nivel>
+<app-modal-subnivel [tiposArea]="tiposArea" (onSaved)="cargarDatos()"></app-modal-subnivel>

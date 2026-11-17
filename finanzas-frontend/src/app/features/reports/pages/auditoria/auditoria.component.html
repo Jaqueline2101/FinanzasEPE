@@ -1,0 +1,47 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+
+    <div class="w-full max-w-full space-y-2">
+        <!-- Breadcrumb -->
+        <div class="pt-0 pb-0">
+            <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+        </div>
+
+        <!-- HEADER -->
+        <app-page-header title="Bitácora y Auditoría" subtitle="Registro unificado de sesiones y cambios en el sistema"
+            iconType="audit" [gradientFrom]="'from-slate-800'" [gradientTo]="'to-slate-900'"
+            [counterValue]="auditTotalElements">
+        </app-page-header>
+
+        <!-- ACCIONES -->
+        <div class="flex justify-end pr-2 mt-2 mb-2 relative z-10">
+            <button (click)="exportarExcel()"
+                class="bg-[#009d6e] hover:bg-[#008a61] text-white px-8 py-2.5 rounded-xl font-black text-[12px] flex items-center gap-2 shadow-xl shadow-green-200/50 transition-all active:scale-95 border-2 border-white">
+                <i class="fa-solid fa-file-excel text-lg"></i>
+                EXPORTAR EXCEL
+            </button>
+        </div>
+
+        <!-- CARD UNIFICADO (FILTROS + TABLA) -->
+        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6 animate-fadeIn space-y-2">
+            <!-- FILTROS -->
+            <app-barra-filtros placeholder="Buscar por Usuario, Tabla o Acción..." [estadoOptions]="actionOptions"
+                statusLabel="Acción" (onFilter)="handleFilter($event)">
+            </app-barra-filtros>
+
+            <!-- TABLA AUDITORIA -->
+            <app-tabla-general [datos]="audits" [columnas]="auditoriaColumnas" [showIndex]="true"
+                [currentPage]="auditPage - 1" [pageSize]="itemsPerPage" [showActions]="true" [showEdit]="false"
+                [showDelete]="false" [showViewDetails]="true" (viewDetails)="openDetailModal($event)">
+            </app-tabla-general>
+
+            <!-- PAGINACION -->
+            <app-pagination [currentPage]="auditPage - 1" [totalPages]="auditTotalPages" [pageSize]="itemsPerPage"
+                [pageSizeOptions]="[10, 25, 50, 100]" (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>
+
+<app-audit-detail-modal [isOpen]="isDetailModalOpen" [audit]="selectedAudit" (close)="closeDetailModal()">
+</app-audit-detail-modal>

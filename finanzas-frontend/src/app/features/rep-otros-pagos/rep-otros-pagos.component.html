@@ -1,0 +1,68 @@
+<div class="animate-fadeIn p-6 min-h-screen bg-slate-50 dark:bg-slate-950">
+    <!-- Navigation -->
+    <div class="mb-4">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="mb-4">
+        <app-page-header 
+            title="Reporte de Otros Pagos" 
+            [showCounter]="true"
+            counterLabel="Registros"
+            [counterValue]="totalRecords"
+            iconType="chart">
+        </app-page-header>
+    </div>
+
+    <!-- Acciones Superiores -->
+    <div class="flex justify-end mt-4">
+        <button 
+            (click)="exportarExcel()" 
+            class="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-200 transition-all active:scale-95 uppercase tracking-wider">
+            <i class="fas fa-file-excel text-sm"></i> Exportar Excel
+        </button>
+    </div>
+
+    <!-- Unified Card (Filters + Table) -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden mt-4">
+        
+        <!-- Filters -->
+        <div class="p-6 pb-2">
+            <app-barra-filtros 
+                placeholder="Buscar por beneficiario o concepto..."
+                [showStatus]="false"
+                [searchOptions]="searchOptions"
+                (onFilter)="handleFilter($event)">
+            </app-barra-filtros>
+        </div>
+
+        <!-- Table Section -->
+        <div class="p-2">
+            <app-tabla-general 
+                [columnas]="columnas" 
+                [datos]="datos" 
+                [loading]="loading"
+                [showIndex]="true"
+                [autoSort]="false"
+                [showEdit]="false" 
+                [showDelete]="false" 
+                [showViewDetails]="false" 
+                [showActions]="false"
+                [currentPage]="currentPage"
+                [pageSize]="pageSize">
+            </app-tabla-general>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+            <app-pagination 
+                [currentPage]="currentPage" 
+                [pageSize]="pageSize" 
+                [totalPages]="totalPages"
+                (pageChange)="onPageChange($event)" 
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,167 @@
+<div class="preview-container">
+    <div class="paper" [ngClass]="{
+        'format-80': formato === 'TICKET_80',
+        'format-58': formato === 'TICKET_58',
+        'format-a4': formato === 'A4',
+        'format-a5': formato === 'A5'
+    }">
+        <!-- HEADER -->
+        <div class="header">
+            <img src="logo.png" alt="Logo" class="logo">
+            <div class="clinic-info">
+                <div class="clinic-name">{{ clinicData.nombre }}</div>
+                <div>RUC: {{ clinicData.ruc }}</div>
+                <div>{{ clinicData.direccion }}</div>
+                <div *ngIf="ventaInfo?.sede" class="font-bold uppercase">SEDE: {{ ventaInfo?.sede }}</div>
+                <div>Telf: {{ clinicData.telefono }}</div>
+            </div>
+
+            <!-- Document Type (Special for documents) -->
+            <div *ngIf="formato === 'A4' || formato === 'A5'" class="text-right">
+                <div class="section-title">Comprobante de Pago</div>
+                <div class="font-black text-xl uppercase">{{ docTitle }}</div>
+                <div class="text-slate-500">{{ numeroComprobante }}</div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- INFO (Tickets style) -->
+        <div *ngIf="formato === 'TICKET_80' || formato === 'TICKET_58'" class="venta-info-ticket">
+            <div class="info-row">
+                <span class="label">{{ docNumberLabel }}</span>
+                <span>{{ numeroComprobante }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Fecha/Hora:</span>
+                <span>{{ (ventaInfo?.fecha || today) | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Caja:</span>
+                <span>{{ ventaInfo?.caja || 'PRINCIPAL' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Usuario:</span>
+                <span>{{ ventaInfo?.usuario || 'ADMIN' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Tipo:</span>
+                <span class="uppercase font-bold text-indigo-700">{{ docTitle }}</span>
+            </div>
+        </div>
+
+        <!-- BENEFICIARIO INFO -->
+        <div class="section-title">Datos del Beneficiario</div>
+        <div class="info-row">
+            <span class="label">Nombre:</span>
+            <span class="uppercase font-bold">{{ ventaInfo?.beneficiario || pago?.nombreRazonSocial }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Documento:</span>
+            <span>{{ ventaInfo?.numeroDocumento || pago?.numeroDocumento || 'N/A' }}</span>
+        </div>
+        <div *ngIf="pago?.areaServicio" class="info-row">
+            <span class="label">Área/Servicio:</span>
+            <span>{{ pago?.areaServicio }}</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ITEM DETAIL -->
+        <div class="section-title">Concepto de Pago</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>DESCRIPCIÓN</th>
+                    <th class="text-right">IMPORTE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="flex flex-col">
+                            <span class="font-bold">{{ pago?.conceptoPago }}</span>
+                            <div *ngIf="pago?.periodoMes" class="text-[10px] text-slate-500">
+                                Periodo: {{ pago?.periodoMes }}/{{ pago?.periodoAnio }}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-right align-top pt-1">
+                        {{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ subtotal | number:'1.2-2' }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="divider-thick"></div>
+
+        <!-- TOTALS -->
+        <div class="totals-container">
+            <!-- Table layout for totals to make it look perfect -->
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 3px 0; font-size: 0.9em;">MONTO BRUTO:</td>
+                    <td class="text-right font-bold" style="padding: 3px 0; font-size: 0.9em;">
+                        {{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ subtotal | number:'1.2-2' }}
+                    </td>
+                </tr>
+                <tr *ngIf="retencion > 0" class="text-red-500">
+                    <td style="padding: 3px 0; font-size: 0.9em; padding-left: 10px;">RETENCIÓN (8%):</td>
+                    <td class="text-right font-bold" style="padding: 3px 0; font-size: 0.9em;">
+                        -{{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ retencion | number:'1.2-2' }}
+                    </td>
+                </tr>
+                <tr *ngIf="otrosDescuentos > 0" class="text-red-500">
+                    <td style="padding: 3px 0; font-size: 0.9em; padding-left: 10px;">OTROS DESCUENTOS:</td>
+                    <td class="text-right font-bold" style="padding: 3px 0; font-size: 0.9em;">
+                        -{{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ otrosDescuentos | number:'1.2-2' }}
+                    </td>
+                </tr>
+                <tr class="total-final">
+                    <td style="padding-top: 5px;">TOTAL NETO:</td>
+                    <td class="text-right" style="padding-top: 5px;">
+                        {{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ total | number:'1.2-2' }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- PAYMENT INFO -->
+        <div class="payment-info">
+            <div class="section-title" style="border: none; margin-bottom: 2px;">Resumen de Pago</div>
+
+            <div class="info-row">
+                <span class="label">Medio de Pago:</span>
+                <span class="font-bold uppercase">{{ pago?.medioPago }}</span>
+            </div>
+
+            <div *ngIf="pago?.bancoDestino" class="info-row text-[10px] ml-2 italic">
+                <span>- Banco: {{ pago?.bancoDestino }}</span>
+            </div>
+            <div *ngIf="pago?.numeroCuenta" class="info-row text-[10px] ml-2 italic">
+                <span>- Cuenta: {{ pago?.numeroCuenta }}</span>
+            </div>
+            <div *ngIf="pago?.codigoTransferencia" class="info-row text-[10px] ml-2 italic">
+                <span>- Op: {{ pago?.codigoTransferencia }}</span>
+            </div>
+
+            <div class="divider" style="margin: 4px 0; border-style: dotted;"></div>
+
+            <div class="info-row">
+                <span class="label">Monto Recibido:</span>
+                <span>{{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ (ventaInfo?.montoRecibido || total) | number:'1.2-2'
+                    }}</span>
+            </div>
+            <div class="info-row" [ngClass]="{'font-black text-emerald-600': (ventaInfo?.vuelto || 0) > 0}">
+                <span class="label">Vuelto:</span>
+                <span>{{ pago?.moneda === 'USD' ? '$' : 'S/' }} {{ (ventaInfo?.vuelto || 0) | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>Comprobante emitido internamente.</p>
+            <p>Favor de verificar sus datos.</p>
+        </div>
+    </div>
+</div>

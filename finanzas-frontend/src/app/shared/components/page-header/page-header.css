@@ -1,0 +1,203 @@
+/* ========================================
+   PAGE HEADER COMPONENT - ESTILOS CON TEMAS
+   ======================================== */
+
+/* ========================================
+   CONTENEDOR PRINCIPAL
+   ======================================== */
+
+/* Contenedor base - modo claro */
+.rounded-xl {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Variante sin gradiente - modo claro */
+.bg-white.border {
+  background-color: white;
+  border-color: #e2e8f0; /* slate-200 */
+  color: #0f172a; /* slate-900 */
+}
+
+/* Variante sin gradiente - modo oscuro */
+.dark .bg-white.border {
+  background-color: #1e293b; /* slate-800 */
+  border-color: #334155; /* slate-700 */
+  color: #f1f5f9; /* slate-100 */
+}
+
+/* ========================================
+   BREADCRUMB
+   ======================================== */
+
+/* Links del breadcrumb - modo claro */
+.text-slate-500 {
+  color: #64748b;
+  transition: color 0.3s ease;
+}
+
+.dark .text-slate-500 {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* Hover en breadcrumb - modo claro */
+.text-slate-500.hover\:text-blue-600:hover {
+  color: #2563eb; /* blue-600 */
+}
+
+.dark .text-slate-500.hover\:text-blue-600:hover {
+  color: #60a5fa; /* blue-400 */
+}
+
+/* Texto actual del breadcrumb */
+.text-slate-400 {
+  color: #94a3b8;
+  transition: color 0.3s ease;
+}
+
+.dark .text-slate-400 {
+  color: #64748b; /* slate-500 */
+}
+
+/* ========================================
+   ICONOS
+   ======================================== */
+
+/* Contenedor del icono - sin gradiente, modo claro */
+.bg-blue-50 {
+  background-color: #eff6ff; /* blue-50 */
+  transition: background-color 0.3s ease;
+}
+
+.dark .bg-blue-50 {
+  background-color: #334155; /* slate-700 */
+}
+
+/* Icono - sin gradiente, modo claro */
+.text-\[\#0b4165\] {
+  color: #0b4165;
+  transition: color 0.3s ease;
+}
+
+.dark .text-\[\#0b4165\] {
+  color: #60a5fa; /* blue-400 */
+}
+
+/* Contenedor del icono - con gradiente */
+.bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+/* Icono blanco para gradientes */
+.text-white {
+  color: white;
+}
+
+/* ========================================
+   TÍTULOS Y TEXTO
+   ======================================== */
+
+/* Título principal - modo claro */
+.text-slate-800 {
+  color: #1e293b;
+  transition: color 0.3s ease;
+}
+
+.dark .text-slate-800 {
+  color: #f1f5f9; /* slate-100 */
+}
+
+/* Subtítulo - sin gradiente, modo claro */
+.text-slate-500 {
+  color: #64748b;
+}
+
+.dark .text-slate-500 {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* Subtítulo con gradiente */
+.text-blue-100 {
+  color: #dbeafe;
+  transition: color 0.3s ease;
+}
+
+/* ========================================
+   CONTADOR
+   ======================================== */
+
+/* Contenedor del contador - sin gradiente, modo claro */
+.bg-slate-100 {
+  background-color: #f1f5f9;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark .bg-slate-100 {
+  background-color: #334155; /* slate-700 */
+}
+
+/* Texto del contador - sin gradiente, modo claro */
+.text-slate-600 {
+  color: #475569;
+  transition: color 0.3s ease;
+}
+
+.dark .text-slate-600 {
+  color: #cbd5e1; /* slate-300 */
+}
+
+/* Número del contador - modo claro */
+.text-slate-900 {
+  color: #0f172a;
+  transition: color 0.3s ease;
+}
+
+.dark .text-slate-900 {
+  color: #f1f5f9; /* slate-100 */
+}
+
+/* Contenedor del contador - con gradiente */
+.dark .bg-white\/20 {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ========================================
+   BACKDROP BLUR
+   ======================================== */
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* ========================================
+   TRANSICIONES
+   ======================================== */
+
+/* Transiciones suaves para todos los elementos del header */
+.rounded-xl * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ========================================
+   SOMBRAS
+   ======================================== */
+
+.shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.dark .shadow-sm {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+  /* Ajustes para móvil si es necesario */
+  .text-xl {
+    font-size: 1.125rem; /* Reducir tamaño en móvil */
+  }
+}

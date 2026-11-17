@@ -1,0 +1,30 @@
+:host {
+    display: block;
+}
+
+/* Animación de entrada */
+.animate-fadeIn {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Ajustes para la tabla y scroll */
+.overflow-hidden {
+    overflow: hidden;
+}
+
+/* Focus styles for components */
+app-search-generic:focus-within {
+    border-color: #3b82f6;
+}

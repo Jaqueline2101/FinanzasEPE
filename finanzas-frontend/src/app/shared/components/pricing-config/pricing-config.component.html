@@ -1,0 +1,159 @@
+<!-- SECCIÓN: CONFIGURACIÓN DE PRECIOS & TIPO -->
+<div class="space-y-4">
+  <!-- Main Toggle: SERVICIO vs PRODUCTO -->
+  <div class="flex items-center justify-between mb-4">
+    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tipo de Registro</label>
+    <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200 shadow-inner">
+      <button type="button" (click)="setTipo('SERVICIO')" [class.bg-white]="tipo === 'SERVICIO'"
+        [class.shadow-md]="tipo === 'SERVICIO'" [class.text-blue-600]="tipo === 'SERVICIO'"
+        class="px-5 py-2 rounded-lg text-[10px] font-black uppercase transition-all duration-300">
+        <i class="fas fa-hand-holding-medical mr-1.5" [class.text-blue-500]="tipo === 'SERVICIO'"></i>
+        Servicio
+      </button>
+      <button type="button" (click)="setTipo('PRODUCTO')" [class.bg-white]="tipo === 'PRODUCTO'"
+        [class.shadow-md]="tipo === 'PRODUCTO'" [class.text-blue-600]="tipo === 'PRODUCTO'"
+        class="px-5 py-2 rounded-lg text-[10px] font-black uppercase transition-all duration-300">
+        <i class="fas fa-box-open mr-1.5" [class.text-blue-500]="tipo === 'PRODUCTO'"></i>
+        Producto
+      </button>
+    </div>
+  </div>
+
+  <!-- MÓDULO AVANZADO (Solo para PRODUCTO) -->
+  <div *ngIf="tipo === 'PRODUCTO'"
+    class="bg-gray-50 p-5 rounded-2xl border border-gray-200 shadow-sm space-y-5 animate-in fade-in slide-in-from-top-2 duration-500">
+    <div class="flex items-center justify-between">
+      <h3 class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Estrategia de Precios (Producto)</h3>
+
+      <!-- Sub Toggle: PERCENTAGE vs FIXED -->
+      <div class="flex bg-gray-200/50 rounded-lg p-1 border border-gray-300/50">
+        <button type="button" (click)="togglePricingMode('PERCENTAGE')" [class.bg-white]="pricingMode === 'PERCENTAGE'"
+          [class.shadow-sm]="pricingMode === 'PERCENTAGE'"
+          class="px-3 py-1 rounded-md text-[9px] font-bold uppercase transition-all duration-200"
+          [class.text-blue-600]="pricingMode === 'PERCENTAGE'" [class.text-gray-500]="pricingMode !== 'PERCENTAGE'">
+          % Margen
+        </button>
+        <button type="button" (click)="togglePricingMode('FIXED')" [class.bg-white]="pricingMode === 'FIXED'"
+          [class.shadow-sm]="pricingMode === 'FIXED'"
+          class="px-3 py-1 rounded-md text-[9px] font-bold uppercase transition-all duration-200"
+          [class.text-blue-600]="pricingMode === 'FIXED'" [class.text-gray-500]="pricingMode !== 'FIXED'">
+          $ Precio Fijo
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <!-- Precio Compra -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Precio Compra (Inc.
+          IGV)</label>
+        <div class="relative group">
+          <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm font-bold">{{ moneda === 'USD' ? '$' : 'S/'
+            }}</span>
+          <input type="number" [value]="displayValue(precioCompra)" (input)="onInput('precioCompra', $event)"
+            name="precioCompra" min="0" step="0.01" placeholder="0.00"
+            class="w-full pl-9 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-sm font-black text-slate-900 transition-all outline-none" />
+        </div>
+      </div>
+
+      <!-- Margen de Ganancia -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Margen Ganancia (%)</label>
+        <div class="relative group">
+          <input type="number" [value]="displayValue(margenGanancia)" (input)="onInput('margenGanancia', $event)"
+            name="margenGanancia" min="0" step="0.01" placeholder="0%" [readonly]="pricingMode === 'FIXED'"
+            [class.bg-slate-100]="pricingMode === 'FIXED'"
+            class="w-full pl-4 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-sm font-black text-blue-600 transition-all outline-none" />
+          <span class="absolute right-4 top-2.5 text-blue-400 text-sm font-bold">%</span>
+        </div>
+      </div>
+
+      <!-- Precio Venta Final -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Precio Venta Final (Inc.
+          IGV)</label>
+        <div class="relative group">
+          <span class="absolute left-3.5 top-2.5 text-emerald-400 text-sm font-bold font-black">{{ moneda === 'USD' ? '$'
+            : 'S/' }}</span>
+          <input type="number" [value]="displayValue(precioConIgv)" (input)="onInput('precioConIgv', $event)"
+            name="precioConIgv" min="0" step="0.01" placeholder="0.00" [readonly]="pricingMode === 'PERCENTAGE'"
+            [class.bg-slate-100]="pricingMode === 'PERCENTAGE'"
+            class="w-full pl-9 pr-4 py-2.5 bg-white border border-emerald-200 rounded-xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm font-black text-emerald-700 transition-all outline-none" />
+        </div>
+      </div>
+
+      <!-- Valor Venta Sin IGV -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Valor Venta (Sin IGV)</label>
+        <div class="relative group">
+          <span class="absolute left-3.5 top-2.5 text-slate-400 text-sm font-bold">{{ moneda === 'USD' ? '$' : 'S/'
+            }}</span>
+          <input type="text" [value]="precioSinIgv > 0 ? precioSinIgv.toFixed(2) : ''" name="precioSinIgv" readonly
+            placeholder="0.00"
+            class="w-full pl-9 pr-4 py-2.5 bg-slate-100/50 border border-slate-200 rounded-xl text-slate-500 text-sm font-bold outline-none" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Rentabilidad Summary -->
+    <div class="pt-4 border-t border-slate-200">
+      <h4 class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Resumen de Rentabilidad Proyectada
+      </h4>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="bg-white p-2.5 rounded-xl border border-slate-100 flex flex-col items-center">
+          <span class="text-[8px] font-black text-slate-400 uppercase">Costo Neto</span>
+          <span class="text-xs font-black text-slate-700">{{ displayMetric(metrics.costoNeto) }}</span>
+        </div>
+        <div class="bg-white p-2.5 rounded-xl border border-slate-100 flex flex-col items-center">
+          <span class="text-[8px] font-black text-slate-400 uppercase">IGV (18%)</span>
+          <span class="text-xs font-black text-slate-700">{{ displayMetric(metrics.igv) }}</span>
+        </div>
+        <div
+          class="bg-emerald-50 p-2.5 rounded-xl border border-emerald-100 flex flex-col items-center shadow-emerald-100/20">
+          <span class="text-[8px] font-black text-emerald-600 uppercase">Utilidad Real</span>
+          <span class="text-xs font-black text-emerald-700">{{ displayMetric(metrics.gananciaReal) }}</span>
+        </div>
+        <div class="bg-blue-50 p-2.5 rounded-xl border border-blue-100 flex flex-col items-center">
+          <span class="text-[8px] font-black text-blue-600 uppercase">Margen Real</span>
+          <span class="text-xs font-black text-blue-700">{{ displayMetric(metrics.margenReal) }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO SIMPLIFICADO (Solo para SERVICIO) -->
+  <div *ngIf="tipo === 'SERVICIO'"
+    class="bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50 space-y-5 animate-in fade-in slide-in-from-top-2 duration-500">
+    <div class="flex items-center gap-2">
+      <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+      <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Configuración Simplificada (Servicio)</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <!-- Precio Venta Final -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-tight">Precio Venta Final (Inc.
+          IGV)</label>
+        <div class="relative group">
+          <span class="absolute left-3.5 top-2.5 text-blue-400 text-sm font-black">{{ moneda === 'USD' ? '$' : 'S/'
+            }}</span>
+          <input type="number" [value]="displayValue(precioConIgv)" (input)="onInput('precioConIgv', $event)"
+            name="precioConIgv" min="0" step="0.01" placeholder="0.00"
+            class="w-full pl-9 pr-4 py-3 bg-white border border-blue-200 rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 text-base font-black text-slate-800 transition-all outline-none" />
+        </div>
+      </div>
+
+      <!-- Valor Venta Sin IGV -->
+      <div class="space-y-1.5">
+        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-tight">Valor Venta (Sin IGV)</label>
+        <div class="relative group">
+          <span class="absolute left-3.5 top-3 text-slate-400 text-sm font-bold">{{ moneda === 'USD' ? '$' : 'S/'
+            }}</span>
+          <input type="text" [value]="precioSinIgv > 0 ? precioSinIgv.toFixed(2) : ''" name="precioSinIgv" readonly
+            placeholder="0.00"
+            class="w-full pl-9 pr-4 py-3 bg-slate-100/50 border border-slate-200 rounded-xl text-slate-500 text-sm font-bold outline-none" />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

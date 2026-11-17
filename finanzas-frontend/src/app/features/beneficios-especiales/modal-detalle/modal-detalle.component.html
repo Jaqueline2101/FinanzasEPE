@@ -1,0 +1,83 @@
+<div *ngIf="visible" class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+
+    <!-- Panel -->
+    <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden"
+        (click)="$event.stopPropagation()">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-base font-semibold text-gray-800">Detalle del Plan</h3>
+            <button (click)="cerrar()"
+                class="text-gray-400 hover:text-gray-600 transition-colors text-xl leading-none">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="px-6 py-5 flex flex-col gap-6" *ngIf="item">
+
+            <!-- Info Header -->
+            <div class="flex flex-col gap-1">
+                <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">Plan de Beneficio</span>
+                <h4 class="text-lg font-bold text-gray-900 leading-tight">{{ item.nombre }}</h4>
+            </div>
+
+            <!-- Grid de datos -->
+            <div class="grid grid-cols-2 gap-y-5 gap-x-4">
+
+                <!-- Código -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Código</span>
+                    <span
+                        class="text-sm font-mono font-medium text-gray-700 bg-gray-50 px-2 py-1 rounded border border-gray-100 w-max">
+                        {{ item.codigo }}
+                    </span>
+                </div>
+
+                <!-- Estado -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Estado</span>
+                    <div>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium"
+                            [ngClass]="item.estado === '1' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+                            {{ item.estado === '1' ? 'Activo' : 'Inactivo' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fecha Inicio</span>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="far fa-calendar-alt text-gray-400"></i>
+                        <span>{{ item.fechaInicio ? (item.fechaInicio | date:'dd/MM/yyyy') : 'No establecida' }}</span>
+                    </div>
+                </div>
+
+                <!-- Fecha Fin -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fecha Fin</span>
+                    <div class="flex items-center gap-2 text-sm text-gray-600">
+                        <i class="far fa-calendar-check text-gray-400"></i>
+                        <span>{{ item.fechaFin ? (item.fechaFin | date:'dd/MM/yyyy') : 'No establecida' }}</span>
+                    </div>
+                </div>
+
+                <!-- Tipo -->
+                <div class="flex flex-col gap-1 col-span-2">
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tipo de Plan</span>
+                    <span class="text-sm text-gray-600 font-medium capitalize">{{ item.tipoPlan.toLowerCase() }}</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end">
+            <button (click)="cerrar()"
+                class="px-6 py-2 text-sm font-semibold text-white bg-[#1E293B] hover:bg-[#2d3f55] rounded-lg transition-all shadow-sm">
+                Cerrar
+            </button>
+        </div>
+    </div>
+</div>

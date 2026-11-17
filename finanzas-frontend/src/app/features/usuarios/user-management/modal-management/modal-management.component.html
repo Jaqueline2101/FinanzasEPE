@@ -1,0 +1,256 @@
+<app-modal [isOpen]="isOpen" [title]="isEditMode ? 'Ajustar Perfil de Usuario' : 'Registrar Nuevo Integrante'" size="lg"
+    iconType="info" (modalClose)="close()">
+    <form (ngSubmit)="saveUser()" class="space-y-6">
+        <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-slate-800 rounded-lg text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                                stroke-width="2" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">
+                        Información Personal
+                    </h3>
+                </div>
+
+                @if(!isEditMode && !userToEdit) {
+                <button type="button" (click)="toggleEmployeeSearch()"
+                    class="text-[10px] font-bold uppercase tracking-widest text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    {{ showEmployeeSearch ? 'Ocultar Búsqueda' : 'Buscar Empleado' }}
+                </button>
+                }
+            </div>
+
+            <!-- SEARCH SECTION -->
+            @if(showEmployeeSearch) {
+            <div class="mb-6 bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="employeeSearchInput" [(ngModel)]="searchTerm" name="searchTerm"
+                        (keyup)="searchEmployees()"
+                        class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm font-medium"
+                        placeholder="Buscar por nombre o DNI..." autocomplete="off">
+                </div>
+
+                @if(filteredEmployees.length > 0) {
+                <div
+                    class="mt-2 bg-white rounded-lg shadow-lg border border-slate-100 divide-y divide-slate-100 overflow-hidden">
+                    @for(emp of filteredEmployees; track emp.id) {
+                    <div (click)="selectEmployee(emp)"
+                        class="p-3 hover:bg-slate-50 cursor-pointer transition-colors flex items-center justify-between group">
+                        <div>
+                            <p class="text-xs font-bold text-slate-700">{{ emp.nombre }} {{ emp.apepat }} {{ emp.apemat
+                                }}</p>
+                            <p class="text-[10px] text-slate-500">DNI: {{ emp.numdoc }}</p>
+                        </div>
+                        <div class="text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Nombre
+                        *</label>
+                    <input type="text" [(ngModel)]="formData.firstName" name="firstName" required
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm"
+                        placeholder="Ej: Juan" />
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Apellido
+                        Paterno *</label>
+                    <input type="text" [(ngModel)]="formData.paternalSurname" name="paternalSurname" required
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm"
+                        placeholder="Ej: Pérez" />
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Apellido
+                        Materno</label>
+                    <input type="text" [(ngModel)]="formData.maternalSurname" name="maternalSurname"
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm"
+                        placeholder="Ej: García" />
+                </div>
+                <div class="md:col-span-2">
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Teléfono</label>
+                    <input type="text" [(ngModel)]="formData.phone" name="phone"
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm"
+                        placeholder="Ej: 987654321" />
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-1.5 bg-slate-800 rounded-lg text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                            stroke-width="2.5" />
+                    </svg>
+                </div>
+                <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">
+                    Credenciales de Acceso
+                </h3>
+
+            </div>
+
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Username
+                        *</label>
+                    <input type="text" [(ngModel)]="formData.username" name="username" required [disabled]="isEditMode"
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm disabled:bg-slate-100"
+                        placeholder="Ej: j.perez" />
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Email
+                        Corporativo *</label>
+                    <input type="email" [(ngModel)]="formData.email" name="email" required
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm"
+                        placeholder="usuario@finanzas.com" />
+                </div>
+
+                @if (!isEditMode) {
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Password
+                        *</label>
+                    <input type="password" [(ngModel)]="formData.password" name="password" required
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm" />
+                </div>
+                <div>
+                    <label
+                        class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 ml-1">Confirmar
+                        *</label>
+                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required
+                        class="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none font-bold text-sm" />
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- ROLES SELECTION -->
+        <div class="bg-slate-900 rounded-xl p-6 text-white shadow-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xs font-black text-blue-300 uppercase tracking-[0.3em]">
+                    Asignación de Roles
+                </h3>
+                <span class="px-3 py-0.5 bg-white/10 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                    {{ selectedRoleIds.size }} Seleccionados
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @for (role of availableRoles; track role.id) {
+                <label (click)="toggleRole(role.id)"
+                    class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-200"
+                    [ngClass]="
+            selectedRoleIds.has(role.id)
+              ? 'bg-blue-600 border-blue-500'
+              : 'bg-slate-800 border-slate-700 hover:bg-slate-700'
+          ">
+                    <div class="w-5 h-5 rounded flex items-center justify-center transition-colors" [ngClass]="
+              selectedRoleIds.has(role.id)
+                ? 'bg-white text-blue-600'
+                : 'bg-slate-600 text-slate-400'
+            ">
+                        @if (selectedRoleIds.has(role.id)) {
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M5 13l4 4L19 7" stroke-width="4" stroke="currentColor" />
+                        </svg>
+                        }
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-tight leading-none text-white">
+                            {{ role.name }}
+                        </p>
+                        <p class="text-[9px] text-white/60 font-medium mt-0.5 uppercase">
+                            {{ role.permissions.length || 0 }} Permisos
+                        </p>
+                    </div>
+                </label>
+                }
+            </div>
+        </div>
+
+        <!-- SUCURSAL ASSIGNMENT -->
+        <div class="bg-blue-900 rounded-xl p-6 text-white shadow-lg">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xs font-black text-blue-200 uppercase tracking-[0.3em]">
+                    Asignación de Sucursales
+                </h3>
+                <span class="px-3 py-0.5 bg-white/10 rounded-full text-[9px] font-bold uppercase tracking-wider">
+                    {{ selectedSucursalIds.size }} Seleccionadas
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @for (sucursal of availableSucursales; track sucursal.idSucursal) {
+                <label (click)="toggleSucursal(sucursal.idSucursal)"
+                    class="flex items-center gap-3 p-3.5 rounded-xl border cursor-pointer transition-all duration-200"
+                    [ngClass]="
+            selectedSucursalIds.has(sucursal.idSucursal)
+              ? 'bg-blue-600 border-blue-400'
+              : 'bg-blue-950 border-blue-900 hover:bg-blue-800'
+          ">
+                    <div class="w-5 h-5 rounded flex items-center justify-center transition-colors" [ngClass]="
+              selectedSucursalIds.has(sucursal.idSucursal)
+                ? 'bg-white text-blue-600'
+                : 'bg-blue-800 text-blue-400'
+            ">
+                        @if (selectedSucursalIds.has(sucursal.idSucursal)) {
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M5 13l4 4L19 7" stroke-width="4" stroke="currentColor" />
+                        </svg>
+                        }
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-tight leading-none text-white">
+                            {{ sucursal.nombreSucursal }}
+                        </p>
+                        <p class="text-[9px] text-white/60 font-medium mt-0.5 uppercase">
+                            {{ sucursal.direccion || 'Sin dirección' }}
+                        </p>
+                    </div>
+                </label>
+                }
+            </div>
+        </div>
+
+        <div footer class="flex justify-end gap-3 w-full pt-2">
+            <button type="button" (click)="close()" [disabled]="saving"
+                class="px-5 py-2.5 rounded-xl text-slate-500 font-bold hover:bg-slate-100 transition-all uppercase text-[10px] tracking-widest">
+                Descartar
+            </button>
+            <button type="submit" [disabled]="saving"
+                class="px-8 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg uppercase text-[10px] tracking-widest">
+                {{ isEditMode ? 'Confirmar Cambios' : 'Crear Usuario' }}
+            </button>
+        </div>
+    </form>
+</app-modal>

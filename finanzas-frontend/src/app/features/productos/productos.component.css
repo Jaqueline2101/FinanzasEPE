@@ -1,0 +1,95 @@
+.consolidation-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+}
+
+.consolidated-row {
+  background: white;
+  transition: all 0.2s;
+}
+
+.consolidated-row:hover {
+  background: #f8fafc;
+}
+
+.consolidated-row td {
+  padding: 1rem;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.consolidated-row td:first-child {
+  border-left: 1px solid #f1f5f9;
+  border-radius: 12px 0 0 12px;
+}
+
+.consolidated-row td:last-child {
+  border-right: 1px solid #f1f5f9;
+  border-radius: 0 12px 12px 0;
+}
+
+.expand-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.expand-btn i {
+  transition: transform 0.2s;
+}
+
+.expand-btn.active {
+  background: #0f172a;
+  color: white;
+}
+
+.expand-btn.active i {
+  transform: rotate(90deg);
+}
+
+.lotes-detail-container {
+  padding: 0.5rem 1rem 1rem 3.5rem;
+}
+
+.lote-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lote-info {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.lote-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.lote-expired {
+  border: 1px solid #fee2e2;
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.lote-ok {
+  border: 1px solid #dcfce7;
+  background: #f0fdf4;
+  color: #16a34a;
+}

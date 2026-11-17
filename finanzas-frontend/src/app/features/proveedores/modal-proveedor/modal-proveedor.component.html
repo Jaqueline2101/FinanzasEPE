@@ -1,0 +1,258 @@
+<app-modal [isOpen]="isOpen" [title]="isEditing ? 'Editar Proveedor' : 'Nuevo Proveedor'" [size]="'3xl'"
+    [showFooter]="true" [iconType]="isEditing ? 'edit' : 'document'" [closeOnBackdrop]="false" (modalClose)="close()">
+
+    <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+
+        <!-- FILA 1: IDENTIFICACIÓN Y DATOS GENERALES -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <!-- SECCIÓN IDENTIFICACIÓN -->
+            <div class="md:col-span-12 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+                <h3 class="text-[9px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2 mb-2">
+                    <i class="fas fa-id-card"></i> Identificación y Razón Social
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                            Tipo
+                            <span class="text-rose-500 text-xl leading-none">*</span>
+                        </label>
+                        <select formControlName="tipoDocIdent"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+                            <option value="RUC">RUC</option>
+                            <option value="DNI">DNI</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                            Documento
+                            <span class="text-rose-500 text-xl leading-none">*</span>
+                        </label>
+                        <input formControlName="numDocIdent" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            [placeholder]="form.get('tipoDocIdent')?.value === 'RUC' ? '11 dígitos' : '8 dígitos'"
+                            [attr.maxlength]="form.get('tipoDocIdent')?.value === 'RUC' ? 11 : 8">
+                        <p *ngIf="form.get('numDocIdent')?.touched && form.get('numDocIdent')?.errors?.['required']"
+                            class="text-[9px] text-red-500 font-bold mt-1 uppercase items-center flex gap-1"><i class="fas fa-exclamation-circle text-[8px]"></i> Requerido</p>
+                        
+                        <!-- Mensajes de Error para RUC -->
+                        <ng-container *ngIf="form.get('tipoDocIdent')?.value === 'RUC'">
+                            <p *ngIf="form.get('numDocIdent')?.dirty && form.get('numDocIdent')?.errors?.['pattern']"
+                                class="text-[9px] text-red-500 font-bold mt-1 uppercase items-center flex gap-1 leading-tight">
+                                <i class="fas fa-exclamation-triangle text-[8px]"></i> El RUC debe iniciar con 20 y tener 11 dígitos
+                            </p>
+                        </ng-container>
+
+                        <!-- Mensajes de Error para DNI -->
+                        <ng-container *ngIf="form.get('tipoDocIdent')?.value === 'DNI'">
+                            <p *ngIf="form.get('numDocIdent')?.dirty && form.get('numDocIdent')?.errors?.['pattern']"
+                                class="text-[9px] text-red-500 font-bold mt-1 uppercase items-center flex gap-1">
+                                <i class="fas fa-exclamation-triangle text-[8px]"></i> EL DNI debe tener 8 dígitos
+                            </p>
+                        </ng-container>
+
+                        <p *ngIf="form.get('numDocIdent')?.touched && form.get('numDocIdent')?.errors?.['docExists']"
+                            class="text-[9px] text-amber-600 font-bold mt-1 uppercase italic items-center flex gap-1"><i class="fas fa-id-badge text-[8px]"></i> Ya registrado en el sistema</p>
+                    </div>
+                    <div class="md:col-span-4 space-y-1">
+                        <label class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase">
+                            Razón Social
+                            <span class="text-rose-500 text-xl leading-none">*</span>
+                        </label>
+                        <input formControlName="razonSocial" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            placeholder="Ej: Inversiones Medicas S.A.C.">
+                        <p *ngIf="form.get('razonSocial')?.touched && form.get('razonSocial')?.errors?.['required']"
+                            class="text-[9px] text-red-500 font-bold mt-1 uppercase">Requerido</p>
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase">Nombre Comercial</label>
+                        <input formControlName="nombreComercial" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                            placeholder="Nombre fantasía">
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase">Clasificación</label>
+                        <select formControlName="tipoProveedor"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none">
+                            <option value="BIENES">Bienes</option>
+                            <option value="SERVICIOS">Servicios</option>
+                            <option value="AMBOS">Mixto</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 2: LEGAL, CRÉDITO Y BANCOS -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <!-- REPR. LEGAL -->
+            <div class="md:col-span-4 bg-white p-3 rounded-xl border border-slate-100 shadow-sm space-y-2">
+                <h3 class="text-[9px] font-black text-indigo-600 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-user-tie"></i> Legal
+                </h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Nombre</label>
+                        <input formControlName="representante" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-900 outline-none"
+                            placeholder="Representante">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Cargo</label>
+                        <input formControlName="cargoRepresentante" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-900 outline-none"
+                            placeholder="Gerente/Apoderado">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRÉDITO -->
+            <div class="md:col-span-2 bg-white p-3 rounded-xl border border-slate-100 shadow-sm space-y-2">
+                <h3 class="text-[9px] font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-clock"></i> Crédito
+                </h3>
+                <div class="space-y-1">
+                    <label class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Plazo (Días)</label>
+                    <div class="relative">
+                        <input formControlName="plazo" type="number" min="0"
+                            class="w-full px-2 py-1.5 bg-amber-50/30 border border-amber-200 rounded-lg text-xs font-bold text-amber-700 outline-none"
+                            placeholder="0">
+                        <span class="absolute right-2 top-1/2 -translate-y-1/2 text-[8px] font-black text-amber-600 uppercase">Días</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BANCOS -->
+            <div class="md:col-span-6 bg-slate-900 p-3 rounded-xl space-y-2 border-b-2 border-b-emerald-500">
+                <h3 class="text-[9px] font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-university"></i> Datos Bancarios (Interbancario)
+                </h3>
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-bold text-emerald-100/40 uppercase tracking-tighter">Banco</label>
+                        <input formControlName="banco" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[11px] font-bold !text-white placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-500 outline-none"
+                            placeholder="BCP/BBVA...">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-bold text-emerald-100/40 uppercase tracking-tighter">Cuenta</label>
+                        <input formControlName="cuentaBancaria" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[11px] font-mono font-bold !text-white placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-500 outline-none"
+                            placeholder="193-XXXX...">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[8px] font-bold text-emerald-100/40 uppercase tracking-tighter">CCI</label>
+                        <input formControlName="cci" type="text"
+                            class="w-full px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-[11px] font-mono font-bold !text-emerald-400 placeholder:text-slate-600 focus:ring-1 focus:ring-emerald-500 outline-none"
+                            placeholder="002-XXXX...">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 3: CONTACTO Y WEB -->
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm space-y-2">
+            <h3 class="text-[9px] font-black text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-envelope-open-text"></i> Canales de Contacto Digital
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
+                        Celular Princ.
+                        <span class="text-rose-500 text-xl leading-none">*</span>
+                    </label>
+                    <input formControlName="telefono" type="text"
+                        class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 outline-none"
+                        placeholder="999888777">
+                    <p *ngIf="form.get('telefono')?.touched && form.get('telefono')?.errors?.['pattern']"
+                        class="text-[9px] text-red-500 font-bold mt-1 uppercase">Debe tener 9 dígitos</p>
+                </div>
+                <div class="space-y-1">
+                    <label class="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-tighter">
+                        Email Corp.
+                        <span class="text-rose-500 text-xl leading-none">*</span>
+                    </label>
+                    <input formControlName="email" type="email"
+                        class="w-full px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-900 outline-none"
+                        placeholder="ventas@empresa.pe">
+                    <p *ngIf="form.get('email')?.touched && form.get('email')?.errors?.['email']"
+                        class="text-[9px] text-red-500 font-bold mt-1 uppercase">Email inválido</p>
+                </div>
+                <div class="space-y-1 md:col-span-2">
+                    <label class="text-[9px] font-bold text-slate-500 uppercase tracking-tighter">Sitio Web / LinkedIn</label>
+                    <div class="relative">
+                        <i class="fas fa-globe absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                        <input formControlName="sitioWeb" type="text"
+                            class="w-full pl-7 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-blue-600 placeholder:text-slate-300 outline-none"
+                            placeholder="www.proveedor.com">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILA 4: DIRECCIONES -->
+        <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[9px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-map-marked-alt"></i> Sedes Corporativas
+                </h3>
+                <button type="button" (click)="addDireccion()"
+                    class="px-2 py-1 bg-blue-600 text-white text-[8px] font-black rounded-lg hover:bg-blue-700 uppercase tracking-tighter shadow-sm">
+                    <i class="fas fa-plus"></i> Nueva sede
+                </button>
+            </div>
+
+            <div formArrayName="direcciones" class="space-y-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
+                <div *ngFor="let group of direcciones.controls; let i=index" [formGroupName]="i" 
+                    class="flex gap-2 p-2 bg-slate-50 border border-slate-100 rounded-xl group transition-all hover:bg-white hover:shadow-sm">
+                    <div class="w-1/4 space-y-1">
+                        <input formControlName="sede" type="text"
+                            class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 outline-none focus:ring-1 focus:ring-blue-500"
+                            placeholder="Etiqueta sede">
+                    </div>
+                    <div class="flex-1 space-y-1">
+                        <input formControlName="direccion" type="text"
+                            class="w-full px-2 py-1 bg-white border border-slate-200 rounded text-[11px] font-bold text-slate-700 outline-none focus:ring-1 focus:ring-blue-500"
+                            [placeholder]="'Dirección completa de la sede ' + (i+1)">
+                    </div>
+                    <button *ngIf="direcciones.length > 1" type="button" (click)="removeDireccion(i)"
+                        class="p-1 text-rose-400 hover:text-rose-600 rounded transition-colors">
+                        <i class="fas fa-times-circle text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-2 mt-2 pt-2 border-t border-slate-50">
+                <input formControlName="departamento" type="text" class="px-2 py-1 bg-slate-50 border-none text-[10px] font-bold rounded" placeholder="DEPARTAMENTO">
+                <input formControlName="provincia" type="text" class="px-2 py-1 bg-slate-50 border-none text-[10px] font-bold rounded" placeholder="PROVINCIA">
+                <input formControlName="distrito" type="text" class="px-2 py-1 bg-slate-50 border-none text-[10px] font-bold rounded" placeholder="DISTRITO">
+                <div class="flex items-center gap-2 justify-end pr-2">
+                     <span class="text-[10px] font-bold text-slate-400">ESTADO:</span>
+                     <label class="relative inline-flex items-center cursor-pointer scale-75">
+                        <input type="radio" formControlName="estado" value="Habilitado" class="sr-only peer">
+                        <div class="w-8 h-4 bg-slate-200 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-4"></div>
+                        <span class="ml-2 text-[10px] font-black" [class]="form.get('estado')?.value === 'Habilitado' ? 'text-emerald-600' : 'text-slate-400'">ACT</span>
+                     </label>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+    <div footer class="flex items-center justify-between w-full">
+        <div class="text-[9px] text-slate-400 font-bold uppercase tracking-widest hidden md:block pl-2">
+            Administración de Proveedores <span class="text-blue-500">v2.1</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <button (click)="close()"
+                class="px-4 py-1.5 text-slate-500 font-black text-[10px] hover:bg-slate-100 rounded-lg transition-all uppercase tracking-widest">
+                Descartar
+            </button>
+            <button (click)="save()" [disabled]="form.invalid || form.pending"
+                class="px-8 py-2 bg-slate-900 border-b-4 border-b-blue-600 hover:bg-black disabled:opacity-30 text-white font-black text-[10px] rounded-xl shadow-lg transition-all uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-check-circle text-blue-400"></i> {{ isEditing ? 'Actualizar Datos' : 'Registrar Proveedor' }}
+            </button>
+        </div>
+    </div>
+</app-modal>

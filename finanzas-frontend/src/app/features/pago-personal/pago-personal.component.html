@@ -1,0 +1,109 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6 animate-fadeIn">
+    <ng-container *ngIf="!isFullScreenView">
+        <!-- Breadcrumb -->
+        <div class="px-4 sm:px-6 lg:px-8 mb-4">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        </div>
+
+        <!-- Header: Solo visible si NO está en modo masivo -->
+        <div *ngIf="!isBulkMode" class="px-4 sm:px-6 lg:px-8 mb-8">
+            <app-page-header 
+                title="Pagos de Personal"
+                subtitle="Gestión de planillas, adelantos y bonificaciones para trabajadores" 
+                icon="fas fa-users"
+                [counterValue]="registros.length" 
+                counterLabel="Registros totales">
+            </app-page-header>
+        </div>
+
+        <div class="px-4 sm:px-6 lg:px-8">
+            <div class="space-y-6">
+                <!-- VISTA NORMAL (Filtros + Botones + Tabla) -->
+                <ng-container *ngIf="!isBulkMode">
+                    <!-- Tarjeta de Contenido Principal -->
+                    <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+                        
+                        <!-- Barra de Filtros -->
+                        <app-barra-filtros 
+                            placeholder="Buscar por empleado o concepto..."
+                            [searchOptions]="searchOptions"
+                            [estadoOptions]="estadoOptions"
+                            [showDates]="true"
+                            (onFilter)="onFilter($event)">
+                        </app-barra-filtros>
+
+                        <!-- Botones de Acción (Debajo de los filtros - A la derecha) -->
+                        <div class="flex justify-end gap-3 py-2 border-t border-slate-50 pt-6">
+                            <app-primary-button 
+                                label="Pago Masivo" 
+                                icon="upload" 
+                                color="purple"
+                                (btnClick)="abrirMasivo()">
+                            </app-primary-button>
+                            
+                            <app-primary-button 
+                                label="Individual" 
+                                icon="plus" 
+                                color="blue"
+                                (btnClick)="abrirNuevo()">
+                            </app-primary-button>
+                        </div>
+
+                        <!-- Tabla de Resultados -->
+                        <app-tabla-general 
+                            [columnas]="columnas" 
+                            [datos]="displayedRegistros" 
+                            [loading]="loading"
+                            [showViewDetails]="true" 
+                            (onEdit)="editar($event)" 
+                            (viewDetails)="verDetalle($event)">
+                        </app-tabla-general>
+
+                        <!-- Paginación -->
+                        <div class="p-4">
+                            <app-pagination 
+                                [currentPage]="currentPage" 
+                                [totalPages]="totalPages" 
+                                [pageSize]="pageSize"
+                                (pageChange)="onPageChange($event)" 
+                                (pageSizeChange)="onPageSizeChange($event)">
+                            </app-pagination>
+                        </div>
+                    </div>
+                </ng-container>
+
+                <!-- VISTA DE PAGO MASIVO (Standalone) -->
+                <app-pago-masivo 
+                    *ngIf="isBulkMode" 
+                    (onCancel)="cancelarMasivo()" 
+                    (onSaveSuccess)="onMasivoSuccess()">
+                </app-pago-masivo>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Modal de Registro/Edición Individual -->
+    <app-modal 
+        [isOpen]="isFullScreenView" 
+        [title]="selectedPago ? 'Editar Registro de Pago' : 'Nuevo Registro de Pago'" 
+        size="xl" 
+        [showIcon]="true"
+        iconType="edit"
+        (modalClose)="onCancelForm()">
+        
+        <div class="p-2">
+            <app-modal-personal 
+                [pago]="selectedPago" 
+                (onClose)="onCancelForm()" 
+                (onSave)="guardarPago($event)">
+            </app-modal-personal>
+        </div>
+    </app-modal>
+
+    <!-- Modal de Detalle -->
+    <app-modal-detalle-pago 
+        [isOpen]="showDetalleModal" 
+        [pago]="selectedPago" 
+        (onClose)="cerrarDetalle()">
+    </app-modal-detalle-pago>
+</div>

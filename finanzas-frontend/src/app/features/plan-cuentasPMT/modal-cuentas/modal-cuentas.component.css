@@ -1,0 +1,60 @@
+@reference "../../../../styles.css";
+
+/* Input estándar (legacy, mantenido para compatibilidad) */
+.form-input-premium {
+    @apply w-full px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-[11px] font-bold outline-none ring-0 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-slate-300 dark:placeholder-slate-700;
+}
+
+/* Input compacto — usado en la nueva versión sin scroll */
+.form-input-compact {
+    @apply w-full px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-[11px] font-semibold outline-none ring-0 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all placeholder-slate-300 dark:placeholder-slate-700;
+}
+
+/* Label compacto */
+.field-label {
+    @apply text-[9px] font-black text-slate-500 uppercase tracking-wider;
+}
+
+/* Scrollbar personalizado */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-slate-800 rounded-full;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slideUp {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}

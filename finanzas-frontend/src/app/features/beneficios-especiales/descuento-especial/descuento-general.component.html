@@ -1,0 +1,257 @@
+<div class="flex flex-col h-full w-full">
+
+    <!-- Header del panel -->
+    <div
+        class="mx-0 mt-0 mb-3 p-4 bg-white border border-gray-200 rounded-lg flex items-center justify-between shrink-0 shadow-sm">
+        <div class="flex items-center gap-3 overflow-hidden">
+            <div class="w-9 h-9 bg-[#1E293B] rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-tags text-white text-sm"></i>
+            </div>
+            <div class="flex items-center gap-3 overflow-hidden">
+                <h2 class="text-base font-bold text-gray-900 truncate">{{ plan.nombre }}</h2>
+                <span class="font-mono bg-gray-100 px-2 py-0.5 rounded text-xs text-gray-700 border border-gray-200">
+                    {{ plan.codigo }}
+                </span>
+                <span class="text-xs px-2 py-0.5 rounded font-semibold"
+                    [ngClass]="plan.estado === '1' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'">
+                    {{ plan.estado === '1' ? 'Activo' : 'Inactivo' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra de herramientas: búsqueda + descuentos + acciones -->
+    <div class="bg-white border border-gray-200 rounded-lg p-3 mb-3 shadow-sm shrink-0">
+        <div class="flex flex-wrap xl:flex-nowrap items-end gap-3">
+
+            <!-- Código de Nivel -->
+            <div class="flex flex-col gap-1 w-44 shrink-0">
+                <label class="text-xs font-medium text-gray-700">Código de Nivel:</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400 text-xs"></i>
+                    </div>
+                    <input type="text" [ngModel]="codigoBusqueda"
+                        (ngModelChange)="codigoBusqueda = $event; onCodigoChange($event)" (keyup.enter)="listarHijos()"
+                        placeholder="Ingrese código"
+                        class="w-full pl-8 pr-3 py-2 text-xs border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm" />
+                </div>
+            </div>
+
+            <!-- Nombre auto-rellenable -->
+            <div class="flex flex-col gap-1 flex-1 min-w-[160px]">
+                <label class="text-xs font-medium text-gray-700">Nombre:</label>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-xs text-gray-600 h-[34px] flex items-center overflow-hidden">
+                        <span class="truncate">{{ nombreEntidadSeleccionada || '-' }}</span>
+                        <button
+                            *ngIf="nombreEntidadSeleccionada && nombreEntidadSeleccionada !== 'No encontrado' && nombreEntidadSeleccionada !== 'Buscando...'"
+                            (click)="limpiarSeleccion()" class="ml-auto pl-2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times-circle text-xs"></i>
+                        </button>
+                    </div>
+                    <button (click)="listarHijos()"
+                        class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md flex items-center gap-1.5 h-[34px] whitespace-nowrap transition-colors">
+                        <i class="fas fa-list text-xs"></i> Listar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Separador -->
+            <div class="hidden md:block w-px h-[34px] bg-gray-200 shrink-0"></div>
+
+            <!-- Desc. Fijo -->
+            <div class="flex flex-col gap-1 shrink-0">
+                <label class="text-xs font-medium text-gray-700">Desc. Fijo:</label>
+                <div class="relative w-28">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-dollar-sign text-gray-400 text-xs"></i>
+                    </div>
+                    <input type="number" [(ngModel)]="descuentoFijo" (ngModelChange)="onDescuentoChange('FIJO')"
+                        placeholder="0.00"
+                        class="w-full pl-8 pr-2 py-2 text-xs border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm" />
+                </div>
+            </div>
+
+            <!-- Tarifa Plana -->
+            <div class="flex flex-col gap-1 shrink-0">
+                <label class="text-xs font-bold text-blue-700">Tarifa Plana:</label>
+                <div class="relative w-28">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-tag text-blue-500 text-xs"></i>
+                    </div>
+                    <input type="number" [(ngModel)]="precioFijo" (ngModelChange)="onDescuentoChange('TARIFA')"
+                        placeholder="0.00"
+                        class="w-full pl-8 pr-2 py-2 text-xs border border-blue-400 rounded-md bg-blue-50 text-blue-900 font-semibold focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm transition-colors" />
+                </div>
+            </div>
+
+            <!-- Desc. % -->
+            <div class="flex flex-col gap-1 shrink-0">
+                <label class="text-xs font-medium text-gray-700">Desc. %:</label>
+                <div class="relative w-24">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-percent text-gray-400 text-xs"></i>
+                    </div>
+                    <input type="number" [(ngModel)]="descuentoPorcentaje"
+                        (ngModelChange)="onDescuentoChange('PORCENTAJE')" placeholder="0%"
+                        class="w-full pl-8 pr-2 py-2 text-xs border border-gray-300 rounded-md bg-white focus:ring-blue-500 focus:border-blue-500 outline-none shadow-sm" />
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="flex gap-2 shrink-0">
+                <button (click)="seleccionarTodo()"
+                    class="py-2 px-3 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 h-[34px] whitespace-nowrap shadow-sm transition-colors">
+                    Seleccionar todo
+                </button>
+                <button (click)="aplicarDescuento()"
+                    class="py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md h-[34px] whitespace-nowrap shadow-sm transition-colors">
+                    {{ labelBotonAccion }}
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Contenido principal con scroll -->
+    <div class="flex-1 overflow-y-auto min-h-0">
+
+        <!-- Acordeón de niveles -->
+        <div *ngIf="mostrarArbol">
+
+            <div *ngIf="arbolLoading" class="flex justify-center items-center h-24">
+                <i class="fas fa-spinner fa-spin text-gray-400 text-xl"></i>
+            </div>
+
+            <div *ngIf="!arbolLoading && arbolNiveles.length === 0" class="text-center text-gray-400 text-sm py-8">
+                No hay niveles disponibles.
+            </div>
+
+            <!-- Template recursivo para nodos hijos -->
+            <ng-template #nodoTemplate let-nodos="nodos" let-nivel="nivel">
+                <div class="flex flex-col gap-1.5 mt-1.5">
+                    <div *ngFor="let nodo of nodos" class="w-full">
+
+                        <!-- Con hijos -->
+                        <div *ngIf="nodo.tieneHijos || (nodo.hijos && nodo.hijos.length > 0)"
+                            class="flex items-center gap-2 py-1.5 px-3 border rounded-lg transition-colors shadow-sm"
+                            [ngClass]="nodoSeleccionado === nodo ? 'bg-blue-100 border-blue-400' : 'bg-white border-gray-200 hover:bg-gray-100'"
+                            [ngStyle]="{'margin-left.px': nivel * 14}">
+                            <div class="w-5 h-5 flex items-center justify-center rounded border shrink-0 cursor-pointer"
+                                [ngClass]="nodoSeleccionado === nodo ? 'border-blue-400 bg-blue-50 text-blue-600' : 'border-gray-200 bg-white text-gray-400 hover:bg-gray-200'"
+                                (click)="toggleNodoArbol(nodo, $event); $event.stopPropagation()">
+                                <i class="fas text-[10px]"
+                                    [ngClass]="nodo.expandido ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                            </div>
+                            <span class="text-xs font-medium truncate flex-1 cursor-pointer"
+                                [ngClass]="nodoSeleccionado === nodo ? 'text-blue-800' : 'text-gray-700'"
+                                (click)="seleccionarDesdeArbol(nodo, 'NIVEL'); nodoSeleccionado = nodo; $event.stopPropagation()">
+                                {{ nodo.numNivel ? nodo.numNivel + ' - ' : '' }}{{ nodo.nombre }}
+                            </span>
+                        </div>
+
+                        <!-- Sin hijos -->
+                        <div *ngIf="!nodo.tieneHijos && (!nodo.hijos || nodo.hijos.length === 0)"
+                            class="flex items-center gap-2 py-1.5 px-3 border rounded-lg transition-colors shadow-sm cursor-pointer"
+                            [ngClass]="nodoSeleccionado === nodo ? 'bg-blue-100 border-blue-400' : 'bg-white border-gray-200 hover:bg-gray-100'"
+                            [ngStyle]="{'margin-left.px': nivel * 14}"
+                            (click)="seleccionarDesdeArbol(nodo, 'SERVICIO'); nodoSeleccionado = nodo">
+                            <div class="w-2 h-2 rounded-full shrink-0"
+                                [ngClass]="nodoSeleccionado === nodo ? 'bg-blue-500' : 'bg-blue-200'"></div>
+                            <span class="text-xs font-medium truncate"
+                                [ngClass]="nodoSeleccionado === nodo ? 'text-blue-800' : 'text-gray-700'">
+                                {{ nodo.numNivel ? nodo.numNivel + ' - ' : '' }}{{ nodo.nombre }}
+                            </span>
+                        </div>
+
+                        <!-- Hijos recursivos -->
+                        <div *ngIf="nodo.expandido && (nodo.hijos?.length || 0) > 0">
+                            <ng-container
+                                *ngTemplateOutlet="nodoTemplate; context: { nodos: nodo.hijos, nivel: nivel + 1 }"></ng-container>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+
+            <!-- Grid paralelo de raíces (4 columnas x 3 filas) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div *ngFor="let raiz of paginatedArbolNiveles"
+                    class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden flex flex-col min-h-[50px]">
+
+                    <!-- Header raíz -->
+                    <div class="flex items-center gap-2 py-2.5 px-3 transition-colors"
+                        [ngClass]="nodoSeleccionado === raiz ? 'bg-blue-100' : 'bg-white hover:bg-gray-50'">
+                        <div class="w-6 h-6 flex items-center justify-center rounded-md border shrink-0 shadow-sm cursor-pointer"
+                            [ngClass]="nodoSeleccionado === raiz ? 'border-blue-400 bg-blue-50 text-blue-600' : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-200'"
+                            (click)="toggleNodoArbol(raiz, $event)">
+                            <i class="fas text-xs" [ngClass]="raiz.expandido ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                        </div>
+                        <span class="text-xs font-bold uppercase truncate flex-1 cursor-pointer"
+                            [ngClass]="nodoSeleccionado === raiz ? 'text-blue-800' : 'text-slate-800'"
+                            (click)="seleccionarDesdeArbol(raiz, 'NIVEL'); nodoSeleccionado = raiz">
+                            {{ raiz.numNivel ? raiz.numNivel + ' - ' : '' }}{{ raiz.nombre }}
+                        </span>
+                        <div class="w-5 h-5 rounded border flex items-center justify-center cursor-pointer shrink-0"
+                            [ngClass]="raiz.checked ? 'bg-green-500 border-green-500 text-white' : 'bg-white border-gray-300 text-transparent hover:bg-gray-100'"
+                            (click)="toggleCheckRaiz(raiz, $event)">
+                            <i class="fas fa-check text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Hijos expandidos -->
+                    <div *ngIf="raiz.expandido && (raiz.hijos?.length || 0) > 0"
+                        class="px-2 pb-3 bg-gray-50/50 flex-1 overflow-y-auto max-h-64">
+                        <ng-container
+                            *ngTemplateOutlet="nodoTemplate; context: { nodos: raiz.hijos, nivel: 1 }"></ng-container>
+                    </div>
+                    <div *ngIf="raiz.expandido && (!raiz.hijos || raiz.hijos.length === 0)"
+                        class="px-3 pb-3 text-xs text-gray-400 italic">
+                        Sin elementos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Arbol Pagination -->
+            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-end">
+                <app-pagination [currentPage]="currentPageArbol" [totalPages]="totalPagesArbol" [pageSize]="pageSizeArbol"
+                    (pageChange)="onPageChangeArbol($event)" [showPageSizeOptions]="false" recordsLabel="niveles">
+                </app-pagination>
+            </div>
+
+        </div>
+
+        <!-- Tabla de descuentos configurados -->
+        <div *ngIf="mostrarTabla" class="flex flex-col gap-3 pt-4 border-t border-gray-100">
+            <div class="flex items-center justify-between w-full">
+                <h3 class="text-xs font-bold text-gray-800 flex items-center gap-2 shrink-0">
+                    <i class="fas fa-list-ul text-blue-600"></i>
+                    Descuentos Configurados
+                </h3>
+                <div class="flex items-center gap-4">
+                    <div class="w-[450px]">
+                        <app-search-generic [options]="searchOptions" placeholder="Buscar en descuentos..."
+                            (onSearch)="handleTableSearch($event)">
+                        </app-search-generic>
+                    </div>
+                    <button (click)="limpiarSeleccion()"
+                        class="text-xs font-medium text-gray-600 hover:text-gray-800 flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors shrink-0">
+                        <i class="fas fa-arrow-left text-xs"></i> Volver al árbol
+                    </button>
+                </div>
+            </div>
+
+            <app-tabla-general [datos]="paginatedDescuentosData" [columnas]="columnasDescuentos"
+                [loading]="descuentosLoading" [showActions]="false" (onHeaderCheckboxChange)="toggleTodosTabla($event)"
+                (onInputChange)="handleTableInputChange($event)" (onCheckboxChange)="handleCheckboxChange($event)">
+            </app-tabla-general>
+
+            <!-- Pagination Component -->
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)" recordsLabel="servicios">
+            </app-pagination>
+        </div>
+    </div>
+
+</div>

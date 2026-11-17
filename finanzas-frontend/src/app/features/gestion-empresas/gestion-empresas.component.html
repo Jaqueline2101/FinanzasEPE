@@ -1,0 +1,67 @@
+<div class="flex flex-col h-full bg-white">
+    <!-- Header Section -->
+    <div class="p-6 pb-0">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+        <div class="mt-1 mb-1">
+            <app-page-header title="Gestión de Empresas" subtitle="Administra las empresas corporativas y convenios"
+                [showCounter]="true" [counterLabel]="'Total'" [counterValue]="totalElements">
+            </app-page-header>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="flex-1 p-6 bg-gray-50 overflow-auto">
+
+        <!-- Main Content Card -->
+        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-black/5 p-6 animate-fadeIn min-h-[500px] flex flex-col">
+
+            <!-- Shared Filters Bar -->
+            <app-barra-filtros [placeholder]="'Buscar empresa...'" [searchOptions]="searchTypeOptions"
+                [estadoOptions]="searchOptions" (onFilter)="handleFilters($event)">
+            </app-barra-filtros>
+
+            <!-- Toolbar Actions (Top Right over Table) -->
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Directorio de Empresas</h3>
+                <app-primary-button label="Nueva Empresa" icon="plus" (btnClick)="nuevaEmpresa()">
+                </app-primary-button>
+            </div>
+
+            <!-- Data Content Area (Fills remaining space) -->
+            <div class="flex-1 flex flex-col space-y-4">
+                <!-- Data Table -->
+                <div class="overflow-hidden rounded-xl border border-gray-200">
+                    <app-tabla-general [datos]="empresasFiltradas" [columnas]="columnas" [showViewDetails]="true"
+                        [showEdit]="true" [showDelete]="true" (onEdit)="editarEmpresa($event)"
+                        (onDelete)="eliminarEmpresa($event)" (viewDetails)="openDetalle($event)">
+                    </app-tabla-general>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!loading && empresasFiltradas.length === 0"
+                    class="flex flex-col items-center justify-center h-48 text-gray-400">
+                    <i class="fas fa-box-open text-4xl mb-3 text-gray-300"></i>
+                    <p class="text-base font-medium text-gray-500">No se encontraron empresas</p>
+                    <p class="text-sm">Intenta ajustar los filtros de búsqueda</p>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-auto pt-2">
+                    <app-pagination [totalPages]="totalPages" [pageSize]="pageSize" [currentPage]="currentPage"
+                        (pageChange)="onPageChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<app-modal-empresa [isVisible]="showModal" [empresa]="selectedEmpresa" (onClose)="closeModal()"
+    (onSave)="onSaveSuccess()">
+</app-modal-empresa>
+
+<app-modal-detalle-empresa [isVisible]="showModalDetalle" [empresa]="selectedEmpresaDetalle" (onClose)="closeDetalle()">
+</app-modal-detalle-empresa>

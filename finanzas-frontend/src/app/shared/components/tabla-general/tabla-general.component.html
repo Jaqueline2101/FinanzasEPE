@@ -1,0 +1,521 @@
+<div class="overflow-hidden rounded-lg border border-slate-200 shadow-sm">
+  <table class="w-full">
+    <thead class="bg-gray-400 border-b border-gray-400">
+      <tr>
+        <th *ngIf="showIndex" class="px-2 py-1 text-center text-[10px] font-bold text-black uppercase tracking-tight w-10">
+          #
+        </th>
+        <th *ngFor="let col of columnas" class="px-2 py-1 text-[10px] font-bold text-black uppercase tracking-tight"
+          [ngClass]="{'text-center': col.align === 'center', 'text-right': col.align === 'right', 'text-left': !col.align || col.align === 'left'}">
+          <ng-container *ngIf="col.tipo === 'checkbox'; else textHeader">
+            <div class="flex items-center justify-center">
+              <input type="checkbox" (change)="onHeaderCheckboxChange.emit($any($event.target).checked)"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+            </div>
+          </ng-container>
+          <ng-template #textHeader>{{ col.header }}</ng-template>
+        </th>
+        <th *ngIf="showActions" class="px-2 py-1 text-center text-[10px] font-bold text-black uppercase tracking-tight">
+          Acciones
+        </th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-slate-100">
+      <!-- Skeleton Loading State -->
+      <ng-container *ngIf="loading && datos.length === 0">
+        <tr *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]" class="animate-pulse">
+          <td *ngIf="showIndex" class="px-2 py-3 text-center">
+            <div class="h-4 w-4 bg-slate-200 rounded-full mx-auto"></div>
+          </td>
+          <td *ngFor="let col of columnas" class="px-2 py-3">
+            <div class="h-3 bg-slate-100 rounded w-3/4 mx-auto"></div>
+          </td>
+          <td *ngIf="showActions" class="px-2 py-3">
+            <div class="h-4 w-16 bg-slate-100 rounded mx-auto"></div>
+          </td>
+        </tr>
+      </ng-container>
+
+      <tr *ngFor="let item of datos; let i = index" 
+        class="hover:bg-slate-50 cursor-pointer group/row"
+        [ngClass]="{'bg-blue-50/70 border-l-4 border-blue-500 ring-1 ring-blue-100': selectedItem === item}"
+        (click)="onRowClick.emit(item)">
+        <td *ngIf="showIndex" class="px-2 py-1 text-center">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-black text-[10px]">
+            {{ currentPage * pageSize + i + 1 }}
+          </span>
+        </td>
+        <td *ngFor="let col of columnas" class="md:table-cell px-2 py-1"
+          [ngClass]="{'text-center': col.align === 'center', 'text-right': col.align === 'right', 'text-left': !col.align || col.align === 'left'}">
+          <ng-container [ngSwitch]="col.tipo">
+            <span *ngSwitchCase="'index'"
+              class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 text-[#1E293B] font-bold text-[10px] transition-colors">
+              {{ currentPage * pageSize + i + 1 }}
+            </span>
+
+            <span *ngSwitchCase="'date'" class="flex items-center text-[11px] text-slate-600 font-medium"
+              [ngClass]="{'justify-center': col.align === 'center', 'justify-end': col.align === 'right'}">
+              <svg class="w-3 h-3 mr-1 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {{ item[col.field] | date : 'dd/MM/yyyy' }}
+            </span>
+
+            <span *ngSwitchCase="'badge'"
+              class="inline-flex items-center px-1.5 py-0.5 rounded-lg text-[10px] font-bold border shadow-xs"
+              [ngClass]="[
+                col.badgeConfig?.from || 'from-slate-100',
+                col.badgeConfig?.to || 'to-slate-200',
+                col.badgeConfig?.text || 'text-[#1E293B]',
+                col.badgeConfig?.border || 'border-slate-300',
+                'bg-linear-to-r'
+              ]">
+              <span *ngIf="col.field === 'nivelJerarquia'" class="mr-0.5 opacity-70">Nivel</span>
+              {{ item[col.field] }}
+            </span>
+
+            <span *ngSwitchCase="'area-badge'" (click)="onLinkClick.emit(item)"
+              class="text-[#1E293B] hover:text-slate-700 font-bold hover:underline cursor-pointer transition-colors flex items-center group/link">
+              <svg class="w-4 h-4 mr-1 text-slate-500 group-hover/link:translate-x-1 transition-transform" fill="none"
+                stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              {{ item[col.field] }}
+            </span>
+
+            <div *ngSwitchCase="'nombre-exam'" class="flex items-center">
+              <div class="flex flex-col min-w-0">
+                <a *ngIf="item.esPerfil" (click)="onLinkClick.emit(item)"
+                  class="text-[11px] font-bold text-[#1E293B] hover:text-slate-600 hover:underline cursor-pointer truncate">
+                  {{ item[col.field] }}
+                </a>
+                <span *ngIf="!item.esPerfil" class="text-[11px] font-semibold text-slate-800 truncate">
+                  {{ item[col.field] }}
+                </span>
+                <span class="text-[9px] text-slate-500 truncate font-medium">
+                  Tipo resultado: {{ col.subField ? item[col.subField[0]] : '' }}
+                </span>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'area-info'" class="flex flex-col items-start">
+              <span
+                class="inline-flex items-center px-1.5 py-0.5 rounded-3xl text-[9px] font-black bg-gray-900 text-white">
+                {{ item.areaNombre }}
+              </span>
+              <span class="text-[9px] text-slate-500 font-bold">
+                Cód: {{ col.subField ? item[col.subField[0]] : '' }}
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'currency-color'" class="flex items-center gap-0.5"
+              [ngClass]="{'justify-end': col.align === 'right', 'justify-center': col.align === 'center'}">
+              <span *ngIf="item[col.field]" class="text-[11px] font-black"
+                [ngClass]="{'text-emerald-600': item.tipo === 'INGRESO', 'text-red-600': item.tipo === 'EGRESO'}">
+                <span class="opacity-60 mr-0.5">
+                  {{ (col.subField && col.subField.length > 0 && item[col.subField[0]] === 'USD') ? '$' : 'S/' }}
+                </span>
+                {{ item[col.field] | number : '1.2-2' }}
+              </span>
+              <span *ngIf="!item[col.field]" class="text-[11px] text-slate-300">-</span>
+            </div>
+
+            <div *ngSwitchCase="'currency'" class="flex items-center gap-0.5"
+              [ngClass]="{'justify-end': col.align === 'right', 'justify-center': col.align === 'center'}">
+              <span *ngIf="item[col.field] !== null && item[col.field] !== undefined" class="text-[11px] font-black text-slate-900">
+                <span class="text-slate-500 mr-0.5">
+                  {{ (col.subField && col.subField.length > 0 && item[col.subField[0]] === 'USD') ? '$' : 'S/' }}
+                </span>
+                {{ item[col.field] | number : '1.2-2' }}
+              </span>
+              <span *ngIf="item[col.field] === null || item[col.field] === undefined" class="text-[11px] text-slate-300">-</span>
+            </div>
+
+            <div *ngSwitchCase="'tiempo-entrega'" class="flex items-center gap-0.5">
+              <svg class="w-3 h-3 text-blue-600 flex shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+
+              <span *ngIf="item[col.field]" class="text-[11px] font-medium text-gray-700">
+                {{ item[col.field] }}h
+              </span>
+
+              <span *ngIf="!item[col.field]" class="text-[10px] text-gray-400 italic">
+                Pendiente
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'status'">
+              <span *ngIf="item[col.field] === 'A' || item[col.field] === true || item[col.field] === 'ACTIVO' || item[col.field] === 'Habilitado' || item[col.field] === 1"
+                class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black bg-emerald-100 text-emerald-800 border border-emerald-200">
+                <span class="w-1 h-1 bg-emerald-500 rounded-full mr-1 animate-pulse"></span>
+                {{ item[col.field] === 'Habilitado' ? 'HABILITADO' : 'ACTIVO' }}
+              </span>
+              <span *ngIf="item[col.field] === 'I' || item[col.field] === false || item[col.field] === 'INACTIVO' || item[col.field] === 'Inhabilitado' || item[col.field] === 0"
+                class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-black bg-rose-100 text-rose-800 border border-rose-200">
+                <span class="w-1 h-1 bg-rose-500 rounded-full mr-1"></span>
+                {{ item[col.field] === 'Inhabilitado' ? 'INHABILITADO' : 'INACTIVO' }}
+              </span>
+            </div>
+            <div *ngSwitchCase="'order-status'">
+              <!-- PENDIENTE: Blue -->
+              <span *ngIf="item[col.field] === 'PENDIENTE'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                <i class="fas fa-clock mr-1.5 text-[9px]"></i> PENDIENTE
+              </span>
+
+              <!-- EN_PROCESO: Orange (Animated) -->
+              <span *ngIf="item[col.field] === 'EN_PROCESO' || item[col.field] === 'PROCESANDO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-orange-50 text-orange-700 border border-orange-200">
+                <i class="fas fa-flask mr-1.5 text-[9px] animate-pulse"></i> EN PROCESO
+              </span>
+
+              <!-- VALIDADO: Green -->
+              <span *ngIf="item[col.field] === 'VALIDADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <i class="fas fa-check-double mr-1.5 text-[9px]"></i> VALIDADO
+              </span>
+
+              <!-- ENTREGADO: Purple -->
+              <span *ngIf="item[col.field] === 'ENTREGADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                <i class="fas fa-hand-holding-medical mr-1.5 text-[9px]"></i> ENTREGADO
+              </span>
+
+              <!-- CANCELADO: Red -->
+              <span *ngIf="item[col.field] === 'CANCELADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
+                <i class="fas fa-ban mr-1.5 text-[9px]"></i> CANCELADO
+              </span>
+
+              <!-- OBSERVADO: Yellow -->
+              <span *ngIf="item[col.field] === 'OBSERVADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-yellow-50 text-yellow-700 border border-yellow-200">
+                <i class="fas fa-exclamation-triangle mr-1.5 text-[9px]"></i> OBSERVADO
+              </span>
+
+              <!-- PAGADO: Emerald (ventas cobradas) -->
+              <span *ngIf="item[col.field] === 'PAGADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                <i class="fas fa-check-circle mr-1.5 text-[9px]"></i> PAGADO
+              </span>
+
+              <!-- ANULADO: Rose (ventas anuladas) -->
+              <span *ngIf="item[col.field] === 'ANULADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-300">
+                <i class="fas fa-times-circle mr-1.5 text-[9px]"></i> ANULADO
+              </span>
+
+              <!-- ACTIVO: Emerald (movimiento vigente en caja chica) -->
+              <span *ngIf="item[col.field] === 'ACTIVO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                <i class="fas fa-check-circle mr-1.5 text-[9px]"></i> ACTIVO
+              </span>
+
+              <!-- PENDIENTE_AUTORIZACION: Amber (anular falta autorizar) -->
+              <span *ngIf="item[col.field] === 'PENDIENTE_AUTORIZACION'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-300">
+                <i class="fas fa-user-clock mr-1.5 text-[9px]"></i> PEND. AUTORIZAR
+              </span>
+
+              <!-- APROBADO / ACEPTADO: Emerald -->
+              <span *ngIf="item[col.field] === 'APROBADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+                <i class="fas fa-check-circle mr-1.5 text-[9px]"></i> APROBADO
+              </span>
+
+              <!-- RECHAZADO: Rose -->
+              <span *ngIf="item[col.field] === 'RECHAZADO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-300">
+                <i class="fas fa-times-circle mr-1.5 text-[9px]"></i> RECHAZADO
+              </span>
+
+              <!-- NOTA_CREDITO: Violet (nota de crédito electrónica) -->
+              <span *ngIf="item[col.field] === 'NOTA_CREDITO'"
+                class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-violet-50 text-violet-700 border border-violet-300">
+                <i class="fas fa-file-invoice mr-1.5 text-[9px]"></i> NOTA CRÉDITO
+              </span>
+            </div>
+            <div *ngSwitchCase="'nombre_nivel'" (click)="onLinkClick.emit(item)">
+              <div class="flex items-center gap-1">
+                <span class="text-[11px] font-bold text-[#1E293B] hover:underline cursor-pointer transition-colors">
+                  {{ item[col.field] }}
+                </span>
+
+                <span
+                  class="inline-flex items-center px-1.5 py-0.5 text-[9px] font-black bg-slate-100 text-[#1E293B] rounded-full border border-slate-200 uppercase tracking-tight">
+                  {{ col.subField ? item[col.subField[0]] : '0' }} subniveles
+                </span>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'rango-normal'">
+              <div
+                class="inline-flex items-center px-1.5 py-0.5 bg-slate-50 rounded border border-slate-200 text-[10px] font-bold text-[#1E293B]">
+                {{ item[col.field] | number : '1.2-2' }} <span class="mx-0.5 opacity-40">—</span>
+                {{ col.subField ? (item[col.subField[0]] | number : '1.2-2') : '' }}
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'rango-critico'">
+              <div *ngIf="item[col.field] || (col.subField && item[col.subField[0]])"
+                class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-red-50 rounded border border-red-200">
+                <div class="flex items-center gap-0.5 text-[10px] font-black text-red-700">
+                  <span>&lt; {{ item[col.field] | number : '1.2-2' }}</span>
+                  <span class="text-red-300">|</span>
+                  <span>&gt; {{ col.subField ? (item[col.subField[0]] | number : '1.2-2') : '' }}</span>
+                </div>
+              </div>
+
+              <span *ngIf="!item[col.field] && (!col.subField || !item[col.subField[0]])"
+                class="text-slate-400 text-[10px] italic font-medium">
+                No definido
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'multi-date'">
+              <div class="relative group cursor-pointer inline-block hover:bg-slate-100 rounded transition-colors"
+                (click)="
+                  $event.stopPropagation(); onLinkAction.emit({ action: 'history', item: item })
+                ">
+                <!-- Vista Simple (Ultima fecha + Badge) -->
+                <div class="flex items-center gap-1">
+                  <span class="text-[11px] text-slate-700 font-medium">
+                    {{
+                    isMultiDate(item[col.field]) ? getLastDate(item[col.field]) : item[col.field]
+                    }}
+                  </span>
+
+                  <span *ngIf="getExtraCount(item[col.field]) > 0"
+                    class="px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[9px] font-bold border border-blue-200">
+                    +{{ getExtraCount(item[col.field]) }}
+                  </span>
+                </div>
+
+                <!-- Tooltip Flotante (Solo si hay multiples) -->
+                <div *ngIf="isMultiDate(item[col.field])"
+                  class="invisible group-hover:visible absolute right-0 bottom-full mb-1 z-50 w-40 bg-white rounded-lg shadow-xl border border-slate-200 text-[10px] text-slate-600 transition-all opacity-0 group-hover:opacity-100 transform translate-y-1 group-hover:translate-y-0 pointer-events-none group-hover:pointer-events-auto">
+                  <div
+                    class="px-2 py-1 bg-slate-50 rounded-t-lg border-b border-slate-100 font-bold text-slate-800 flex justify-between items-center">
+                    <span>Historial Entregas</span>
+                    <span class="text-[9px] text-slate-400">{{ getAllDates(item[col.field]).length }} registros</span>
+                  </div>
+                  <div class="p-1 flex flex-col gap-0.5 max-h-40 overflow-y-auto custom-scrollbar">
+                    <div *ngFor="let fecha of getAllDates(item[col.field]); let i = index"
+                      class="flex items-center gap-1 px-1 py-0.5 rounded hover:bg-slate-50">
+                      <span
+                        class="w-4 h-4 flex items-center justify-center rounded-full bg-slate-100 text-[9px] font-bold text-slate-500">
+                        {{ i + 1 }}
+                      </span>
+                      <span class="text-slate-700">{{ fecha }}</span>
+                    </div>
+                  </div>
+                  <!-- Flechita -->
+                  <div
+                    class="absolute bottom-0 right-4 translate-y-1/2 rotate-45 w-1.5 h-1.5 bg-white border-r border-b border-slate-200">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="'list-badges'" class="flex flex-wrap gap-1">
+              <span *ngFor="let subItem of item[col.field]"
+                class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                {{ col.subField && col.subField.length ? subItem[col.subField[0]] : subItem }}
+              </span>
+              <span *ngIf="!item[col.field] || item[col.field].length === 0" class="text-[9px] text-slate-400 italic">
+                -
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'object'">
+              <span class="text-[11px] text-slate-700 font-medium">
+                {{
+                item[col.field] && col.subField && col.subField.length
+                ? item[col.field][col.subField[0]]
+                : '-'
+                }}
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'custom-button-action'" class="flex items-center justify-center gap-2">
+              <button (click)="onLinkAction.emit(item)"
+                class="px-2 py-0.5 flex items-center gap-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-all text-[10px] font-bold border border-slate-200 shadow-sm"
+                [ngClass]="col.actionClass || ''">
+                <i *ngIf="col.actionIcon" class="fas {{ col.actionIcon }} text-[10px]"></i>
+                {{ col.actionLabel || 'Ver' }}
+              </button>
+
+              <!-- Optional View Details Action in the same cell -->
+              <button *ngIf="col.showViewDetails" (click)="viewDetails.emit(item)"
+                class="p-1 px-1.5 text-emerald-600 hover:bg-emerald-50 rounded border border-emerald-100 transition-colors"
+                title="Ver detalles completos">
+                <i class="fas fa-eye text-[11px]"></i>
+              </button>
+            </div>
+
+            <div *ngSwitchCase="'action-button'" class="flex items-center justify-center gap-2">
+              <button *ngIf="!col.disabledField || !item[col.disabledField]" 
+                (click)="onActionButton.emit({item: item, col: col})"
+                class="px-2 py-0.5 flex items-center gap-1 rounded transition-all text-[10px] font-bold border border-slate-200 shadow-sm"
+                [ngClass]="col.actionClass || 'bg-slate-100 hover:bg-slate-200 text-slate-700'">
+                <i *ngIf="col.actionIcon" class="fas {{ col.actionIcon }} text-[10px]"></i>
+                <span *ngIf="col.actionLabel">{{ col.actionLabel }}</span>
+              </button>
+            </div>
+
+            <div *ngSwitchCase="'semaphore'">
+              <span class="inline-flex items-center px-1.5 py-0.5 rounded-full bg-slate-50 border border-slate-200">
+                <span
+                  [class]="'w-2 h-2 rounded-full mr-1.5 ' + (col.subField && item[col.subField[0]] ? item[col.subField[0]] : 'bg-gray-400')"></span>
+                <span class="text-[10px] font-bold text-slate-700 uppercase tracking-tight">{{ item[col.field] }}</span>
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'amount-color'" class="flex items-center"
+              [ngClass]="{'justify-end': col.align === 'right', 'justify-center': col.align === 'center'}">
+              <span *ngIf="col.subField && item[col.subField[0]] === 'INGRESO'"
+                class="inline-flex items-center gap-1.5 text-[11px] font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                <span class="text-[8px]">🟢</span> S/ {{ item[col.field] | number : '1.2-2' }}
+              </span>
+              <span *ngIf="col.subField && item[col.subField[0]] === 'EGRESO'"
+                class="inline-flex items-center gap-1.5 text-[11px] font-black text-red-600 bg-red-50 px-2 py-0.5 rounded border border-red-100">
+                <span class="text-[8px]">🔴</span> S/ {{ item[col.field] | number : '1.2-2' }}
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'status-badge'">
+              <span *ngIf="col.subField && item[col.subField[0]] === '1'"
+                class="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-green-100/80 text-green-700 border border-green-200">
+                <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-1.5 animate-pulse"></span>
+                Activo
+              </span>
+              <span *ngIf="col.subField && item[col.subField[0]] === '0'"
+                class="inline-flex items-center px-2 py-1 rounded-lg text-[10px] font-bold bg-red-100/80 text-red-700 border border-red-200">
+                <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                Inactivo
+              </span>
+            </div>
+
+            <div *ngSwitchCase="'title-subtitle'" class="flex flex-col">
+              <span class="text-[11px] font-bold text-slate-900 leading-tight">{{ item[col.field] }}</span>
+              <span class="text-[9px] text-slate-500 font-medium">{{ col.subField ? item[col.subField[0]] : '' }}</span>
+            </div>
+
+            <div *ngSwitchCase="'input-number'" class="flex items-center justify-center">
+              <input type="number" [(ngModel)]="item[col.field]"
+                [disabled]="col.disabledField ? !item[col.disabledField] : false"
+                (ngModelChange)="onInputChange.emit({item: item, col: col, value: $event})"
+                class="w-20 px-2 py-1 text-[11px] text-center border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 bg-white disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed">
+            </div>
+
+            <div *ngSwitchCase="'checkbox'" class="flex items-center justify-center">
+              <input type="checkbox" [checked]="item.checked"
+                (change)="item.checked = $any($event.target).checked; onCheckboxChange.emit({item: item, checked: item.checked})"
+                class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2">
+            </div>
+
+            <span *ngSwitchDefault class="text-[11px] text-slate-700 font-medium">
+              {{ item[col.field] }}
+            </span>
+          </ng-container>
+        </td>
+
+        <td *ngIf="showActions" class="px-2 py-1">
+          <div class="flex justify-center gap-0.5">
+            <button *ngIf="showCreateNivel" (click)="onNivel.emit(item)"
+              class="p-1 text-[#1E293B] hover:bg-slate-100 rounded transition-colors" title="Añadir">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+            <button *ngIf="showConfig" (click)="onConfig.emit(item)" class="group p-2.5 text-slate-500 rounded-xl"
+              title="Configuración Avanzada">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                class="lucide lucide-settings">
+                <path
+                  d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+            </button>
+
+            <button *ngIf="showEdit" (click)="onEdit.emit(item)"
+              class="p-1 text-amber-600 hover:bg-amber-50 rounded transition-colors" title="Editar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+
+            <button *ngIf="showDelete" (click)="onDelete.emit(item)"
+              class="p-1 text-rose-600 hover:bg-rose-50 rounded transition-colors" title="Eliminar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+
+            <button *ngIf="showSubExams" (click)="viewSubExams.emit(item)"
+              class="p-1 text-purple-600 hover:bg-purple-50 rounded transition-colors" title="Ver subexámenes">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+
+            <button *ngIf="showDetallesExamenes" (click)="viewdetalles.emit(item)"
+              class="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" title="Ver detalles examenes">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+
+            <button *ngIf="showViewDetails" (click)="viewDetails.emit(item)"
+              class="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors" title="Ver detalles completos">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+            <button *ngIf="showDownloadPdf" (click)="onDownloadPdf.emit(item)"
+              class="p-1 text-slate-600 hover:bg-slate-100 rounded transition-colors border border-slate-200"
+              title="Ver Documento">
+              <i class="fas fa-file-alt text-sm"></i>
+            </button>
+
+            <button *ngIf="showPrint && (!onlyPrintValidated || item.estado === 'VALIDADO')"
+              (click)="onPrint.emit(item)"
+              class="p-1 text-emerald-600 hover:bg-emerald-50 rounded transition-colors border border-emerald-200 bg-emerald-50"
+              title="Imprimir">
+              <i class="fas fa-print text-sm"></i>
+            </button>
+            <button *ngIf="showLinkAction" (click)="onLinkAction.emit(item)"
+              class="p-1 text-blue-600 hover:bg-blue-50 rounded transition-colors group relative"
+              [title]="linkActionLabel">
+              <i class="fas {{
+                  linkActionIcon
+                }} w-4 h-4 flex items-center justify-center text-[11px]"></i>
+            </button>
+
+            <button *ngIf="showCustom" (click)="$event.stopPropagation(); onCustom.emit(item)"
+              class="p-1 text-indigo-600 hover:bg-indigo-50 rounded transition-colors" [title]="customTooltip">
+              <i class="fas {{ customIcon }} w-4 h-4 flex items-center justify-center text-[11px]"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

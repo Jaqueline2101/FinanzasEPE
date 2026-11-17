@@ -1,0 +1,246 @@
+<app-modal 
+    [isOpen]="isOpen" 
+    [size]="'3xl'" 
+    [customHeader]="true"
+    [showFooter]="true"
+    (modalClose)="close()">
+    
+    <!-- HEADER CUSTOMIZADO (Proyectado al slot 'header') -->
+    <div header class="flex items-center justify-between w-full">
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-200">
+                <i class="fas fa-file-invoice-dollar text-white text-lg"></i>
+            </div>
+            <div>
+                <h2 class="text-base font-black text-slate-800 leading-tight">Detalle de Orden de Compra</h2>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Visualización completa del registro #{{ orden?.numeroOrden }}</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-3 pr-4">
+            <span [class]="'px-3 py-1 rounded-full text-[10px] font-black border uppercase tracking-widest ' + getStatusClass(orden?.estado)">
+                {{ orden?.estado || 'DESCONOCIDO' }}
+            </span>
+        </div>
+    </div>
+
+    <!-- CONTENIDO ESPECÍFICO (Se proyecta al <ng-content> por defecto) -->
+    <div class="space-y-6">
+        
+        <!-- SECCIÓN 1: CABECERA Y PROVEEDOR -->
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Información General -->
+            <div class="col-span-5 space-y-4">
+                <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i> Información General
+                </h3>
+                <div class="section-card grid grid-cols-2 gap-x-4 gap-y-2">
+                    <div class="detail-row">
+                        <span class="detail-label">Fecha Emisión</span>
+                        <span class="detail-value text-slate-800">{{ orden?.fechaEmision | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Tipo Compra</span>
+                        <span class="detail-value text-slate-800">{{ orden?.tipoCompra }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Moneda</span>
+                        <span class="detail-value text-blue-600 font-black">{{ orden?.moneda }} ({{ orden?.moneda === 'PEN' ? 'S/' : '$' }})</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Centro de Costo</span>
+                        <span class="detail-value text-slate-800">{{ orden?.centroCosto || '-' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Área Solicitante</span>
+                        <span class="detail-value text-slate-800">{{ orden?.areaSolicitante || '-' }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">F. Est. Entrega</span>
+                        <span class="detail-value text-slate-800">{{ (orden?.fechaEstimadaEntrega | date:'dd/MM/yyyy') || '-' }}</span>
+                    </div>
+                    <div class="detail-row col-span-2">
+                        <span class="detail-label">Responsable</span>
+                        <span class="detail-value text-slate-800">{{ orden?.responsableCompra || '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información Proveedor -->
+            <div class="col-span-7 space-y-4">
+                <h3 class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i class="fas fa-user-tie"></i> Datos del Proveedor
+                </h3>
+                <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 flex flex-col gap-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex flex-col">
+                            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Razón Social</span>
+                            <span class="text-base font-black text-slate-800 leading-tight uppercase">{{ orden?.razonSocialProveedor }}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">RUC</span>
+                            <span class="block text-sm font-black text-slate-700">{{ orden?.rucProveedor }}</span>
+                        </div>
+                    </div>
+                    <div class="border-t border-blue-100/50 pt-3">
+                        <span class="detail-label text-blue-400">Dirección Fiscal</span>
+                        <span class="detail-value block mt-0.5 text-slate-700 text-xs">{{ orden?.direccionFiscal || '-' }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 border-t border-blue-100/50 pt-3">
+                        <div class="detail-row">
+                            <span class="detail-label text-blue-400">Condición Pago</span>
+                            <span class="detail-value text-slate-800">{{ orden?.condicionPago }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label text-blue-400">Plazo (Días)</span>
+                            <span class="detail-value text-slate-800">{{ orden?.plazoDias }} días</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN: GESTIÓN DE ADELANTO -->
+        <div *ngIf="orden?.permiteAdelanto" class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100 space-y-3">
+            <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                <i class="fas fa-hand-holding-usd"></i> Gestión de Adelanto
+            </h3>
+            <div class="grid grid-cols-4 gap-6">
+                <div class="detail-row">
+                    <span class="detail-label text-emerald-600/70">Tipo Adelanto</span>
+                    <span class="detail-value text-slate-700">{{ orden?.tipoAdelanto || '-' }}</span>
+                </div>
+                <div class="detail-row" *ngIf="orden?.tipoAdelanto === 'PORCENTAJE (%)'">
+                    <span class="detail-label text-emerald-600/70">Porcentaje (%)</span>
+                    <span class="detail-value text-slate-700">{{ orden?.porcentajeAdelanto }}%</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label text-emerald-600/70">Monto Adelanto</span>
+                    <span class="detail-value text-slate-800 font-black">{{ orden?.moneda === 'PEN' ? 'S/' : '$' }} {{ orden?.montoAdelanto | number:'1.2-2' }}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label text-emerald-600/70">Fecha Adelanto</span>
+                    <span class="detail-value text-slate-700">{{ (orden?.fechaAdelanto | date:'dd/MM/yyyy') || '-' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: DETALLE DE ITEMS -->
+        <div class="space-y-3">
+            <h3 class="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] flex items-center gap-2">
+                <i class="fas fa-list-ul text-blue-600"></i> Detalle de Items
+                <span class="px-2 py-0.5 bg-slate-800 text-white text-[8px] font-black rounded-md">{{ orden?.detalles?.length || 0 }} ITEMS</span>
+            </h3>
+            <div class="overflow-hidden rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-white text-[9px] uppercase tracking-widest">
+                            <th class="px-4 py-2.5">Descripción / Código</th>
+                            <th class="px-4 py-2.5 text-center">Cant.</th>
+                            <th class="px-4 py-2.5 text-center">Unidad</th>
+                            <th class="px-4 py-2.5 text-right">Precio Unit.</th>
+                            <th class="px-4 py-2.5 text-right">Desc.</th>
+                            <th class="px-4 py-2.5 text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr *ngFor="let item of orden?.detalles" class="hover:bg-slate-50 transition-colors">
+                            <td class="px-4 py-2.5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-bold text-slate-700 uppercase">{{ item.descripcion }}</span>
+                                    <span class="text-[8px] text-slate-400 font-bold tracking-tighter">{{ item.codigoItem || 'SIN CÓDIGO' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-2.5 text-center font-black text-slate-700 text-xs">{{ item.cantidad }}</td>
+                            <td class="px-4 py-2.5 text-center text-[10px] font-bold text-slate-400 uppercase">{{ item.unidadMedida }}</td>
+                            <td class="px-4 py-2.5 text-right text-xs font-bold text-slate-700">{{ orden?.moneda === 'PEN' ? 'S/' : '$' }} {{ item.precioUnitario | number:'1.2-2' }}</td>
+                            <td class="px-4 py-2.5 text-right text-xs font-bold text-rose-500">- {{ item.descuento | number:'1.2-2' }}</td>
+                            <td class="px-4 py-2.5 text-right text-xs font-black text-slate-800">{{ orden?.moneda === 'PEN' ? 'S/' : '$' }} {{ item.total | number:'1.2-2' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- TOTALES COMPACTOS -->
+            <div class="flex justify-end gap-10 p-4 bg-slate-900 text-white rounded-xl shadow-lg mt-2">
+                <div class="flex flex-col items-center">
+                    <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Subtotal</span>
+                    <span class="text-xs font-bold">{{ orden?.moneda === 'PEN' ? 'S/' : '$' }} {{ (orden?.totalGeneral! - orden?.totalIgv! + orden?.totalDescuento!) | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[8px] font-black text-rose-400 uppercase tracking-widest mb-0.5">IGV (18%)</span>
+                    <span class="text-xs font-bold text-slate-200">{{ (orden?.totalIgv || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex flex-col items-center">
+                    <span class="text-[8px] font-black text-rose-400 uppercase tracking-widest mb-0.5">Descuento</span>
+                    <span class="text-xs font-bold text-rose-400">- {{ (orden?.totalDescuento || 0) | number:'1.2-2' }}</span>
+                </div>
+                <div class="flex flex-col items-center border-l border-slate-700 pl-10 gap-0.5">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total General</span>
+                    <span class="text-xl font-black text-blue-400">{{ orden?.moneda === 'PEN' ? 'S/' : '$' }} {{ orden?.totalGeneral | number:'1.2-2' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: LOGÍSTICA Y CONTROL -->
+        <div class="grid grid-cols-2 gap-6">
+            <!-- Logística -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i class="fas fa-truck text-blue-600"></i> Información Logística
+                </h3>
+                <div class="section-card space-y-2">
+                    <div class="detail-row">
+                        <span class="detail-label">Punto de Entrega</span>
+                        <span class="detail-value text-xs">{{ orden?.lugarEntrega || '-' }}</span>
+                        <p class="text-[10px] text-slate-400 font-medium italic leading-tight">{{ orden?.direccionEntrega || '-' }}</p>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Responsable Recepción</span>
+                        <span class="detail-value text-slate-800">{{ orden?.responsableRecepcion || '-' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Otros Datos -->
+            <div class="space-y-3">
+                <h3 class="text-[10px] font-black text-slate-800 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-blue-600"></i> Control Interno
+                </h3>
+                <div class="section-card space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="detail-row">
+                            <span class="detail-label">Cotización Ref.</span>
+                            <span class="detail-value text-slate-800 text-xs">{{ orden?.numCotizacionRelacionada || '-' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Requerimiento Ref.</span>
+                            <span class="detail-value text-slate-800 text-xs">{{ orden?.numRequerimientoInterno || '-' }}</span>
+                        </div>
+                    </div>
+                    <div class="detail-row border-t border-slate-100 pt-2">
+                        <span class="detail-label">Grabado por</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                           <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-black text-slate-500 uppercase">
+                               {{ orden?.usuarioRegistro?.charAt(0) || 'S' }}
+                           </div>
+                           <span class="text-[11px] font-bold text-slate-700">{{ orden?.usuarioRegistro || 'SISTEMA' }}</span>
+                           <span class="text-[9px] text-slate-400 font-medium">— {{ orden?.fechaActualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER (Proyectado al slot 'footer') -->
+    <div footer class="flex justify-between items-center w-full px-2">
+        <p class="text-[9px] font-bold text-slate-400 uppercase italic tracking-widest">
+            * Este documento es una visualización interna del sistema central de finanzas.
+        </p>
+        <button (click)="close()" class="px-8 py-2 bg-slate-900 hover:bg-black text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-lg active:scale-95 flex items-center gap-2">
+            <i class="fas fa-check-circle"></i> Entendido
+        </button>
+    </div>
+
+</app-modal>

@@ -1,0 +1,35 @@
+<div class="alerta-container pt-4">
+
+  <!-- Loading alertas -->
+  <div *ngIf="isLoadingAlertas" class="flex flex-col items-center justify-center py-16">
+    <div class="w-10 h-10 border-4 border-red-400 border-t-transparent rounded-full animate-spin mb-3"></div>
+    <span class="text-sm text-slate-500">Buscando lotes críticos...</span>
+  </div>
+
+  <!-- Empty State alertas -->
+  <div *ngIf="!isLoadingAlertas && alertas.length === 0" class="flex flex-col items-center justify-center py-20 text-slate-400">
+    <i class="fas fa-check-circle text-5xl mb-4 text-green-400 opacity-60"></i>
+    <p class="font-medium text-slate-600">¡Todo en orden!</p>
+    <p class="text-sm mt-1">No hay lotes próximos a vencer en los próximos {{ diasFiltro }} días.</p>
+  </div>
+
+  <!-- Tabla de alertas -->
+  <div *ngIf="!isLoadingAlertas && alertas.length > 0" class="p-4">
+    <app-tabla-general 
+      [columnas]="columnasAlertas" 
+      [datos]="paginatedAlertas"
+      [showEdit]="false"
+      [showDelete]="false"
+      [showViewDetails]="false">
+    </app-tabla-general>
+
+    <!-- Paginación -->
+    <app-pagination
+      [currentPage]="currentPage"
+      [totalPages]="totalPages"
+      [pageSize]="pageSize"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)">
+    </app-pagination>
+  </div>
+</div>

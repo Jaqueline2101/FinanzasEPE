@@ -1,0 +1,194 @@
+<app-modal [isOpen]="isOpen" [title]="'Gestión de Pagos'" (modalClose)="close()" [size]="'xl'" [showFooter]="true"
+    [customHeader]="true" [showIcon]="true" iconType="document">
+
+    <!-- Header Personalizado -->
+    <div header class="flex-1">
+        <div class="flex items-center gap-2.5">
+            <div class="bg-blue-50 p-1.5 rounded-lg border border-blue-200">
+                <i class="fas fa-file-invoice-dollar text-blue-600 text-sm"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Gestión de Pagos</h3>
+                <p class="text-[10px] text-slate-500 font-medium uppercase tracking-tight">
+                    Proveedor: <span class="text-slate-800 font-bold">{{ compra?.proveedorRazonSocial }}</span>
+                    <span class="mx-1.5 text-slate-300">|</span>
+                    Doc: <span class="text-slate-800 font-bold">{{ compra?.serie }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="space-y-6">
+        <!-- Resumen Rápido -->
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Deuda Total</p>
+                <p class="text-lg font-black text-slate-800">S/ {{ compra?.montoTotal | number:'1.2-2' }}</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pagado</p>
+                <p class="text-lg font-black text-emerald-600">S/ {{ compra?.montoPagado | number:'1.2-2' }}</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg border border-slate-200 shadow-sm">
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pendiente</p>
+                <p class="text-lg font-black text-rose-600">S/ {{ compra?.montoPendiente | number:'1.2-2' }}</p>
+            </div>
+        </div>
+
+        <!-- Alerta de Vencimiento Próximo -->
+        <div *ngIf="hayCuotasCriticas" 
+            class="bg-amber-50 border-l-4 border-amber-400 p-4 rounded-r-lg shadow-sm animate-pulse-slow">
+            <div class="flex items-center gap-3">
+                <div class="bg-amber-100 p-1.5 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-amber-600"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-amber-800">Atención: Vencimientos Próximos</p>
+                    <p class="text-xs text-amber-700 font-medium">Hay cuotas que vencen en los próximos 15 días o ya han vencido.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Cuotas -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-slate-100 border-b border-slate-200 text-xs text-slate-500 uppercase font-bold">
+                    <tr>
+                        <th class="px-3 py-3 w-10 text-center">
+                            <input type="checkbox" (change)="seleccionarTodas()" [checked]="todasSeleccionadas()"
+                                class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        </th>
+                        <th class="px-4 py-3"># Cuota</th>
+                        <th class="px-4 py-3">Vencimiento</th>
+                        <th class="px-4 py-3 text-right">Monto</th>
+                        <th class="px-4 py-3 text-center">Estado</th>
+                        <th class="px-4 py-3 text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <tr *ngFor="let cuota of compra?.cuotas" class="hover:bg-slate-50 transition-colors"
+                        [class.bg-blue-50/30]="isSeleccionada(cuota.idCronograma)">
+                        <td class="px-3 py-3 text-center">
+                            <input type="checkbox" *ngIf="cuota.estado !== 'PAGADO'"
+                                [checked]="isSeleccionada(cuota.idCronograma)" (change)="toggleSeleccion(cuota)"
+                                class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer">
+                        </td>
+                        <td class="px-4 py-3 font-bold text-slate-700">#{{ cuota.numeroCuota }}</td>
+                        <td class="px-4 py-3">
+                            <span [class]="getVencimientoClass(cuota)">
+                                {{ cuota.fechaVencimiento | date:'dd/MM/yyyy' }}
+                                <span *ngIf="isVencido(cuota)"
+                                    class="text-[10px] bg-red-100 text-red-600 font-bold px-1 rounded ml-1">VENCIDO</span>
+                                <span *ngIf="isAlerta15Dias(cuota) && !isVencido(cuota)"
+                                    class="text-[10px] bg-amber-100 text-amber-600 font-bold px-1 rounded ml-1">¡PRONTO!</span>
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-right font-mono font-bold text-slate-800">
+                            S/ {{ cuota.montoCuota | number:'1.2-2' }}
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <span *ngIf="cuota.estado === 'PAGADO'"
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                <i class="fas fa-check mr-1.5 text-[0.6rem]"></i> PAGADO
+                            </span>
+                            <span *ngIf="cuota.estado === 'PENDIENTE'"
+                                class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                PENDIENTE
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button *ngIf="cuota.estado !== 'PAGADO'" (click)="iniciarPago(cuota)"
+                                class="text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 font-bold py-1.5 px-3 rounded-lg border border-blue-200 transition-all flex items-center justify-center gap-1 mx-auto">
+                                <i class="fas fa-wallet"></i> Pagar
+                            </button>
+                            <button *ngIf="cuota.estado === 'PAGADO'" disabled
+                                class="text-xs text-slate-400 font-bold py-1.5 px-3 cursor-not-allowed">
+                                ---
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Barra de Resumen de Selección (Pago Masivo) -->
+        <div *ngIf="selectedCuotas.size > 0 && !cuotaSeleccionada && !modoLote" 
+            class="bg-blue-600 rounded-xl p-4 shadow-lg shadow-blue-200 flex items-center justify-between animate-fadeIn">
+            <div class="flex items-center gap-4">
+                <div class="bg-white/20 p-2 rounded-lg text-white">
+                    <i class="fas fa-layer-group text-lg"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-blue-100 font-bold uppercase tracking-widest">Lote Seleccionado</p>
+                    <p class="text-white font-black text-lg">
+                        {{ selectedCuotas.size }} cuotas <span class="mx-2 text-blue-300">|</span> Total: S/ {{ totalSeleccionado | number:'1.2-2' }}
+                    </p>
+                </div>
+            </div>
+            <button (click)="iniciarPagoMasivo()"
+                class="bg-white text-blue-600 hover:bg-blue-50 font-black py-2.5 px-6 rounded-xl shadow-sm transition-all flex items-center gap-2">
+                <i class="fas fa-money-check-alt"></i>
+                Pagar Selección
+            </button>
+        </div>
+
+        <!-- Formulario de Pago Inline -->
+        <div *ngIf="cuotaSeleccionada || modoLote"
+            class="mt-6 bg-blue-50/50 rounded-xl border border-blue-200 p-5 animate-fadeIn">
+            <div class="flex items-center justify-between mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-2 h-8 bg-blue-500 rounded-full"></div>
+                    <h4 class="font-black text-blue-900 text-lg">
+                        {{ modoLote ? 'Pago Masivo de ' + selectedCuotas.size + ' Cuotas' : 'Registrando Pago: Cuota #' + cuotaSeleccionada?.numeroCuota }}
+                    </h4>
+                </div>
+                <button (click)="cancelarPago()" class="text-blue-500 hover:text-blue-700 text-sm font-bold flex items-center gap-1">
+                    <i class="fas fa-times-circle"></i> Cancelar
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
+                        <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Monto a Confirmar</label>
+                        <p class="text-2xl font-black text-slate-900">
+                            S/ {{ (modoLote ? totalSeleccionado : cuotaSeleccionada?.montoCuota) | number:'1.2-2' }}
+                        </p>
+                    </div>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Nro. Operación Bancaria *</label>
+                        <input type="text" [(ngModel)]="numeroOperacion" placeholder="Ej. 00045812"
+                            class="w-full h-11 px-4 border border-slate-300 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1.5 ml-1">Voucher (Opcional)</label>
+                        <input type="file" (change)="onFileSelected($event)" accept="image/*,.pdf"
+                            class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 bg-white border border-slate-300 rounded-xl h-11 pt-1.5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button (click)="confirmarPago()" [disabled]="!numeroOperacion || loadingPago"
+                    class="px-8 py-3 bg-blue-600 text-white font-black rounded-xl text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-200 flex items-center gap-2 transition-all active:scale-95">
+                    <i *ngIf="loadingPago" class="fas fa-spinner fa-spin"></i>
+                    <i *ngIf="!loadingPago" class="fas fa-check-circle"></i>
+                    {{ loadingPago ? 'Procesando Pago...' : 'Confirmar y Finalizar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Acciones -->
+    <div footer>
+        <button (click)="close()"
+            class="px-5 py-2 bg-white border border-slate-300 text-slate-700 font-bold rounded-xl text-sm hover:bg-slate-100 shadow-sm transition-all">
+            Cerrar
+        </button>
+    </div>
+</app-modal>
+
+<app-alertas></app-alertas>

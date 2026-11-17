@@ -1,0 +1,148 @@
+:host {
+    display: block;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slideUp {
+    animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #3b82f6;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+    background-color: #1e293b;
+    border-color: #3b82f6;
+}
+
+/* Layout de dos columnas sin scroll */
+.form-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    height: 100%;
+}
+
+.form-col {
+    padding: 10px 14px; /* Even more compact */
+    overflow-y: auto;
+}
+
+.form-col::-webkit-scrollbar {
+    width: 4px;
+}
+
+.form-col::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.form-col::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.dark .form-col::-webkit-scrollbar-thumb {
+    background: #334155;
+}
+
+/* Secciones más compactas */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.section-title h2 {
+    font-size: 11px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1e293b;
+}
+
+.dark .section-title h2 {
+    color: white;
+}
+
+/* Inputs más compactos */
+.compact-input {
+    height: 34px !important;
+}
+
+.compact-label {
+    font-size: 10px !important;
+    margin-bottom: 2px !important;
+}
+
+/* Separador entre secciones de la misma columna */
+.section-divider {
+    border-top: 1px solid #e2e8f0;
+    margin: 12px 0;
+}
+
+.dark .section-divider {
+    border-top-color: #1e293b;
+}
+
+/* Estilo para el placeholder del nombre */
+.name-input::placeholder {
+    text-transform: none !important;
+    font-weight: 300 !important;
+    opacity: 0.5 !important;
+    font-style: italic;
+}
+
+/* Acciones dentro de la columna */
+.actions-panel {
+    border-style: dashed !important;
+}

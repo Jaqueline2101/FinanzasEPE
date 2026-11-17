@@ -1,0 +1,4 @@
+/* Estilos específicos para el modal de detalle */
+:host ::ng-deep .modal-container {
+    max-height: 90vh;
+}

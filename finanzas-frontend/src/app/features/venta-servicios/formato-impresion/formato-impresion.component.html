@@ -1,0 +1,246 @@
+<div class="preview-container">
+    <div class="paper" [ngClass]="{
+        'format-80': formato === 'TICKET_80',
+        'format-58': formato === 'TICKET_58',
+        'format-a4': formato === 'A4',
+        'format-a5': formato === 'A5'
+    }">
+        <!-- HEADER -->
+        <div class="header">
+            <img src="logo.png" alt="Logo" class="logo">
+            <div class="clinic-info">
+                <div class="clinic-name">{{ clinicData.nombre }}</div>
+                <div>RUC: {{ clinicData.ruc }}</div>
+                <div>{{ clinicData.direccion }}</div>
+                <div *ngIf="ventaInfo?.sede" class="font-bold">SEDE: {{ ventaInfo?.sede }}</div>
+                <div>Telf: {{ clinicData.telefono }}</div>
+            </div>
+
+            <!-- Document Type (Special for documents) -->
+            <div *ngIf="formato === 'A4' || formato === 'A5'" class="text-right">
+                <div class="section-title">{{ modo === 'COMPANIA' ? 'Liquidación de Cobertura' : 'Comprobante de Venta' }}</div>
+                <div class="font-black text-xl uppercase">{{ modo === 'COMPANIA' ? 'VOUCHER DE SEGURO' : docTitle }}</div>
+                <div class="text-slate-500">{{ ventaInfo?.ticketNumber || '000-000000' }}</div>
+            </div>
+        </div>
+
+        <!-- MODO COMPANIA BADGE -->
+        <div *ngIf="modo === 'COMPANIA'" class="bg-indigo-600 text-white text-center py-1 text-[10px] font-bold uppercase tracking-widest mb-4">
+            Voucher de Cobertura - Copia para Auditoría
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- ÁREA / NIVEL INFO -->
+        <div *ngIf="nombreGrupo && nombreGrupo !== 'Venta'" class="bg-indigo-100 text-indigo-800 text-center py-1 text-[12px] font-black uppercase tracking-widest my-2 border-y-2 border-indigo-200">
+            TICKET ÁREA: {{ nombreGrupo }}
+        </div>
+
+        <!-- VENTA INFO (Tickets style) -->
+        <div *ngIf="formato === 'TICKET_80' || formato === 'TICKET_58'" class="venta-info-ticket">
+            <div class="info-row">
+                <span class="label">{{ docNumberLabel }}</span>
+                <span>{{ ventaInfo?.ticketNumber || 'T001-001234' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Fecha/Hora:</span>
+                <span>{{ (ventaInfo?.fecha || '2026-02-14 18:00') | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Caja:</span>
+                <span>{{ ventaInfo?.caja || 'PRINCIPAL' }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Cajero:</span>
+                <span>{{ ventaInfo?.usuario || 'ADMIN' }}</span>
+            </div>
+            <div *ngIf="ventaInfo?.puntoCaja" class="info-row">
+                <span class="label">Punto Caja:</span>
+                <span>{{ ventaInfo?.puntoCaja }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Comprobante:</span>
+                <span class="uppercase font-bold text-indigo-700">{{ docTitle }}</span>
+            </div>
+        </div>
+
+        <!-- PACIENTE INFO -->
+        <div class="section-title">Datos del Paciente</div>
+        <div class="info-row">
+            <span class="label">Paciente:</span>
+            <span>{{ paciente?.firstName }} {{ paciente?.lastName }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">DNI:</span>
+            <span>{{ paciente?.numdoc || 'N/A' }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Tipo Cliente:</span>
+            <span>{{ ventaInfo?.nombrePlan ? 'CONVENIO' : (paciente?.tipo || 'PARTICULAR') }}</span>
+        </div>
+
+        <!-- DATOS FISCALES (Si es Factura) -->
+        <ng-container *ngIf="ventaInfo?.ruc">
+            <div class="divider" style="margin: 4px 0; border-style: dashed;"></div>
+            <div class="section-title">Datos de Facturación</div>
+            <div class="info-row">
+                <span class="label">RUC:</span>
+                <span class="font-bold">{{ ventaInfo?.ruc }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">Razón Social:</span>
+                <span class="font-bold">{{ ventaInfo?.razonSocial }}</span>
+            </div>
+        </ng-container>
+
+        <div class="divider"></div>
+
+        <!-- ITEMS TABLE -->
+        <div class="section-title">Detalle de Venta</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>DESCRIPCIÓN</th>
+                    <th class="text-right">IMPORTE</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let item of carrito">
+                    <tr>
+                        <td>
+                            <div class="flex flex-col">
+                                <span class="font-bold">{{ item.cantidad || 1 }} x {{ item.nombre }}</span>
+
+                                <!-- DESGLOSE DE PAQUETE (Senior Rule) -->
+                                <div *ngIf="item.tipo === 'PAQUETE' && item.serviciosDetalle?.length > 0"
+                                    class="ml-4 mt-1 border-l-2 border-slate-100 pl-2 space-y-0.5">
+                                    <div *ngFor="let sub of item.serviciosDetalle"
+                                        class="text-[9px] text-slate-500 flex items-center gap-1 leading-tight">
+                                        <span class="text-indigo-400">•</span>
+                                        <span>{{ sub.nombre }}</span>
+                                        <span *ngIf="sub.cantidad > 1" class="text-[8px] bg-slate-100 px-1 rounded">x{{
+                                            sub.cantidad }}</span>
+                                    </div>
+                                </div>
+
+                                <div *ngIf="item.descuento > 0" class="text-[10px] text-red-500 font-bold mt-1">
+                                    Descuento: -S/ {{ item.descuento | number:'1.2-2' }}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-right align-top pt-1">
+                            <div class="flex flex-col items-end">
+                                <!-- Descuento / Convenio -->
+                                <div *ngIf="item.precioOriginal && item.precioOriginal > item.precioFinal" class="flex flex-col items-end w-full leading-none mb-1">
+                                    <span *ngIf="ventaInfo?.nombrePlan" class="text-[8px] text-red-500 font-bold mb-0.5">Dscto. Convenio</span>
+                                    <span class="text-[9px] line-through" [ngClass]="ventaInfo?.nombrePlan ? 'text-red-500 font-bold' : 'text-slate-400'">
+                                        S/ {{ item.precioOriginal | number:'1.2-2' }}
+                                    </span>
+                                </div>
+                                <span class="font-bold">S/ {{ item.precioFinal | number:'1.2-2' }}</span>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+
+        <div class="divider-thick"></div>
+
+        <!-- TOTALS -->
+        <div class="totals-container">
+            <!-- Totales Finales -->
+            <div class="total-row">
+                <span>SUBTOTAL:</span>
+                <span>S/ {{ subtotal | number:'1.2-2' }}</span>
+            </div>
+            <div *ngIf="descuentoTotal > 0" class="total-row text-red-500 font-bold">
+                <span>DESCUENTO:</span>
+                <span>-S/ {{ descuentoTotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="total-row total-final">
+                <span>TOTAL:</span>
+                <span>S/ {{ total | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+    <!-- MODO COMPANIA - LEGAL CLAUSE & SIGNATURE -->
+    <div *ngIf="modo === 'COMPANIA'" class="mt-8 pt-4 border-t border-slate-200">
+        <div class="text-[9px] text-justify text-slate-500 leading-tight mb-8">
+            Yo, <strong>{{ paciente?.firstName }} {{ paciente?.lastName }}</strong>, con DNI <strong>{{ paciente?.numdoc }}</strong>, declaro haber recibido conforme los servicios detallados en este documento y autorizo al establecimiento <strong>{{ clinicData.nombre }}</strong> a gestionar el cobro de la cobertura descrita ante mi aseguradora o empresa responsable.
+        </div>
+
+        <div class="flex flex-col items-center mt-12 mb-4">
+            <div class="w-48 border-t border-slate-400 mb-2"></div>
+            <div class="text-[10px] font-bold text-slate-800 uppercase">Firma y Huella del Paciente</div>
+            <div class="text-[8px] text-slate-400 mt-1">DNI: {{ paciente?.numdoc }}</div>
+        </div>
+    </div>
+
+        <!-- PAYMENT INFO -->
+        <div class="payment-info" *ngIf="ventaInfo">
+            <div class="section-title" style="border: none; margin-bottom: 2px;">Resumen de Pago</div>
+
+            <div class="info-row">
+                <span class="label">Método(s):</span>
+                <span class="font-bold">
+                    <ng-container *ngIf="(ventaInfo.montoEfectivo || 0) > 0">EFECTIVO </ng-container>
+                    <ng-container *ngIf="(ventaInfo.montoTarjeta || 0) > 0">{{ (ventaInfo.montoEfectivo || 0) > 0 ? '+ '
+                        : '' }}YAPE/TARJETA </ng-container>
+                    <ng-container *ngIf="(ventaInfo.montoTransferencia || 0) > 0">{{ ((ventaInfo.montoEfectivo || 0) > 0
+                        || (ventaInfo.montoTarjeta || 0) > 0) ? '+ ' : '' }}TRANSF.</ng-container>
+                </span>
+            </div>
+
+            <div *ngIf="(ventaInfo.montoEfectivo || 0) > 0" class="info-row text-[10px] ml-2 italic">
+                <span>- Efectivo: S/ {{ (ventaInfo.montoEfectivo || 0) | number:'1.2-2' }}</span>
+            </div>
+            <div *ngIf="(ventaInfo.montoTarjeta || 0) > 0" class="info-row text-[10px] ml-2 italic">
+                <span>- Yape/Tarj: S/ {{ (ventaInfo.montoTarjeta || 0) | number:'1.2-2' }}</span>
+            </div>
+            <div *ngIf="(ventaInfo.montoTransferencia || 0) > 0" class="info-row text-[10px] ml-2 italic">
+                <span>- Transf: S/ {{ (ventaInfo.montoTransferencia || 0) | number:'1.2-2' }}</span>
+            </div>
+
+            <div class="divider" style="margin: 4px 0; border-style: dotted;"></div>
+
+            <div class="info-row">
+                <span class="label">Monto Recibido:</span>
+                <span>S/ {{ (ventaInfo.montoRecibido || 0) | number:'1.2-2' }}</span>
+            </div>
+            <div class="info-row" [ngClass]="{'font-black text-emerald-600': (ventaInfo.vuelto || 0) > 0}">
+                <span class="label">Vuelto:</span>
+                <span>S/ {{ (ventaInfo.vuelto || 0) | number:'1.2-2' }}</span>
+            </div>
+        </div>
+
+        <!-- NUBEFACT ELECTRONIC INFO -->
+        <div *ngIf="ventaInfo?.codigoHash && modo === 'PACIENTE'" class="electronic-footer">
+            <div class="divider" style="margin: 8px 0; border-style: solid;"></div>
+            <div class="flex flex-col items-center text-center space-y-2">
+                <!-- QR Code Placeholder (Using a QR generation service or the hash) -->
+                <div class="qr-container bg-white p-2 border border-slate-200 rounded">
+                    <img [src]="'https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + ventaInfo?.codigoHash" 
+                         alt="QR SUNAT" class="w-24 h-24">
+                </div>
+                <div class="text-[9px] text-slate-500 leading-tight">
+                    <div class="font-bold">Resumen Hash:</div>
+                    <div class="break-all">{{ ventaInfo?.codigoHash }}</div>
+                </div>
+                <div class="flex gap-2 mt-2" *ngIf="ventaInfo?.enlacePdf">
+                    <a [href]="ventaInfo?.enlacePdf" target="_blank" class="text-[8px] bg-indigo-50 text-indigo-600 px-2 py-1 rounded border border-indigo-100 no-underline">Descargar PDF</a>
+                    <a *ngIf="ventaInfo?.enlaceXml" [href]="ventaInfo?.enlaceXml" target="_blank" class="text-[8px] bg-slate-50 text-slate-600 px-2 py-1 rounded border border-slate-100 no-underline">Descargar XML</a>
+                </div>
+                <div class="text-[8px] italic mt-1 text-slate-400">
+                    Representación impresa de la {{ docTitle }}
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>¡Gracias por su preferencia!</p>
+            <p>No se aceptan devoluciones sin ticket.</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,256 @@
+<div class="p-4 lg:p-6 bg-slate-50 min-h-screen">
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+    <!-- Eliminado el Page Header extra para ahorrar espacio, o un Header muy sutil -->
+    <div class="mb-6 mt-4">
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Autorización de Descuentos</h1>
+        <p class="text-sm text-slate-500 mt-1">Gestión de solicitudes y revisión del historial de autorizaciones
+            emitidas.</p>
+    </div>
+
+    <div class="flex flex-col xl:flex-row gap-6">
+
+        <!-- Panel Izquierdo: Solicitudes Pendientes (Tipo Checkout) -->
+        <div class="w-full xl:w-[400px] shrink-0">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col h-[calc(100vh-14rem)]">
+
+                <!-- Título Panel Izquierdo -->
+                <div class="p-5 border-b border-slate-100 flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex flex-col items-center justify-center">
+                        <i class="fas fa-calculator text-lg"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800 leading-tight">Pendientes</h2>
+                        <p class="text-[11px] text-slate-500">Solicitudes de caja</p>
+                    </div>
+                    <div class="ml-auto bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full">
+                        {{ pendientes.length }}
+                    </div>
+                </div>
+
+                <!-- Lista Recíproca de Solicitudes -->
+                <div class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
+
+                    <!-- Contenedor de Solicitudes -->
+
+                    <!-- Empty state -->
+                    <div *ngIf="!loadingPendientes && pendientes.length === 0"
+                        class="flex flex-col justify-center items-center py-10 text-center px-4">
+                        <div
+                            class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-3 text-slate-400">
+                            <i class="fas fa-check-circle text-2xl"></i>
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-700">Todo al día</h3>
+                        <p class="text-[11px] text-slate-500 mt-1">No hay autorizaciones pendientes de revisar.</p>
+                    </div>
+
+                    <!-- Single Info Card -->
+                    <div *ngFor="let req of pendientes"
+                        class="bg-white border text-left border-slate-200 rounded-xl p-4 shadow-sm hover:border-blue-300 hover:shadow-md transition-all duration-200">
+                        <!-- Top Info -->
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Cajero</h3>
+                                <p class="text-sm font-semibold text-slate-800">{{ req.cajeroNombre }}</p>
+                                <p class="text-[10px] text-slate-400 mt-0.5"><i class="far fa-clock mr-1"></i>{{
+                                    req.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</p>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Descuento
+                                </h3>
+                                <p class="text-lg font-bold text-blue-600">S/ {{ req.montoDescuento | number:'1.2-2' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Patient & Doctor Info (Senior Layout) -->
+                        <div class="mb-4 p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-2 flex flex-col">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-[8px]">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black text-slate-700 uppercase leading-none">{{ req.pacienteNombre || 'Paciente No Especificado' }}</span>
+                                    <span class="text-[8px] font-bold text-slate-400 tracking-wider">DNI: {{ req.pacienteDni || '---' }}</span>
+                                </div>
+                            </div>
+                            <div *ngIf="req.doctorNombre" class="flex items-center gap-2 pt-1 border-t border-slate-200/50">
+                                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-[8px]">
+                                    <i class="fas fa-user-md"></i>
+                                </div>
+                                <span class="text-[9px] font-bold text-slate-500 uppercase">Solicitado por: {{ req.doctorNombre }}</span>
+                            </div>
+                        </div>
+
+
+                        <!-- Motivo -->
+                        <div class="bg-amber-50 rounded-lg p-3 mb-4">
+                            <div class="flex gap-2">
+                                <i class="fas fa-info-circle text-amber-500 text-xs mt-0.5"></i>
+                                <div>
+                                    <p class="text-[10px] font-bold text-amber-700 uppercase tracking-wider mb-0.5">
+                                        Motivo de Solicitud</p>
+                                    <p class="text-xs text-amber-900 leading-snug">{{ req.motivoSolicitud }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="flex gap-2">
+                            <button (click)="abrirAprobar(req)"
+                                class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 rounded-lg text-xs transition-colors shadow-sm shadow-emerald-500/20">
+                                <i class="fas fa-check mr-1.5"></i> Aprobar
+                            </button>
+                            <button (click)="abrirRechazar(req)"
+                                class="flex-1 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-bold py-2.5 rounded-lg text-xs transition-colors">
+                                <i class="fas fa-times mr-1.5"></i> Rechazar
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Historial de Autorizaciones -->
+        <div class="flex-1 bg-white rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[500px]">
+            <!-- Header Panel Derecho -->
+            <div
+                class="p-5 border-b border-slate-100 flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-50/50 rounded-t-2xl">
+                <div class="flex items-center gap-3 w-full sm:w-auto">
+                    <div class="text-slate-400">
+                        <i class="fas fa-history text-lg"></i>
+                    </div>
+                    <h2 class="text-base font-bold text-slate-800">Historial Resolutivo</h2>
+                </div>
+
+                <div class="w-full sm:w-72">
+                    <app-search-generic [options]="searchOptions" [placeholder]="'Buscar en historial...'"
+                        (onSearch)="onSearch($event)">
+                    </app-search-generic>
+                </div>
+            </div>
+
+            <!-- Contenido Historial: Tabla -->
+            <div class="flex-1 p-0 flex flex-col">
+                <app-tabla-general class="flex-1" [datos]="paginatedHistorial" [columnas]="columnas"
+                    [loading]="false" [showViewDetails]="true" [showEdit]="false" [showDelete]="false"
+                    [currentPage]="currentPage" [pageSize]="pageSize" (viewDetails)="verDetalles($event)">
+                </app-tabla-general>
+
+                <!-- Paginación -->
+                <div class="px-4 py-3 border-t border-slate-100 bg-white rounded-b-xl"
+                    *ngIf="filteredHistorial.length > 0">
+                    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                        [recordsLabel]="'registros'" (pageChange)="onPageChange($event)"
+                        (pageSizeChange)="onPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal Resolución -->
+<app-modal-resolucion *ngIf="mostrarModal" [autorizacion]="selectedAutorizacion" [accion]="accionModal"
+    (onSave)="onSaveSuccess()" (onClose)="closeModal()">
+</app-modal-resolucion>
+
+<!-- Modal Detalles Historial -->
+<app-modal *ngIf="selectedAutorizacion" 
+    [isOpen]="mostrarDetalle"
+    [title]="'Detalles de Resolución'" 
+    (modalClose)="mostrarDetalle = false" 
+    size="md"
+    [showFooter]="true">
+    
+    <div class="space-y-6">
+        <!-- Status Header -->
+        <div class="flex items-center justify-between p-4 rounded-2xl border"
+            [ngClass]="selectedAutorizacion.estado === 'APROBADO' ? 'bg-emerald-50 border-emerald-100' : 'bg-rose-50 border-rose-100'">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-sm"
+                    [ngClass]="selectedAutorizacion.estado === 'APROBADO' ? 'bg-emerald-500' : 'bg-rose-500'">
+                    <i class="fas" [ngClass]="selectedAutorizacion.estado === 'APROBADO' ? 'fa-check' : 'fa-times'"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black uppercase tracking-tight"
+                        [ngClass]="selectedAutorizacion.estado === 'APROBADO' ? 'text-emerald-800' : 'text-rose-800'">
+                        {{ selectedAutorizacion.estado }}
+                    </h3>
+                    <p class="text-[10px] font-bold opacity-70"
+                        [ngClass]="selectedAutorizacion.estado === 'APROBADO' ? 'text-emerald-600' : 'text-rose-600'">
+                        Resolución emitida el {{ selectedAutorizacion.fechaResolucion | date:'dd/MM/yyyy HH:mm' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Grid -->
+        <div class="grid grid-cols-2 gap-4">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Paciente</span>
+                <p class="text-xs font-bold text-slate-700 uppercase">{{ selectedAutorizacion.pacienteNombre }}</p>
+                <p class="text-[10px] text-slate-500">DNI: {{ selectedAutorizacion.pacienteDni || '---' }}</p>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Cajero</span>
+                <p class="text-xs font-bold text-slate-700 uppercase">{{ selectedAutorizacion.cajeroNombre }}</p>
+            </div>
+        </div>
+
+        <!-- Financial Info -->
+        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+            <div class="px-4 py-2 bg-slate-50 border-b border-slate-100">
+                <span class="text-[10px] font-black text-slate-500 uppercase">Resumen Financiero</span>
+            </div>
+            <div class="p-4 grid grid-cols-3 gap-4">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Original</span>
+                    <p class="text-xs font-bold text-slate-600">S/ {{ selectedAutorizacion.montoOriginal | number:'1.2-2' }}</p>
+                </div>
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Diferencia</span>
+                    <p class="text-xs font-black text-rose-600">- S/ {{ selectedAutorizacion.montoDescuento | number:'1.2-2' }}</p>
+                </div>
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 block mb-0.5">Final</span>
+                    <p class="text-xs font-black text-emerald-600">S/ {{ selectedAutorizacion.montoFinal | number:'1.2-2' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motivos -->
+        <div class="space-y-4">
+            <div class="p-4 bg-amber-50/50 border border-amber-100 rounded-2xl">
+                <span class="text-[9px] font-black text-amber-600 uppercase tracking-widest block mb-1.5">Motivo de Solicitud</span>
+                <p class="text-xs text-amber-900 leading-relaxed font-medium">{{ selectedAutorizacion.motivoSolicitud }}</p>
+            </div>
+
+            <div *ngIf="selectedAutorizacion.motivoRechazo" class="p-4 bg-rose-50/50 border border-rose-100 rounded-2xl">
+                <span class="text-[9px] font-black text-rose-600 uppercase tracking-widest block mb-1.5">Razón de Rechazo</span>
+                <p class="text-xs text-rose-900 leading-relaxed font-bold italic">"{{ selectedAutorizacion.motivoRechazo }}"</p>
+            </div>
+        </div>
+
+        <!-- Auditoría -->
+        <div class="pt-4 border-t border-slate-100 flex items-center gap-2">
+            <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400">
+                <i class="fas fa-user-shield text-xs"></i>
+            </div>
+            <div>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Autorizador por</p>
+                <p class="text-[10px] font-black text-slate-600 uppercase">{{ selectedAutorizacion.autorizadorNombre || 'Sistema' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div footer class="w-full flex justify-end">
+        <button (click)="mostrarDetalle = false" 
+            class="px-6 py-2 bg-slate-900 text-white text-xs font-black rounded-xl hover:bg-slate-800 transition-all shadow-md shadow-slate-900/20">
+            CERRAR DETALLES
+        </button>
+    </div>
+</app-modal>

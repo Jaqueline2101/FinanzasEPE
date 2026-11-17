@@ -1,0 +1,120 @@
+<app-modal [isOpen]="isVisible" [title]="'Detalle de la Compañía'" [size]="'xl'" [showFooter]="true"
+    [closeOnBackdrop]="false" (modalClose)="close()">
+
+    <div class="space-y-6" *ngIf="compania">
+        <!-- Información General -->
+        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 pb-1 border-b border-slate-300">
+                Información General
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">ID Interno</span>
+                    <span class="text-sm font-bold text-slate-800">#{{ compania.id }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Código</span>
+                    <span class="text-sm font-mono text-slate-700">{{ compania.codigo }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Nombre Comercial</span>
+                    <span class="text-sm font-medium text-slate-800">{{ compania.nombre }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Razón Social</span>
+                    <span class="text-sm text-slate-600">{{ compania.razSol || '-' }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">RUC / Cod. IAFA</span>
+                    <span class="text-sm font-mono text-slate-700">{{ compania.codigoIafa }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Tipo</span>
+                    <span
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 uppercase">
+                        {{ compania.tipoNombre || 'OTRO' }}
+                    </span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Estado</span>
+                    <span *ngIf="compania.estado === '1'"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-green-100 text-green-700">
+                        ACTIVO
+                    </span>
+                    <span *ngIf="compania.estado !== '1'"
+                        class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-500">
+                        INACTIVO
+                    </span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Fecha Creación</span>
+                    <span class="text-sm font-medium text-slate-800">{{ (compania.fechaCreacion | date:'dd/MM/yyyy') ||
+                        '-' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalles Técnicos -->
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 pb-1 border-b border-slate-300">
+                Detalles Técnicos
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Cod. Plan (Codeps)</span>
+                    <span class="text-sm font-mono text-slate-700">{{ compania.codPlan || $any(compania).cod_plan ||
+                        compania.codEps || $any(compania).codeps || '-' }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Cuenta Corriente</span>
+                    <span class="text-sm font-bold"
+                        [ngClass]="compania.ctacte === '1' ? 'text-blue-600' : 'text-slate-500'">
+                        {{ compania.ctacte === '1' ? 'SÍ' : 'NO' }}
+                    </span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Días Plazo</span>
+                    <span class="text-sm text-slate-700">{{ compania.diasPlazo || 0 }} días</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Facturar</span>
+                    <span class="text-sm font-bold"
+                        [ngClass]="compania.facturar === '1' ? 'text-blue-600' : 'text-slate-500'">
+                        {{ compania.facturar === '1' ? 'SÍ' : 'NO' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm" *ngIf="compania.representante">
+            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3 pb-1 border-b border-slate-300">
+                Contacto
+            </h4>
+            <div>
+                <span class="block text-xs text-slate-400 font-semibold uppercase">Representante Legal</span>
+                <span class="text-sm text-slate-700">{{ compania.representante || '-' }}</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Teléfono</span>
+                    <span class="text-sm text-slate-700">{{ compania.fonLocal || compania.personaBase?.fonLocal
+                        || '-' }}</span>
+                </div>
+                <div>
+                    <span class="block text-xs text-slate-400 font-semibold uppercase">Correo Electrónico</span>
+                    <span class="text-sm text-slate-700">{{ compania.email || compania.personaBase?.email ||
+                        '-' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div footer class="w-full flex justify-end">
+        <button (click)="close()"
+            class="px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-lg hover:bg-slate-900 transition-all shadow-lg shadow-slate-500/30">
+            Cerrar
+        </button>
+    </div>
+
+</app-modal>

@@ -1,0 +1,240 @@
+<app-modal [title]="'Detalle del Paquete'" [isOpen]="isVisible" [size]="'xl'" [showFooter]="true"
+    [closeOnBackdrop]="false" (modalClose)="close()">
+
+    <div class="space-y-6" *ngIf="paquete">
+        <!-- Section 1: Info & Pricing Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Col 1: Basic Info -->
+            <div class="space-y-4">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                    Información Principal
+                </h4>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Nombre del Paquete</label>
+                        <p class="text-base font-semibold text-slate-800">{{ paquete.nombre }}</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Código</label>
+                            <p
+                                class="text-sm font-medium text-slate-700 font-mono bg-slate-50 inline-block px-2 py-1 rounded">
+                                {{ paquete.codigo }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Estado</label>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                [ngClass]="{
+                                    'bg-green-100 text-green-800': paquete.estado === '1',
+                                    'bg-red-100 text-red-800': paquete.estado !== '1'
+                                }">
+                                {{ paquete.estado === '1' ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Tipo de Atención</label>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                [ngClass]="{
+                                    'bg-blue-100 text-blue-800': paquete.tipoAtencion === 'AMBULATORIO',
+                                    'bg-purple-100 text-purple-800': paquete.tipoAtencion === 'HOSPITALARIO',
+                                    'bg-red-100 text-red-800': paquete.tipoAtencion === 'EMERGENCIA',
+                                    'bg-slate-100 text-slate-800': !['AMBULATORIO', 'HOSPITALARIO', 'EMERGENCIA'].includes(paquete.tipoAtencion || '')
+                                }">
+                                {{ paquete.tipoAtencionNombre || paquete.tipoAtencion || 'No especificado' }}
+                            </span>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Tipo de Registro</label>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                                [ngClass]="{
+                                    'bg-emerald-100 text-emerald-800': paquete.categoria === 'CAMPAÑA',
+                                    'bg-slate-100 text-slate-800': paquete.categoria === 'PAQUETE_REGULAR'
+                                }">
+                                {{ paquete.categoria === 'CAMPAÑA' ? 'Campaña' : 'Paquete Regular' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Descripción</label>
+                        <p
+                            class="text-sm text-slate-600 leading-relaxed bg-slate-50 rounded-lg p-3 border border-slate-100">
+                            {{ paquete.descripcion || 'Sin descripción disponible.' }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Col 2: Pricing & Dates -->
+            <div class="space-y-4">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                    Precios y Vigencia
+                </h4>
+
+                <div class="bg-gradient-to-br from-slate-50 to-blue-50/30 rounded-xl p-5 border border-slate-200">
+                    <div class="grid grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Precio Real</label>
+                            <p class="text-lg text-slate-500 line-through font-semibold">
+                                S/ {{ paquete.precioReal || 0 | number:'1.2-2' }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Precio Oferta</label>
+                            <p class="text-2xl font-bold text-emerald-600">
+                                S/ {{ paquete.precioPaquete | number:'1.2-2' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-3 border-t border-slate-200">
+                        <span class="text-xs font-medium text-slate-500">Descuento Total</span>
+                        <span
+                            class="text-base font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
+                            S/ {{ paquete.descuento || 0 | number:'1.2-2' }}
+                            <span class="text-xs text-blue-400 ml-1 font-normal">
+                                ({{ calcularPorcentajeDescuentoTotal() | number:'1.2-2' }}%)
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Inicio</label>
+                        <div
+                            class="flex items-center text-sm text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                            <i class="far fa-calendar-alt text-slate-400 mr-2"></i>
+                            {{ paquete.fechaInicio ? (paquete.fechaInicio | date:'dd/MM/yyyy') : '-' }}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Fecha Vencimiento</label>
+                        <div
+                            class="flex items-center text-sm text-slate-700 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                            <i class="far fa-calendar-times text-slate-400 mr-2"></i>
+                            {{ paquete.fechaFin ? (paquete.fechaFin | date:'dd/MM/yyyy') : '-' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Services List with All Details -->
+        <div class="col-span-1 md:col-span-2 pt-2">
+            <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <span>Servicios Incluidos</span>
+                <span class="bg-slate-100 text-slate-600 py-0.5 px-2 rounded-full text-[10px] font-bold">
+                    {{ paquete.servicios?.length || 0 }}
+                </span>
+            </h4>
+
+            <div class="border border-slate-200 rounded-lg overflow-hidden bg-white shadow-sm"
+                *ngIf="paquete.servicios && paquete.servicios.length > 0; else noServicios">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                            <tr>
+                                <th class="px-4 py-3 text-left">Servicio</th>
+                                <th class="px-4 py-3 text-center w-20">Cant.</th>
+                                <th class="px-4 py-3 text-right w-28 whitespace-nowrap">Precio Real</th>
+                                <th class="px-4 py-3 text-center w-24 whitespace-nowrap">Desc S/.</th>
+                                <th class="px-4 py-3 text-right w-28 whitespace-nowrap">Desc %</th>
+                                <th class="px-4 py-3 text-right w-32 whitespace-nowrap">Precio Final</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            <tr *ngFor="let item of paquete.servicios" class="hover:bg-slate-50 transition-colors">
+                                <!-- Servicio -->
+                                <td class="px-4 py-3 font-medium text-slate-700">{{ item.nombreServicio }}</td>
+
+                                <!-- Cantidad -->
+                                <td class="px-4 py-3 text-center">
+                                    <span
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-700 text-sm font-bold">
+                                        {{ item.cantidad }}
+                                    </span>
+                                </td>
+
+                                <!-- Precio Real -->
+                                <td class="px-4 py-3 text-right whitespace-nowrap">
+                                    <span class="text-blue-600 font-semibold">
+                                        S/ {{ calcularPrecioRealServicio(item) | number:'1.2-2' }}
+                                    </span>
+                                </td>
+
+                                <!-- Descuento S/. -->
+                                <td class="px-4 py-3 text-center">
+                                    <span class="text-slate-700 font-medium">
+                                        S/ {{ calcularDescuentoMonto(item) | number:'1.2-2' }}
+                                    </span>
+                                </td>
+
+                                <!-- Descuento % -->
+                                <td class="px-4 py-3 text-right whitespace-nowrap">
+                                    <ng-container *ngIf="(item.descuentoPorcentaje ?? 0) > 0">
+                                        <span
+                                            class="inline-flex items-center px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-sm font-semibold border border-amber-200">
+                                            {{ item.descuentoPorcentaje | number:'1.2-2' }}%
+                                        </span>
+                                    </ng-container>
+                                    <span *ngIf="(item.descuentoPorcentaje ?? 0) === 0" class="text-slate-400 text-sm">
+                                        0%
+                                    </span>
+                                </td>
+
+                                <!-- Precio Final -->
+                                <td class="px-4 py-3 text-right whitespace-nowrap">
+                                    <span class="text-green-700 font-bold">
+                                        S/ {{ calcularPrecioFinalServicio(item) | number:'1.2-2' }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="bg-slate-50 border-t-2 border-slate-300">
+                            <tr>
+                                <td colspan="2" class="px-4 py-3 text-right font-semibold text-slate-700">
+                                    Totales:
+                                </td>
+                                <!-- Total Precio Real -->
+                                <td class="px-4 py-3 text-right font-bold text-blue-600">
+                                    S/ {{ calcularTotalPrecioReal() | number:'1.2-2' }}
+                                </td>
+                                <!-- Total Descuento -->
+                                <td class="px-4 py-3 text-center font-bold text-slate-700">
+                                    S/ {{ paquete.descuento || 0 | number:'1.2-2' }}
+                                </td>
+                                <td></td>
+                                <!-- Total Final -->
+                                <td class="px-4 py-3 text-right font-bold text-green-700 text-base">
+                                    S/ {{ paquete.precioPaquete | number:'1.2-2' }}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <ng-template #noServicios>
+                <div class="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                    <i class="fas fa-box-open text-slate-300 text-3xl mb-2"></i>
+                    <p class="text-slate-500 text-sm">Este paquete no incluye servicios adicionales.</p>
+                </div>
+            </ng-template>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div footer class="flex justify-end pt-2">
+        <button (click)="close()"
+            class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-xl shadow-lg shadow-slate-500/20 transition-all duration-200 text-sm">
+            Cerrar
+        </button>
+    </div>
+
+</app-modal>

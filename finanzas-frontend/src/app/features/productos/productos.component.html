@@ -1,0 +1,64 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0">
+  <!-- Breadcrumb -->
+  <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true"></app-breadcrumb>
+
+  <!-- Header Separado -->
+  <div class="mb-3">
+    <app-page-header title="Gestión de Productos" subtitle="Inventario consolidado con trazabilidad de lotes"
+      iconType="examenes" [showCounter]="true" counterLabel="Consolidados" [counterValue]="filteredConsolidados().length">
+    </app-page-header>
+  </div>
+
+  <!-- Contenedor Principal (Card) -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-6">
+    <div class="space-y-6">
+      
+      <!-- Barra de Filtros Modernizada -->
+      <app-barra-filtros 
+        placeholder="Ej: Paracetamol, Antibióticos..." 
+        [searchOptions]="searchOptions"
+        (onFilter)="handleFilters($event)">
+      </app-barra-filtros>
+
+      <!-- Acciones Principales -->
+      <div class="flex justify-end">
+        <app-primary-button 
+          label="Nuevo Registro" 
+          icon="plus" 
+          (click)="openModal()">
+        </app-primary-button>
+      </div>
+
+      <!-- Tabla Consolidada -->
+      <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700">
+        <app-tabla-general
+          [datos]="displayedConsolidados()"
+          [columnas]="columnas"
+          [showEdit]="true"
+          [showDelete]="true"
+          [showViewDetails]="true"
+          [showCreateNivel]="true"
+          tituloAcciones="Operaciones"
+          (onEdit)="onEdit($event)"
+          (onDelete)="onDelete($event)"
+          (viewDetails)="onViewDetails($event)"
+          (onNivel)="onAddLote($event)">
+        </app-tabla-general>
+      </div>
+
+      <!-- Pagination -->
+      <div>
+        <app-pagination [currentPage]="currentPage()" [totalPages]="totalPages()" [pageSize]="pageSize()"
+          [pageSizeOptions]="pageSizeOptions" (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
+      </div>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- SECCIÓN DE MODALES -->
+<app-modal-producto *ngIf="showModal()" [allProducts]="productos()" [isOpen]="showModal()" [producto]="selectedProducto()" (onClose)="closeModal()" (onSave)="onSave($event)"></app-modal-producto>
+<app-modal-detalle-producto *ngIf="showDetailModal()" [isOpen]="showDetailModal()" [producto]="selectedProductoDetalle()" (onClose)="closeModal()"></app-modal-detalle-producto>

@@ -1,0 +1,211 @@
+{
+  "permissions": [
+    ["USUARIO_LEER", "GESTIÓN DE USUARIOS"],
+    ["USUARIO_CREAR", "CREAR USUARIOS"],
+    ["USUARIO_ACTUALIZAR", "ACTUALIZAR USUARIOS"],
+    ["USUARIO_ELIMINAR", "ELIMINAR USUARIOS"],
+    ["ROL_LEER", "GESTIÓN DE ROLES"],
+    ["ROL_CREAR", "CREAR ROLES"],
+    ["ROL_ACTUALIZAR", "ACTUALIZAR ROLES/ADMIN"],
+    ["ROL_ELIMINAR", "ELIMINAR ROLES"],
+    ["PERMISO_LEER", "GESTIÓN DE PERMISOS"],
+    ["PERMISO_CREAR", "CREAR PERMISOS"],
+    ["PERMISO_ACTUALIZAR", "ACTUALIZAR PERMISOS"],
+    ["PERMISO_ELIMINAR", "ELIMINAR PERMISOS"],
+    ["SUCURSAL_LEER", "VER SUCURSALES"],
+    ["SUCURSAL_CREAR", "CREAR SUCURSALES"],
+    ["SUCURSAL_ACTUALIZAR", "ACTUALIZAR SUCURSALES"],
+    ["SUCURSAL_ELIMINAR", "ELIMINAR SUCURSALES"],
+    ["PUNTO_LEER", "VER PUNTOS DE VENTA"],
+    ["PUNTO_CREAR", "CREAR PUNTOS DE VENTA"],
+    ["PUNTO_ACTUALIZAR", "ACTUALIZAR PUNTOS DE VENTA"],
+    ["PUNTO_ELIMINAR", "ELIMINAR PUNTOS DE VENTA"],
+    ["PAQUETE_LEER", "VER PAQUETES"],
+    ["PAQUETE_CREAR", "CREAR PAQUETES"],
+    ["PAQUETE_ACTUALIZAR", "ACTUALIZAR PAQUETES"],
+    ["PAQUETE_ELIMINAR", "ELIMINAR PAQUETES"],
+    ["PLAN_CUENTA_LEER", "PLAN DE CUENTAS"],
+    ["CONVENIO_LEER", "CUENTAS CONVENIO"],
+    ["CONVENIO_CREAR", "CREAR CONVENIOS/BENEFICIOS"],
+    ["CONVENIO_ACTUALIZAR", "ACTUALIZAR CONVENIOS/BENEFICIOS"],
+    ["CONVENIO_ELIMINAR", "ELIMINAR CONVENIOS/BENEFICIOS"],
+    ["NIVEL_LEER", "VER NIVELES"],
+    ["CATALOGO_LEER", "VER CATÁLOGOS"],
+    ["EMPRESA_LEER", "VER EMPRESAS"],
+    ["COMPANIA_LEER", "VER COMPAÑÍAS"],
+    ["BENEFICIO_LEER", "VER BENEFICIOS"],
+    ["VENTA_LEER", "VER VENTAS"],
+    ["VENTA_CREAR", "REALIZAR VENTAS"],
+    ["VENTA_ELIMINAR", "ANULAR COMPROBANTES"],
+    ["COMPRA_LEER", "GESTIÓN DE COMPRAS"],
+    ["PROVEEDOR_LEER", "VER PROVEEDORES"],
+    ["CAJA_LEER", "GESTIÓN DE CAJA"],
+    ["CAJA_CHICA_LEER", "CAJA CHICA"],
+    ["RRHH_LEER", "GESTIÓN DE RRHH"],
+    ["EMPLEADO_LEER", "GESTIÓN DE EMPLEADOS"],
+    ["PAGO_PERSONAL_LEER", "VER PAGOS DE PERSONAL"],
+    ["PAGO_PERSONAL_CREAR", "REGISTRAR PAGOS DE PERSONAL"],
+    ["PAGO_PERSONAL_ACTUALIZAR", "ACTUALIZAR PAGOS DE PERSONAL"],
+    ["PAGO_PERSONAL_ELIMINAR", "ANULAR PAGOS DE PERSONAL"],
+    ["PAGO_HONORARIO_LEER", "VER PAGOS DE HONORARIOS"],
+    ["PAGO_HONORARIO_CREAR", "REGISTRAR PAGOS DE HONORARIOS"],
+    ["PAGO_HONORARIO_ACTUALIZAR", "ACTUALIZAR PAGOS DE HONORARIOS"],
+    ["PAGO_HONORARIO_ELIMINAR", "ANULAR PAGOS DE HONORARIOS"],
+    ["REPORTE_LEER", "VER REPORTES"],
+    ["AUDITORIA_LEER", "AUDITORIA DEL SISTEMA"],
+    ["REIMPRESION_LEER", "REIMPRESIÓN DE DOCUMENTOS"],
+    ["TIPO_PACIENTE_LEER", "GESTIÓN TIPOS PACIENTE"]
+  ],
+  "menus": [
+    {
+      "titulo": "CONFIGURACIONES",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-settings\"><path d=\"M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>",
+      "orden": 1,
+      "tipo": "GRUPO",
+      "control": "PUBLICO",
+      "children": [
+        {
+          "titulo": "SEGURIDAD",
+          "orden": 1,
+          "tipo": "SUBMENU",
+          "control": "PERMISOS",
+          "permisos": ["USUARIO_LEER", "ROL_LEER"],
+          "children": [
+            { "titulo": "Usuarios", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["USUARIO_LEER"], "ruta": "/admin/configuraciones/seguridad/users" },
+            { "titulo": "Roles", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["ROL_LEER"], "ruta": "/admin/configuraciones/seguridad/roles" },
+            { "titulo": "Permisos", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["PERMISO_LEER"], "ruta": "/admin/configuraciones/seguridad/permisos" },
+            { "titulo": "Gestión de Claves", "orden": 4, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/seguridad/gestion-claves" },
+            { "titulo": "Gestión Avanzada", "orden": 5, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["ROL_ACTUALIZAR"], "ruta": "/admin/configuraciones/seguridad/admin" }
+          ]
+        },
+        { "titulo": "Cambio Punto de Atención", "orden": 2, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/cambio-punto" },
+        { "titulo": "Cambiar contraseña", "orden": 3, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/cambio-clave" },
+        { "titulo": "Niveles", "orden": 4, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/niveles" },
+        { "titulo": "Catálogo", "orden": 5, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/catalogo" },
+        { "titulo": "Compañías", "orden": 6, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/companias" },
+        { "titulo": "Paquetes", "orden": 7, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["PAQUETE_LEER"], "ruta": "/admin/configuraciones/paquetes" },
+        { "titulo": "Empresas", "orden": 8, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/empresas" },
+        { "titulo": "Beneficios Especiales", "orden": 9, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/beneficios-especiales" },
+        { "titulo": "Plan de cuentas (P. M. T.)", "orden": 10, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/plan-cuentas" },
+        { "titulo": "Cuentas de Convenio", "orden": 11, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/cuentas-convenio" },
+        { "titulo": "Autorizar descuentos", "orden": 12, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/configuraciones/autorizar-descuentos" },
+        { "titulo": "Sucursales", "orden": 13, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["SUCURSAL_LEER"], "ruta": "/admin/configuraciones/sucursales" }
+      ]
+    },
+    {
+      "titulo": "PROCESOS",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-cpu\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><rect x=\"9\" y=\"9\" width=\"6\" height=\"6\"/><path d=\"M15 2v2\"/><path d=\"M15 20v2\"/><path d=\"M2 15h2\"/><path d=\"M2 9h2\"/><path d=\"M20 15h2\"/><path d=\"M20 9h2\"/><path d=\"M9 2v2\"/><path d=\"M9 20v2\"/></svg>",
+      "orden": 2,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["PAQUETE_LEER", "COMPRA_LEER"],
+      "children": [
+        { "titulo": "Productos", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["PAQUETE_LEER"], "ruta": "/admin/procesos/productos" },
+        { "titulo": "Cuentas por Pagar", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/pagos" },
+        { "titulo": "Pagos de Personal", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/pagos-personal" },
+        { "titulo": "Pago de Honorarios", "orden": 4, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/pago-honorarios" },
+        { "titulo": "Otros Pagos", "orden": 5, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/otros-pagos" },
+        { "titulo": "Reimpresión", "orden": 6, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REIMPRESION_LEER"], "ruta": "/admin/procesos/reimpresion" }
+      ]
+    },
+    {
+      "titulo": "RR. HH.",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-users\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/></svg>",
+      "orden": 3,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["EMPLEADO_LEER"],
+      "children": [
+        { "titulo": "Gestión de Empleados", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["EMPLEADO_LEER"], "ruta": "/admin/rrhh/empleados" }
+      ]
+    },
+    {
+      "titulo": "VENTA DE SERVICIOS",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-shopping-cart\"><circle cx=\"8\" cy=\"21\" r=\"1\"/><circle cx=\"19\" cy=\"21\" r=\"1\"/><path d=\"M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12\"/></svg>",
+      "orden": 4,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["VENTA_LEER", "VENTA_CREAR"],
+      "children": [
+        { "titulo": "Venta de Servicios", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["VENTA_CREAR"], "ruta": "/admin/procesos/punto-venta" },
+        { "titulo": "Anular comprobante", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["VENTA_ELIMINAR"], "ruta": "/admin/punto-venta/anular-comprobante" },
+        { "titulo": "Anular falta autorizar", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["VENTA_ELIMINAR"], "ruta": "/admin/punto-venta/anular-falta-autorizar" },
+        { "titulo": "Notas de crédito", "orden": 4, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["VENTA_CREAR"], "ruta": "/admin/punto-venta/notas-credito" }
+      ]
+    },
+    {
+      "titulo": "COMPRAS",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-shopping-bag\"><path d=\"M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z\"/><path d=\"M3 6h18\"/><path d=\"M16 10a4 4 0 0 1-8 0\"/></svg>",
+      "orden": 5,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["COMPRA_LEER"],
+      "children": [
+        { "titulo": "Registrar Compra", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/compras" },
+        { "titulo": "Proveedores", "orden": 2, "tipo": "ITEM", "control": "PUBLICO", "ruta": "/admin/procesos/proveedores" },
+        { "titulo": "Orden de Compra", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/orden-compra" },
+        { "titulo": "Anular Compra", "orden": 4, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/compras/anular" },
+        { "titulo": "Ajustar Compra", "orden": 5, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["COMPRA_LEER"], "ruta": "/admin/procesos/compras/ajustar" }
+      ]
+    },
+    {
+      "titulo": "CAJA GENERAL",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-wallet\"><path d=\"M21 12V7H5a2 2 0 0 1 0-4h14v4\"/><path d=\"M3 5v14a2 2 0 0 0 2 2h16v-5\"/><path d=\"M18 12a2 2 0 0 0 0 4h4v-4Z\"/></svg>",
+      "orden": 6,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["CAJA_LEER"],
+      "children": [
+        { "titulo": "Gestión de Operaciones", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["CAJA_LEER"], "ruta": "/admin/caja/operaciones" },
+        { "titulo": "Cuentas Corrientes", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["CAJA_LEER"], "ruta": "/admin/caja/cuentas-corriente" }
+      ]
+    },
+    {
+      "titulo": "CAJA CHICA",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-coins\"><circle cx=\"8\" cy=\"8\" r=\"6\"/><path d=\"M18.09 10.37A6 6 0 1 1 10.34 18\"/><path d=\"M7 6h1v4\"/><path d=\"m16.71 13.88.7.71-2.82 2.82\"/><path d=\"m17.42 17.42-.71.7-.71-.71\"/></svg>",
+      "orden": 7,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["CAJA_LEER"],
+      "children": [
+        { "titulo": "Registro de Movimientos", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["CAJA_LEER"], "ruta": "/admin/caja-chica/movimientos" },
+        { "titulo": "Ingresos y Gastos", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["CAJA_LEER"], "ruta": "/admin/caja-chica/ingresos-gastos" },
+        { "titulo": "Arqueo de Caja", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["CAJA_LEER"], "ruta": "/admin/caja-chica/arqueo-caja" }
+      ]
+    },
+    {
+      "titulo": "REPORTES",
+      "icono": "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-clipboard-plus\"><rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M9 14h6\"/><path d=\"M12 17v-6\"/></svg>",
+      "orden": 8,
+      "tipo": "GRUPO",
+      "control": "PERMISOS",
+      "permisos": ["REPORTE_LEER"],
+      "children": [
+        { "titulo": "bitacora", "orden": 1, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/auditoria" },
+        { "titulo": "Correlatividad", "orden": 2, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/correlatividad" },
+        { "titulo": "kardex", "orden": 3, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/kardex" },
+        { "titulo": "valorizacion", "orden": 4, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/valorizacion" },
+        { "titulo": "Otros pagos", "orden": 5, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/otros-pagos" },
+        { "titulo": "Rep. Rec. honorarios", "orden": 6, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/honorarios" },
+        { "titulo": "Rep. pagos", "orden": 7, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/pagos" },
+        { "titulo": "Rep. Compras", "orden": 8, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/compras" },
+        { "titulo": "Rep. ventas", "orden": 9, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/ventas" },
+        { "titulo": "Rep. descuento", "orden": 10, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/descuentos" },
+        { "titulo": "Rep. Comprobantes anulados", "orden": 11, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/comprobantes-anulados" },
+        { "titulo": "Rep. Empresas Atendidas", "orden": 12, "tipo": "ITEM", "control": "PERMISOS", "permisos": ["REPORTE_LEER"], "ruta": "/admin/reportes/empresas-atendidas" }
+      ]
+    }
+  ],
+  "documentTypes": [
+    ["B", "BOLETA", "BOLETA DE VENTA", "false"],
+    ["F", "FACTURA", "FACTURA", "true"],
+    ["T", "TICKET", "TICKET DE VENTA", "false"],
+    ["NC", "NOTA DE CRÉDITO", "ANULACIÓN O DEVOLUCIÓN", "false"],
+    ["ND", "NOTA DE DÉBITO", "AJUSTE DE PRECIO", "false"]
+  ],
+  "patientTypes": [
+    ["P", "PARTICULAR", "1"],
+    ["C", "CONVENIO", "1"],
+    ["S", "SEGURO", "1"]
+  ]
+}

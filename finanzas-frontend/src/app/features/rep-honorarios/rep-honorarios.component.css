@@ -1,0 +1,41 @@
+:host {
+    display: block;
+    background-color: #fafafa;
+    min-height: 100vh;
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Estilos para los selectores de fecha y filtros */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Efectos de hover en tarjetas */
+.group:hover .absolute {
+    transform: scale(1.1);
+}
+
+/* Transiciones para botones */
+button {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Estilos dark mode específicos si es necesario */
+:host-context(.dark) .bg-white {
+    background-color: #0f172a;
+}

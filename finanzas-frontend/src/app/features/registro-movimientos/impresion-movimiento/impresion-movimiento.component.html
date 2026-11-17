@@ -1,0 +1,103 @@
+<div class="overlay" (click)="onClose()">
+    <div class="modal-container" (click)="$event.stopPropagation()">
+
+        <!-- Header Controls (No-Print) -->
+        <div class="controls no-print">
+            <h3>🖨️ Imprimir Comprobante</h3>
+
+            <div class="format-selector">
+                <button [class.active]="selectedFormat === '80mm'" (click)="setFormat('80mm')">80mm</button>
+                <button [class.active]="selectedFormat === '58mm'" (click)="setFormat('58mm')">58mm</button>
+                <button [class.active]="selectedFormat === 'A4'" (click)="setFormat('A4')">A4</button>
+                <button [class.active]="selectedFormat === 'A5'" (click)="setFormat('A5')">A5</button>
+            </div>
+
+            <div class="actions">
+                <button class="btn-whatsapp" (click)="sendWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                </button>
+                <button class="btn-email" (click)="sendEmail()">
+                    <i class="fas fa-envelope"></i> Correo
+                </button>
+                <button class="btn-cancel" (click)="onClose()">Cerrar</button>
+                <button class="btn-print" (click)="print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+
+        <!-- Preview Area -->
+        <div class="preview-area">
+            <div class="ticket-container" [ngClass]="'format-' + selectedFormat">
+
+                <!-- Ticket Header -->
+                <div class="header">
+                    <div class="logo">
+                        <img src="Finanzas.png" alt="Logo" style="max-width: 150px; height: auto;"
+                            onerror="this.style.display='none'">
+                    </div>
+                    <h2>{{ tituloDocumento }}</h2>
+                    <p class="company-name">REUMACENTER S.A.C.</p>
+                    <p class="ruc">RUC: 20601234567</p>
+                    <p class="address">Av. La Cultura 1234, Cusco</p>
+                    <p class="ticket-info">
+                        <strong>N°:</strong> {{ movimiento?.numeroComprobante || 'S/N' }}<br>
+                        <strong>Fecha:</strong> {{ movimiento?.fechaEmision | date:'dd/MM/yyyy' }}<br>
+                        <strong>Hora:</strong> {{ currentDate | date:'HH:mm a' }}
+                    </p>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Ticket Body -->
+                <div class="body">
+                    <div class="row">
+                        <span class="label">Beneficiario/Ref:</span>
+                        <span class="value">{{ movimiento?.beneficiario || '---' }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Concepto:</span>
+                        <span class="value">{{ movimiento?.concepto || movimiento?.descripcion }}</span>
+                    </div>
+                    <div class="row" *ngIf="movimiento?.codigoContable">
+                        <span class="label">Cod. Contable:</span>
+                        <span class="value">{{ movimiento?.codigoContable }}</span>
+                    </div>
+                    <div class="row">
+                        <span class="label">Método Pago:</span>
+                        <span class="value">{{ movimiento?.metodoPago || 'EFECTIVO' }}</span>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Totals -->
+                <div class="totals">
+                    <div class="total-row">
+                        <span>TOTAL:</span>
+                        <span class="amount">{{ movimiento?.moneda || 'S/' }} {{ movimiento?.monto | number:'1.2-2'
+                            }}</span>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Footer / Signatures -->
+                <div class="footer">
+                    <div class="signature-box">
+                        <div class="line"></div>
+                        <p>Entregué Conforme</p>
+                        <p class="small">(Caja / Tesorería)</p>
+                    </div>
+
+                    <div class="signature-box">
+                        <div class="line"></div>
+                        <p>Recibí Conforme</p>
+                        <p class="small">DNI: __________________</p>
+                    </div>
+
+                    <p class="thank-you">*** GRACIAS POR SU PREFERENCIA ***</p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

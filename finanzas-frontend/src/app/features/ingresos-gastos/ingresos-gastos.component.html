@@ -1,0 +1,70 @@
+<div class="p-6 space-y-6 bg-slate-50 min-h-screen">
+
+    <!-- Breadcrumb -->
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+    <!-- Header -->
+    <app-page-header title="Caja Chica (Ingresos y Gastos)" subtitle="Manejo del dinero en efectivo del cajero"
+        [counterValue]="totalElements" [showCounter]="true">
+        <ng-container *ngIf="!cajaAbierta(); else cajaAbiertaTemplate">
+            <button (click)="abrirCaja()"
+                class="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all duration-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Abrir Caja
+            </button>
+        </ng-container>
+        <ng-template #cajaAbiertaTemplate>
+            <div class="flex items-center gap-2">
+                <span class="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    CAJA ABIERTA
+                </span>
+                <button (click)="cerrarCaja()"
+                    class="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold rounded-lg shadow-sm transition-all duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                    </svg>
+                    Cerrar Caja
+                </button>
+            </div>
+        </ng-template>
+    </app-page-header>
+
+    <!-- Contenedor Único (Card) para Filtros y Tabla -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+        <!-- Filtros -->
+        <div class="px-6 py-4 bg-slate-50/30">
+            <app-barra-filtros 
+                [searchOptions]="searchOptions" 
+                (filterEvent)="onFilter($any($event))">
+            </app-barra-filtros>
+        </div>
+        
+        <!-- Tabla -->
+        <div class="px-6">
+            <app-tabla-general [datos]="movimientos()" [columnas]="columnas" [currentPage]="currentPage" [pageSize]="pageSize"
+                [loading]="loading()" [showEdit]="false" [showDelete]="true" [showViewDetails]="true" [showIndex]="true" tituloAcciones="Acciones"
+                (onDelete)="anular($event.id)">
+            </app-tabla-general>
+        </div>
+
+        <!-- Paginación -->
+        <div class="px-6 py-4">
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+
+    <!-- Abrir Caja Modal -->
+    <app-abrir-caja-modal [isOpen]="isAbrirCajaModalOpen" (modalClose)="isAbrirCajaModalOpen = false"
+        (confirmar)="onConfirmarAbrirCaja($event)">
+    </app-abrir-caja-modal>
+
+    <!-- Cerrar Caja Modal -->
+    <app-cerrar-caja-modal [isOpen]="isCerrarCajaModalOpen" [saldoTeorico]="saldoTeoricoCierre"
+        (modalClose)="isCerrarCajaModalOpen = false" (confirmar)="onConfirmarCerrarCaja($event)">
+    </app-cerrar-caja-modal>
+</div>

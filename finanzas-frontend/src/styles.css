@@ -1,0 +1,790 @@
+@config "../tailwind.config.js";
+@import 'tailwindcss';
+
+/* ========================================
+   VARIABLES CSS GLOBALES - MODO CLARO Y OSCURO
+   ======================================== */
+
+:root {
+    /* COLORES PRINCIPALES - MODO CLARO */
+    --color-background: #ffffff;
+    --color-background-secondary: #f8fafc;
+    /* slate-50 */
+    --color-background-tertiary: #f1f5f9;
+    /* slate-100 */
+
+    --color-text-primary: #0f172a;
+    /* slate-900 */
+    --color-text-secondary: #475569;
+    /* slate-600 */
+    --color-text-tertiary: #64748b;
+    /* slate-500 */
+
+    --color-border: #e2e8f0;
+    /* slate-200 */
+    --color-border-secondary: #cbd5e1;
+    /* slate-300 */
+
+    --color-primary: #1D4ED8;
+    /* blue-700 */
+    --color-primary-hover: #1E40AF;
+    /* blue-800 */
+
+    /* SIDEBAR */
+    --color-sidebar-bg: #1e293b;
+    /* slate-800 */
+    --color-sidebar-text: #e2e8f0;
+    /* slate-200 */
+    --color-sidebar-hover: #334155;
+    /* slate-700 */
+    --color-sidebar-active: #1D4ED8;
+
+    /* HEADER */
+    --color-header-bg: #ffffff;
+    --color-header-text: #334155;
+    /* slate-700 */
+    --color-header-border: #1D4ED8;
+
+    /* TABLAS */
+    --color-table-header-bg: #f1f5f9;
+    /* slate-100 */
+    --color-table-header-text: #1e293b;
+    /* slate-800 */
+    --color-table-row-hover: #f8fafc;
+    /* slate-50 */
+    --color-table-border: #e2e8f0;
+    /* slate-200 */
+
+    /* CARDS */
+    --color-card-bg: #ffffff;
+    --color-card-border: #e5e7eb;
+    /* gray-200 */
+
+    /* INPUTS */
+    --color-input-bg: #ffffff;
+    --color-input-border: #cbd5e1;
+    /* slate-300 */
+    --color-input-focus: #1D4ED8;
+
+    /* MODALES */
+    --color-modal-bg: #ffffff;
+    --color-modal-overlay: rgba(0, 0, 0, 0.5);
+
+    /* SCROLLBAR */
+    --color-scrollbar-track: #f1f1f1;
+    --color-scrollbar-thumb: #888;
+    --color-scrollbar-thumb-hover: #555;
+}
+
+/* ========================================
+   VARIABLES CSS - MODO OSCURO
+   ======================================== */
+
+html.dark {
+    /* COLORES PRINCIPALES - MODO OSCURO (MÁS OSCURO Y PROFESIONAL) */
+    --color-background: #1a2332;
+    /* Fondo principal más oscuro */
+    --color-background-secondary: #1e2a3a;
+    /* Fondo secundario oscuro */
+    --color-background-tertiary: #243447;
+    /* Fondo terciario */
+
+    --color-text-primary: #e8edf5;
+    /* Texto principal claro */
+    --color-text-secondary: #b8c5d6;
+    /* Texto secundario */
+    --color-text-tertiary: #8a9bb0;
+    /* Texto terciario */
+
+    --color-border: #2d3e52;
+    /* Bordes oscuros */
+    --color-border-secondary: #3a4d63;
+    /* Bordes secundarios */
+
+    --color-primary: #3b82f6;
+    /* blue-500 */
+    --color-primary-hover: #2563eb;
+    /* blue-600 */
+
+    /* SIDEBAR */
+    --color-sidebar-bg: #1a2332;
+    /* Mismo que fondo principal */
+    --color-sidebar-text: #e8edf5;
+    /* Texto claro */
+    --color-sidebar-hover: #243447;
+    /* Hover más claro */
+    --color-sidebar-active: #3b82f6;
+
+    /* HEADER */
+    --color-header-bg: #1a2332;
+    /* Mismo que fondo principal */
+    --color-header-text: #e8edf5;
+    /* Texto claro */
+    --color-header-border: #1d4ed8;
+
+    /* TABLAS */
+    --color-table-header-bg: #1e2a3a;
+    /* Fondo de encabezado de tabla */
+    --color-table-header-text: #e8edf5;
+    /* Texto de encabezado */
+    --color-table-row-hover: #243447;
+    /* Hover en filas */
+    --color-table-border: #2d3e52;
+    /* Bordes de tabla */
+
+    /* CARDS */
+    --color-card-bg: #1e2a3a;
+    /* Fondo de tarjetas */
+    --color-card-border: #2d3e52;
+    /* Bordes de tarjetas */
+
+    /* INPUTS */
+    --color-input-bg: #243447;
+    /* Fondo de inputs */
+    --color-input-border: #3a4d63;
+    /* Bordes de inputs */
+    --color-input-focus: #3b82f6;
+
+    /* MODALES */
+    --color-modal-bg: #1e2a3a;
+    /* Fondo de modales */
+    --color-modal-overlay: rgba(0, 0, 0, 0.75);
+    /* Overlay más oscuro */
+
+    /* SCROLLBAR */
+    --color-scrollbar-track: #1e2a3a;
+    --color-scrollbar-thumb: #3a4d63;
+    --color-scrollbar-thumb-hover: #4a5d73;
+}
+
+/* ========================================
+   ESTILOS BASE
+   ======================================== */
+
+@layer base {
+
+    html,
+    body {
+        @apply h-full;
+    }
+
+    body {
+        font-family: 'Lato', sans-serif;
+        @apply antialiased;
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: 'Montserrat', sans-serif;
+        color: var(--color-text-primary);
+    }
+
+    /* Asegurar que el contenido principal herede el tema */
+    main,
+    .main-content,
+    app-root>*,
+    router-outlet+* {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+}
+
+/* ========================================
+   ESTILOS PARA IMÁGENES
+   ======================================== */
+
+html.dark img {
+    transition: filter 0.3s ease, opacity 0.3s ease;
+}
+
+/* Logo específico - ajustar para modo oscuro */
+html.dark .logo-image,
+html.dark img[alt*="Logo"],
+html.dark img[alt*="logo"] {
+    filter: brightness(1.2) contrast(1.1);
+    opacity: 0.95;
+}
+
+/* Imágenes de perfil del header - NO aplicar filtros */
+html.dark header img[alt*="perfil"],
+html.dark header img[alt*="Perfil"],
+html.dark header img[alt*="Foto de Perfil"] {
+    filter: none !important;
+}
+
+/* Imágenes de perfil en sidebar - mantener naturales pero con mejor contraste */
+html.dark img[alt*="perfil"]:not(header img),
+html.dark img[alt*="Perfil"]:not(header img),
+html.dark img[alt*="avatar"],
+html.dark img[alt*="Avatar"] {
+    filter: brightness(1.1);
+    border-color: var(--color-border-secondary) !important;
+}
+
+/* Imágenes en general - mejor visibilidad */
+html.dark img:not(.logo-image):not([alt*="perfil"]):not([alt*="avatar"]) {
+    filter: brightness(1.1) contrast(1.05);
+}
+
+/* ========================================
+   COMPONENTES PERSONALIZADOS
+   ======================================== */
+
+@layer components {
+
+    /* ===== BOTONES ===== */
+    .btn-primary {
+        @apply px-4 py-2 text-white rounded-lg transition duration-200 font-medium shadow-sm hover:shadow-md;
+        background-color: var(--color-primary);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--color-primary-hover);
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2 rounded-lg transition duration-200 font-medium;
+        background-color: var(--color-background-tertiary);
+        color: var(--color-text-secondary);
+    }
+
+    .btn-secondary:hover {
+        background-color: var(--color-background-secondary);
+    }
+
+    /* ===== INPUTS ===== */
+    .input-field {
+        @apply w-full px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-all;
+        background-color: var(--color-input-bg);
+        border: 1px solid var(--color-input-border);
+        color: var(--color-text-primary);
+    }
+
+    .input-field:focus {
+        border-color: var(--color-input-focus);
+        ring-color: var(--color-input-focus);
+    }
+
+    .input-error {
+        @apply border-red-500 focus:ring-red-500;
+    }
+
+    html.dark .input-error {
+        @apply border-red-600 focus:ring-red-600;
+    }
+
+    /* ===== CARDS ===== */
+    .card {
+        @apply rounded-xl shadow-lg p-6;
+        background-color: var(--color-card-bg);
+        border: 1px solid var(--color-card-border);
+        color: var(--color-text-primary);
+    }
+
+    /* ===== ALERTAS ===== */
+    .alert-success {
+        @apply bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 text-green-800 dark:text-green-200 px-4 py-3 rounded-lg;
+    }
+
+    .alert-error {
+        @apply bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg;
+    }
+
+    .alert-warning {
+        @apply bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded-lg;
+    }
+
+    .alert-info {
+        @apply bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200 px-4 py-3 rounded-lg;
+    }
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+
+@layer utilities {
+
+    /* Animaciones personalizadas */
+    .animate-fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.3s ease-out;
+    }
+
+    /* ===== SCROLLBAR PERSONALIZADO ===== */
+    .scrollbar-thin::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-track {
+        background: var(--color-scrollbar-track);
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: var(--color-scrollbar-thumb);
+        border-radius: 3px;
+    }
+
+    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+        background: var(--color-scrollbar-thumb-hover);
+    }
+
+    /* Scrollbar oculto */
+    .scrollbar-none {
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+
+    .scrollbar-none::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* ===== CHIPS SCROLLBAR ===== */
+    .custom-scrollbar-chips::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    .custom-scrollbar-chips::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar-chips::-webkit-scrollbar-thumb {
+        background: var(--color-border);
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar-chips::-webkit-scrollbar-thumb:hover {
+        background: var(--color-border-secondary);
+    }
+}
+
+/* ========================================
+   ANIMACIONES
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* ===== SPINNER DE CARGA ===== */
+.spinner {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+html.dark .spinner {
+    border: 2px solid var(--color-background-tertiary);
+    border-top: 2px solid var(--color-primary);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== TRANSICIONES SUAVES GLOBALES ===== */
+* {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* ========================================
+   ESTILOS ADICIONALES PARA MODO OSCURO
+   ======================================== */
+
+/* Tablas */
+table {
+    color: var(--color-text-primary);
+}
+
+table thead {
+    background-color: var(--color-table-header-bg);
+    color: var(--color-table-header-text);
+}
+
+table tbody tr {
+    border-color: var(--color-table-border);
+}
+
+table tbody tr:hover {
+    background-color: var(--color-table-row-hover);
+}
+
+table tbody td {
+    color: var(--color-text-primary);
+}
+
+/* Modales y overlays */
+.modal-overlay {
+    background-color: var(--color-modal-overlay);
+}
+
+/* ========================================
+   REGLAS GLOBALES PARA MODO OSCURO
+   Aplican automáticamente a TODOS los componentes
+   ======================================== */
+
+/* Fondos blancos y grises → oscuros en modo noche */
+html.dark .bg-white,
+html.dark [class*="bg-white"] {
+    background-color: #1a2332 !important;
+}
+
+html.dark .bg-gray-50,
+html.dark [class*="bg-gray-50"] {
+    background-color: #1e2a3a !important;
+}
+
+html.dark .bg-gray-100 {
+    background-color: #243447 !important;
+}
+
+html.dark .bg-gray-200 {
+    background-color: #2d3e52 !important;
+}
+
+html.dark .bg-gray-400 {
+    background-color: #1e2a3a !important;
+}
+
+/* Textos grises → claros en modo noche */
+html.dark .text-gray-400,
+html.dark .text-gray-500,
+html.dark .text-gray-600,
+html.dark .text-gray-700,
+html.dark .text-slate-500,
+html.dark .text-slate-600,
+html.dark .text-slate-700,
+html.dark .text-slate-800 {
+    color: #e8edf5 !important;
+}
+
+html.dark .text-black {
+    color: #e8edf5 !important;
+}
+
+/* Placeholders */
+html.dark input::placeholder,
+html.dark textarea::placeholder,
+html.dark select::placeholder {
+    color: #8a9bb0 !important;
+}
+
+/* Bordes grises → oscuros en modo noche */
+html.dark .border-gray-200,
+html.dark .border-gray-300,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300 {
+    border-color: #2d3e52 !important;
+}
+
+html.dark .border-gray-400 {
+    border-color: #3a4d63 !important;
+}
+
+html.dark .divide-slate-100,
+html.dark .divide-gray-100 {
+    border-color: #2d3e52 !important;
+}
+
+/* Hover states */
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-gray-50:hover {
+    background-color: #243447 !important;
+}
+
+html.dark .hover\:bg-slate-100:hover,
+html.dark .hover\:bg-gray-100:hover {
+    background-color: #2d3e52 !important;
+}
+
+html.dark .hover\:text-gray-700:hover {
+    color: #e8edf5 !important;
+}
+
+/* Rings (focus states) */
+html.dark .ring-black\/5,
+html.dark [class*="ring-black"] {
+    --tw-ring-color: rgb(61 78 101 / 0.5) !important;
+}
+
+/* Inputs, selects, textareas */
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark input[type="time"],
+html.dark input[type="search"],
+html.dark select,
+html.dark textarea {
+    background-color: #243447 !important;
+    color: #e8edf5 !important;
+    border-color: #3a4d63 !important;
+}
+
+html.dark input[type="text"]:focus,
+html.dark input[type="email"]:focus,
+html.dark input[type="password"]:focus,
+html.dark input[type="number"]:focus,
+html.dark input[type="date"]:focus,
+html.dark input[type="time"]:focus,
+html.dark input[type="search"]:focus,
+html.dark select:focus,
+html.dark textarea:focus {
+    background-color: #2d3e52 !important;
+    border-color: #3b82f6 !important;
+}
+
+/* Botones con fondo blanco */
+html.dark button.bg-white,
+html.dark a.bg-white {
+    background-color: #243447 !important;
+    color: #e8edf5 !important;
+    border-color: #3a4d63 !important;
+}
+
+html.dark button.bg-white:hover,
+html.dark a.bg-white:hover {
+    background-color: #2d3e52 !important;
+}
+
+/* Iconos */
+html.dark .text-gray-400 i,
+html.dark .text-gray-500 i {
+    color: #8a9bb0 !important;
+}
+
+/* Sombras - reducir en modo oscuro */
+html.dark .shadow-sm,
+html.dark .shadow,
+html.dark .shadow-md,
+html.dark .shadow-lg {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3) !important;
+}
+
+/* Cards y contenedores redondeados */
+html.dark .rounded-2xl,
+html.dark .rounded-xl,
+html.dark .rounded-lg {
+    background-color: #1e2a3a;
+}
+
+/* Badges y pills con fondos claros */
+html.dark .bg-slate-100,
+html.dark .bg-slate-50 {
+    background-color: #2d3e52 !important;
+    color: #e8edf5 !important;
+}
+
+/* Scrollbars en modo oscuro */
+html.dark ::-webkit-scrollbar-track {
+    background-color: #1e2a3a;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+    background-color: #3a4d63;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #4a5d73;
+}
+
+.modal-content {
+    background-color: var(--color-modal-bg);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+/* Dropdowns y selects */
+select,
+.dropdown {
+    background-color: var(--color-input-bg);
+    color: var(--color-text-primary);
+    border-color: var(--color-input-border);
+}
+
+select option {
+    background-color: var(--color-input-bg);
+    color: var(--color-text-primary);
+}
+
+/* Badges y tags */
+.badge {
+    background-color: var(--color-background-tertiary);
+    color: var(--color-text-primary);
+}
+
+/* Links */
+a {
+    color: var(--color-primary);
+}
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* Texto secundario */
+.text-secondary,
+.text-muted {
+    color: var(--color-text-secondary);
+}
+
+/* Bordes */
+.border,
+[class*="border-"] {
+    border-color: var(--color-border);
+}
+
+/* Backgrounds secundarios */
+.bg-secondary {
+    background-color: var(--color-background-secondary);
+}
+
+.bg-tertiary {
+    background-color: var(--color-background-tertiary);
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: var(--color-sidebar-bg);
+    border-color: var(--color-border);
+}
+
+/* Navbar/Header */
+.navbar,
+.header {
+    background-color: var(--color-header-bg);
+    border-color: var(--color-border);
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+    color: var(--color-text-tertiary);
+}
+
+.breadcrumb a {
+    color: var(--color-text-secondary);
+}
+
+.breadcrumb a:hover {
+    color: var(--color-text-primary);
+}
+
+/* Tooltips */
+.tooltip {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+/* Progress bars */
+.progress-bar {
+    background-color: var(--color-background-tertiary);
+}
+
+.progress-fill {
+    background-color: var(--color-primary);
+}
+
+/* Form labels */
+label {
+    color: var(--color-text-primary);
+}
+
+/* Placeholders */
+::placeholder {
+    color: var(--color-text-tertiary);
+}
+
+/* Disabled states */
+:disabled,
+.disabled {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-tertiary);
+    cursor: not-allowed;
+}
+
+/* Icons */
+.icon {
+    color: var(--color-text-tertiary);
+}
+
+/* Checkbox y radio buttons */
+input[type="checkbox"],
+input[type="radio"] {
+    border-color: var(--color-input-border);
+    background-color: var(--color-input-bg);
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+/* Code blocks */
+pre,
+code {
+    background-color: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
+}
+
+/* Dividers */
+hr {
+    border-color: var(--color-border);
+}
+
+/* ===== UTILIDADES DE ALINEACIÓN ===== */
+.numero-sin-spinner::-webkit-inner-spin-button,
+.numero-sin-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.numero-sin-spinner {
+    -moz-appearance: textfield;
+}

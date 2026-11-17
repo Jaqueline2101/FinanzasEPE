@@ -1,0 +1,92 @@
+<div class="p-6 space-y-6">
+    <app-breadcrumb [items]="breadcrumbItems" class="mb-0"></app-breadcrumb>
+
+    <div class="mt-4">
+        <app-page-header title="Gestión de Claves"
+            subtitle="Restablecer credenciales de acceso para usuarios de la organización" iconType="settings" [showCounter]="true"
+            counterLabel="Encontrados" [counterValue]="totalElements">
+        </app-page-header>
+    </div>
+
+    <!-- Filtros -->
+    <div class="flex flex-col md:flex-row gap-4 items-center justify-between pb-2">
+        <div class="w-full md:max-w-xl">
+            <app-search-generic 
+                [options]="searchOptions" 
+                placeholder="Buscar por usuario, nombre o DNI..."
+                (onSearch)="handleSearch($event)">
+            </app-search-generic>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <app-tabla-general 
+            [columnas]="columns" 
+            [datos]="users" 
+            [loading]="isLoading" 
+            [currentPage]="currentPage"
+            [pageSize]="pageSize"
+            [showEdit]="false"
+            [showDelete]="false"
+            [showConfig]="true"
+            tituloAcciones="Acciones"
+            (onConfig)="openResetModal($event)">
+        </app-tabla-general>
+    </div>
+
+    <!-- Paginación -->
+    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+        (pageChange)="onPageChange($event)">
+    </app-pagination>
+</div>
+
+<!-- Modal de Reseteo -->
+<app-modal [isOpen]="isModalVisible" [title]="'Restablecer Clave - ' + (selectedUser?.username || '')" (modalClose)="closeModal()" size="md">
+    <div class="p-4 space-y-6">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-start gap-3">
+            <i class="fas fa-exclamation-triangle text-amber-500 mt-1"></i>
+            <div>
+                <p class="text-xs font-black text-amber-800 uppercase tracking-tight">Atención Administrador</p>
+                <p class="text-[11px] text-amber-700 mt-1">
+                    Esta acción restablecerá la contraseña del usuario. Se recomienda forzar el cambio en el próximo inicio de sesión.
+                </p>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nueva Contraseña</label>
+                <div class="relative">
+                    <input type="text" [(ngModel)]="newPassword" 
+                        class="w-full px-4 py-2.5 text-sm font-bold text-slate-700 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                        placeholder="Ingrese la nueva contraseña">
+                    <button (click)="generateRandomPassword()" 
+                        class="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Generar aleatoria">
+                        <i class="fas fa-magic"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <input type="checkbox" id="mustChange" [(ngModel)]="mustChangePassword"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500">
+                <label for="mustChange" class="text-xs font-bold text-slate-600 cursor-pointer">
+                    Forzar cambio de contraseña al iniciar sesión
+                </label>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4 border-t border-slate-100">
+            <button (click)="closeModal()" [disabled]="isSaving"
+                class="px-5 py-2 text-xs font-black text-slate-500 hover:bg-slate-100 rounded-xl transition-all uppercase">
+                Cancelar
+            </button>
+            <button (click)="confirmReset()" [disabled]="isSaving || !newPassword"
+                class="px-6 py-2 text-xs font-black bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50 uppercase">
+                {{ isSaving ? 'Procesando...' : 'Restablecer Ahora' }}
+            </button>
+        </div>
+    </div>
+</app-modal>

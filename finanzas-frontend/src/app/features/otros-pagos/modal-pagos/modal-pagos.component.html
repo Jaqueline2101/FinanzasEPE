@@ -1,0 +1,123 @@
+<app-modal [isOpen]="isOpen" (modalClose)="close()" [title]="paymentToEdit ? 'Editar Pago' : 'Registrar Nuevo Pago'"
+    [size]="'md'">
+    <div class="space-y-4">
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-1">
+                <label class="flex items-center gap-1 h-4 text-xs font-bold text-slate-500 uppercase mb-1">Fecha <span
+                        class="text-rose-500 text-xl leading-none">*</span></label>
+                <input type="date" [(ngModel)]="form.fecha"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+            </div>
+            <div class="col-span-1">
+                <label class="flex items-center gap-1 h-4 text-xs font-bold text-slate-500 uppercase mb-1">Tipo Persona
+                    <span class="text-rose-500 text-xl leading-none">*</span></label>
+                <select [(ngModel)]="form.tipoPersona"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+                    <option value="TRABAJADOR">Trabajador</option>
+                    <option value="MEDICO">Médico</option>
+                    <option value="EXTERNO">Externo</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="flex items-center gap-1 h-4 text-xs font-bold text-slate-500 uppercase mb-1">Nombre / Razón
+                Social <span class="text-rose-500 text-xl leading-none">*</span></label>
+            <input type="text" [(ngModel)]="form.beneficiario" placeholder="Ingrese nombre completo"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="flex items-center h-4 text-xs font-bold text-slate-500 uppercase mb-1">DNI
+                    (Opcional)</label>
+                <input type="text" [(ngModel)]="form.dni" #dniInput="ngModel" placeholder="Número de documento"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    [class.border-rose-500]="(dniInput.touched || submitted) && isDniInvalid()">
+                <p *ngIf="(dniInput.touched || submitted) && isDniInvalid()" class="text-rose-500 text-[10px] mt-1 font-medium">
+                    <i class="fas fa-exclamation-circle mr-1"></i>Debe tener 8 dígitos
+                </p>
+            </div>
+            <div>
+                <label class="flex items-center gap-1 h-4 text-xs font-bold text-slate-500 uppercase mb-1">Monto (S/)
+                    <span class="text-rose-500 text-xl leading-none">*</span></label>
+                <input type="number" [(ngModel)]="form.monto" (focus)="onMontoFocus()" (blur)="onMontoBlur()"
+                    placeholder="0.00" [class.placeholder-shown]="form.monto === 0"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold text-blue-700 bg-blue-50 border-blue-200 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder-shown:text-slate-400 placeholder-shown:font-normal">
+            </div>
+        </div>
+
+        <div>
+            <label class="flex items-center gap-1 h-4 text-xs font-bold text-slate-500 uppercase mb-1">Método de Pago
+                <span class="text-rose-500 text-xl leading-none">*</span></label>
+            <div class="flex gap-2">
+                <button *ngFor="let m of metodoPagoOptions" (click)="form.metodoPago = m"
+                    [class]="form.metodoPago === m ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 ring-2 ring-blue-600 ring-offset-1' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'"
+                    class="flex-1 py-2 rounded-lg text-xs font-bold transition-all">
+                    {{ m }}
+                </button>
+            </div>
+        </div>
+
+        <!-- New Fields for Donation Ticket -->
+        <div>
+            <label class="flex items-center h-4 text-xs font-bold text-slate-500 uppercase mb-1">Campaña / Destino
+                (Opcional)</label>
+            <input type="text" [(ngModel)]="form.nombreCampana" placeholder="Ej. Campaña Salud 2026"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="flex items-center h-4 text-xs font-bold text-slate-500 uppercase mb-1">Teléfono</label>
+                <input type="text" [(ngModel)]="form.telefono" #telInput="ngModel" placeholder="999 999 999"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    [class.border-rose-500]="(telInput.touched || submitted) && isTelefonoInvalid()">
+                <p *ngIf="(telInput.touched || submitted) && isTelefonoInvalid()" class="text-rose-500 text-[10px] mt-1 font-medium">
+                    <i class="fas fa-exclamation-circle mr-1"></i>9 dígitos (Inicia con 9)
+                </p>
+            </div>
+            <div>
+                <label class="flex items-center h-4 text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+                <input type="email" [(ngModel)]="form.email" #emailInput="ngModel" placeholder="correo@ejemplo.com"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all"
+                    [class.border-rose-500]="(emailInput.touched || submitted) && isEmailInvalid()">
+                <p *ngIf="(emailInput.touched || submitted) && isEmailInvalid()" class="text-rose-500 text-[10px] mt-1 font-medium">
+                    <i class="fas fa-exclamation-circle mr-1"></i>Formato de correo inválido
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2 py-2">
+            <input type="checkbox" id="anonimo" [(ngModel)]="form.esAnonimo"
+                class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500">
+            <label for="anonimo" class="text-sm text-slate-700 font-medium select-none">Donación Anónima</label>
+        </div>
+
+        <div>
+            <label class="flex items-center h-4 text-xs font-bold text-slate-500 uppercase mb-1">Concepto /
+                Observación</label>
+            <textarea [(ngModel)]="form.concepto" rows="3" placeholder="Describa el motivo del pago..."
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500/20 transition-all resize-none"></textarea>
+        </div>
+    </div>
+
+    <!-- Print Component -->
+    <app-impresion-pagos [visible]="showPrintModal" [data]="lastSavedPayment" (onClose)="closePrint()">
+    </app-impresion-pagos>
+
+    <!-- Footer Actions -->
+    <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-100">
+        <button (click)="close()"
+            class="px-4 py-2 text-sm font-semibold text-slate-500 hover:text-slate-700 transition-colors rounded-lg hover:bg-slate-100">
+            Cancelar
+        </button>
+        <button (click)="guardarPago()" [disabled]="guardando"
+            class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg shadow-blue-200 transition-all font-bold text-sm flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+            <i *ngIf="guardando" class="fas fa-spinner fa-spin"></i>
+            {{ guardando ? 'Guardando...' : (paymentToEdit ? 'Actualizar Pago' : 'Confirmar Pago') }}
+        </button>
+    </div>
+    <app-alertas></app-alertas>
+</app-modal>

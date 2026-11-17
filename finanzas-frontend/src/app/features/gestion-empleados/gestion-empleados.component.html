@@ -1,0 +1,58 @@
+<div class="flex flex-col h-full bg-slate-50 relative">
+
+    <!-- Modal Empleado -->
+    <app-modal-empleado *ngIf="mostrarModal" [isOpen]="mostrarModal" [empleadoId]="selectedEmpleadoId"
+        (closeModal)="onModalClose($event)">
+    </app-modal-empleado>
+
+    <!-- Modal Detalle (Solo Lectura) -->
+    <app-modal-detalle *ngIf="mostrarDetalle" [isOpen]="mostrarDetalle" [empleadoId]="selectedEmpleadoId"
+        (closeModal)="mostrarDetalle = false">
+    </app-modal-detalle>
+
+    <!-- Header -->
+    <div class="px-6 pt-6 pb-0">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+        <div class="mt-1 mb-1">
+            <app-page-header title="Gestión de Empleados" description="Administración de personal y núcleo familiar"
+                [counterValue]="empleados.length">
+            </app-page-header>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1 p-6 relative z-0 overflow-auto">
+        <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+
+            <!-- Filters and Actions -->
+            <div class="px-6 py-4 bg-white">
+                <app-barra-filtros placeholder="Buscar empleado..." [searchOptions]="searchOptions"
+                    (onFilter)="handleFilters($event)">
+                </app-barra-filtros>
+
+                <div class="flex justify-end mt-2">
+                    <app-primary-button label="Nuevo Empleado" icon="plus" color="brand" size="md"
+                        (btnClick)="nuevoEmpleado()">
+                    </app-primary-button>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="flex-1 overflow-auto p-4">
+                <app-tabla-general [datos]="paginatedData" [columnas]="columnas" [currentPage]="currentPage"
+                    [pageSize]="pageSize" [loading]="loading" [showEdit]="true" [showDelete]="true"
+                    [showViewDetails]="true" (onEdit)="onEdit($event)" (onDelete)="onDelete($event)"
+                    (viewDetails)="onView($event)">
+                </app-tabla-general>
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-auto p-4">
+                <app-pagination [totalPages]="totalPages" [pageSize]="pageSize" [currentPage]="currentPage"
+                    (pageChange)="onPageChange($event)">
+                </app-pagination>
+            </div>
+        </div>
+    </div>
+</div>

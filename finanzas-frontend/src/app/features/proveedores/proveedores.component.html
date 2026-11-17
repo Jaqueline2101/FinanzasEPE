@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6">
+    <!-- Breadcrumb -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-4">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <div class="px-4 sm:px-6 lg:px-8 mb-6">
+        <app-page-header title="Gestión de Proveedores" subtitle="Administra el catálogo de proveedores"
+            iconType="users" [showCounter]="true" counterLabel="Total" [counterValue]="filteredProveedores.length"
+            gradientFrom="from-slate-800" gradientTo="to-slate-900"></app-page-header>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL (Card unificado estilo Productos/Cuentas) -->
+    <div class="px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 animate-fade-in relative z-10">
+            <div class="space-y-6">
+                <!-- Barra de Filtros -->
+                <div class="pb-2">
+                    <app-barra-filtros placeholder="Buscar proveedor por nombre o RUC..."
+                        [searchOptions]="searchOptions" [estadoOptions]="estadoOptions" [showDates]="true"
+                        (onFilter)="onFilter($event)">
+                    </app-barra-filtros>
+                </div>
+
+                <!-- Acciones Principales (Entre filtros y tabla) -->
+                <div class="flex justify-end">
+                    <app-primary-button label="Nuevo Proveedor" icon="plus" color="brand" (btnClick)="onNew()">
+                    </app-primary-button>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+                    <app-tabla-general [datos]="displayedProveedores" [columnas]="columnas" [showEdit]="true"
+                        [showDelete]="true" (onEdit)="onEdit($event)" (onDelete)="onDelete($event)"
+                        [currentPage]="currentPage" [pageSize]="pageSize" [showLinkAction]="true"
+                        linkActionIcon="fa-eye" linkActionLabel="Detalles" (onLinkAction)="onViewDetails($event)"
+                        [showCustom]="true" customIcon="fa-credit-card" customTooltip="Estado de Cuenta"
+                        (onCustom)="irACuenta($event)">
+                    </app-tabla-general>
+
+                    <!-- Loading State -->
+                    <div *ngIf="loading" class="p-12 text-center text-slate-500 bg-slate-50/30">
+                        <i class="fas fa-spinner fa-spin text-3xl text-blue-500 mb-3"></i>
+                        <p class="text-sm font-black text-slate-700">Cargando proveedores...</p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Sincronizando
+                            catálogo</p>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div *ngIf="!loading && filteredProveedores.length === 0"
+                        class="p-12 text-center text-slate-400 bg-slate-50/20">
+                        <div
+                            class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200">
+                            <i class="fas fa-search text-2xl opacity-20 text-slate-600"></i>
+                        </div>
+                        <p class="text-base font-black text-slate-600">Sin resultados</p>
+                        <p class="text-xs font-bold text-slate-400">No se encontraron proveedores con los filtros
+                            actuales</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pt-2" *ngIf="!loading && filteredProveedores.length > 0">
+                    <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                        [pageSizeOptions]="pageSizeOptions" (pageChange)="onPageChange($event)"
+                        (pageSizeChange)="onPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Form as Child Component -->
+    <app-modal-proveedor *ngIf="showModal" [isOpen]="showModal" [proveedor]="selectedProveedor" (onClose)="closeModal()"
+        (onSave)="onSave($event)">
+    </app-modal-proveedor>
+
+    <!-- Modal Detalle -->
+    <app-modal-detalle-proveedor *ngIf="showDetailModal" [isOpen]="showDetailModal"
+        [proveedor]="selectedProveedorDetalle" (onClose)="closeDetailModal()">
+    </app-modal-detalle-proveedor>
+</div>

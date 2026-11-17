@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-slate-50/50 pb-8 pt-6 animate-fadeIn">
+    <ng-container *ngIf="!isFullScreenView">
+        <!-- Breadcrumb -->
+        <div class="px-4 sm:px-6 lg:px-8 mb-4">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        </div>
+
+        <!-- Header -->
+        <div class="px-4 sm:px-6 lg:px-8 mb-8">
+            <app-page-header title="Orden de Compra" subtitle="Gestión de órdenes de adquisición de productos"
+                icon="fas fa-shopping-cart" [counterValue]="registros.length" counterLabel="Órdenes totales">
+            </app-page-header>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="px-4 sm:px-6 lg:px-8 mt-6">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-100 dark:border-slate-800 p-6 space-y-6">
+                <!-- Barra de Filtros -->
+                <app-barra-filtros 
+                    placeholder="Buscar por número o proveedor..."
+                    [searchOptions]="searchOptions"
+                    [estadoOptions]="estadoOptions"
+                    [showDates]="true"
+                    (onFilter)="onFilter($event)">
+                </app-barra-filtros>
+
+                <!-- Acciones Principales -->
+                <div class="flex justify-end">
+                    <app-primary-button 
+                        label="Nueva Orden" 
+                        icon="plus" 
+                        color="brand" 
+                        (btnClick)="abrirNuevo()">
+                    </app-primary-button>
+                </div>
+
+                <!-- Tabla de Resultados -->
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                    <app-tabla-general 
+                        [columnas]="columnas" 
+                        [datos]="displayedRegistros" 
+                        [loading]="loading"
+                        [showViewDetails]="true" 
+                        (onEdit)="editar($event)" 
+                        (onDelete)="onDelete($event)"
+                        (viewDetails)="verDetalle($event)">
+                    </app-tabla-general>
+
+                    <!-- Paginación -->
+                    <div class="p-4 border-t border-slate-50 dark:border-slate-800">
+                        <app-pagination 
+                            [currentPage]="currentPage" 
+                            [totalPages]="totalPages" 
+                            [pageSize]="pageSize"
+                            (pageChange)="onPageChange($event)" 
+                            (pageSizeChange)="onPageSizeChange($event)">
+                        </app-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+
+    <!-- Modal de Registro (Pantalla Completa Simulada) -->
+    <ng-container *ngIf="isFullScreenView">
+        <div class="px-4 sm:px-6 lg:px-8 mb-6">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        </div>
+        <div class="px-4 sm:px-6 lg:px-8 mt-4">
+            <app-modal-orden-compra [orden]="selectedOrden" (onClose)="onCancelForm()" (onSave)="onSaveSuccess()">
+            </app-modal-orden-compra>
+        </div>
+    </ng-container>
+
+    <!-- Modal Detalle -->
+    <app-modal-detalle-orden [isOpen]="showDetailModal" [orden]="selectedOrden" (onClose)="showDetailModal = false">
+    </app-modal-detalle-orden>
+</div>

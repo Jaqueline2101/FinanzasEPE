@@ -1,0 +1,93 @@
+<app-modal [isOpen]="isOpen" [title]="isEdit ? 'Editar Cuenta' : 'Nueva Cuenta Corriente'"
+    [iconType]="isEdit ? 'edit' : 'document'" [showFooter]="true" (modalClose)="close()">
+
+    <!-- Body -->
+    <div class="space-y-4">
+        <!-- Banco -->
+        <div>
+            <label class="flex items-center gap-1 h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Banco
+                / Entidad <span class="text-rose-500 text-xl leading-none">*</span></label>
+            <input type="text" [(ngModel)]="data.banco" (ngModelChange)="onBancoChange($event)"
+                placeholder="BCP, BBVA, Caja Arequipa"
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-slate-400 placeholder:font-normal">
+        </div>
+
+        <!-- Descripción -->
+        <div>
+            <label
+                class="flex items-center h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Descripción</label>
+            <input type="text" [(ngModel)]="data.alias" placeholder="Cuenta Recaudadora, Caja Chica"
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-slate-400 placeholder:font-normal">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Cuenta Contable -->
+            <div>
+                <label class="flex items-center h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Cuenta
+                    Contable</label>
+                <input type="text" [(ngModel)]="data.cuentaContable" placeholder="" readonly
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400 focus:ring-0">
+            </div>
+
+            <!-- Código SBS -->
+            <div>
+                <label class="flex items-center h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Código
+                    SBS</label>
+                <input type="text" [(ngModel)]="data.codigoSBS" placeholder="" readonly
+                    class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400 focus:ring-0">
+            </div>
+        </div>
+
+        <!-- Estado -->
+        <div>
+            <label
+                class="flex items-center h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Estado</label>
+            <select [(ngModel)]="data.estado"
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-white dark:text-white">
+                <option value="A">ACTIVO</option>
+                <option value="I">INACTIVO</option>
+            </select>
+        </div>
+
+        <!-- Titular -->
+        <div>
+            <label
+                class="flex items-center gap-1 h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nombre
+                del Titular <span class="text-rose-500 text-xl leading-none">*</span></label>
+            <input type="text" [(ngModel)]="data.nombreTitular" placeholder="Reumacenter S.A.C."
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm placeholder:text-slate-400 placeholder:font-normal">
+        </div>
+
+        <!-- Número Cuenta -->
+        <div>
+            <label
+                class="flex items-center gap-1 h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Número
+                de Cuenta <span class="text-rose-500 text-xl leading-none">*</span></label>
+            <input type="text" [ngModel]="data.numeroCuenta" (input)="onCuentaInput($event)"
+                [placeholder]="currentPlaceholder"
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm tracking-wider font-mono placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal">
+        </div>
+
+        <!-- CCI -->
+        <div>
+            <label class="flex items-center h-4 text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">CCI
+                (Interbancario)</label>
+            <input type="text" [ngModel]="data.cci" (input)="onCCIInput($event)" placeholder="XXX-XXX-XXXXXXXXXXXX-XX"
+                maxlength="24"
+                class="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm tracking-wider font-mono placeholder:text-slate-400 placeholder:font-normal placeholder:tracking-normal">
+        </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div footer class="flex gap-2">
+        <button (click)="close()"
+            class="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+            Cancelar
+        </button>
+        <button (click)="save()"
+            class="px-4 py-2 text-sm font-bold text-white bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 rounded-lg transition-all shadow-sm">
+            {{ isEdit ? 'Guardar Cambios' : 'Registrar Cuenta' }}
+        </button>
+    </div>
+
+</app-modal>

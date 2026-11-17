@@ -1,0 +1,114 @@
+<div class="relative" #nivelContainer>
+    <button type="button" (click)="toggleDropdown($event)"
+        class="w-full h-12 flex justify-between items-center bg-white border border-slate-200 rounded-2xl px-4 text-sm outline-none transition-all hover:bg-slate-50 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 group">
+        
+        <div class="flex flex-col items-start overflow-hidden">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                {{ label }}
+            </span>
+            <span class="text-slate-700 font-bold truncate">
+                {{ selectedName }}
+            </span>
+        </div>
+
+        <i class="fas fa-chevron-down text-slate-400 text-[10px] transition-transform duration-300"
+            [class.rotate-180]="showDropdown"></i>
+    </button>
+
+    <!-- Dropdown de Niveles -->
+    <div *ngIf="showDropdown"
+        class="bg-white border border-slate-200 rounded-2xl shadow-[0_15px_50px_-12px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        [ngStyle]="dropdownStyles" (click)="$event.stopPropagation()">
+
+        <!-- Búsqueda -->
+        <div class="p-4 border-b border-slate-50 bg-slate-50/30">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" [(ngModel)]="searchTerm" placeholder="Filtrar niveles..."
+                    class="w-full h-9 pl-9 pr-4 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-300 font-semibold"
+                    (click)="$event.stopPropagation()">
+            </div>
+        </div>
+
+        <!-- Lista Árbol (Scrollable) -->
+        <div class="overflow-y-auto p-2 custom-scrollbar max-h-[350px]">
+            <!-- Opción: TODOS LOS NIVELES -->
+            <div class="mb-1" *ngIf="!searchTerm">
+                <div class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all cursor-pointer group"
+                    [class.bg-indigo-50]="!value"
+                    (click)="selectNivel({idNivel: null, nombre: 'TODOS LOS NIVELES'})">
+                    <div class="flex items-center gap-3 overflow-hidden flex-1">
+                        <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors">
+                            <i class="fas fa-th-large text-xs"></i>
+                        </div>
+                        <span class="text-xs font-bold leading-tight" 
+                            [class.text-indigo-700]="!value"
+                            [class.text-slate-700]="value">
+                            TODOS LOS NIVELES
+                        </span>
+                    </div>
+                    <div *ngIf="!value" class="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center animate-in zoom-in duration-200">
+                        <i class="fas fa-check text-[8px] text-white"></i>
+                    </div>
+                </div>
+            </div>
+
+            <ng-container *ngFor="let raiz of arbolFiltrado">
+                <ng-container *ngTemplateOutlet="treeNodeDropdown; context: { nodo: raiz, nivel: 0, hermanos: arbolFiltrado }"></ng-container>
+            </ng-container>
+
+            <!-- Estado vacío -->
+            <div *ngIf="arbolFiltrado.length === 0" class="flex flex-col items-center justify-center py-10 px-4 text-center">
+                <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center mb-3 text-slate-300">
+                    <i class="fas fa-search"></i>
+                </div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sin resultados</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Recursivo para el Dropdown -->
+<ng-template #treeNodeDropdown let-nodo="nodo" let-nivel="nivel" let-hermanos="hermanos">
+    <div class="mb-0.5">
+        <div class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 transition-all cursor-pointer group"
+            [style.paddingLeft.px]="nivel * 16 + 12" 
+            [class.bg-indigo-50]="value === nodo.idNivel"
+            (click)="selectNivel(nodo)">
+
+            <div class="flex items-center gap-3 overflow-hidden flex-1">
+                <!-- Flecha de Expansión -->
+                <button *ngIf="nodo.hijos && nodo.hijos.length > 0" type="button"
+                    (click)="toggleNode($event, nodo, hermanos)"
+                    class="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-white text-slate-400 hover:text-indigo-600 transition-all">
+                    <i class="fas fa-chevron-right text-[10px] transform transition-transform duration-200"
+                        [class.rotate-90]="expandedNodes.has(nodo.idNivel)"></i>
+                </button>
+                <div *ngIf="!nodo.hijos || nodo.hijos.length === 0" class="w-6 shrink-0 flex justify-center">
+                    <span class="w-1 h-1 rounded-full bg-slate-300"></span>
+                </div>
+
+                <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-bold leading-tight" 
+                        [class.text-indigo-700]="value === nodo.idNivel"
+                        [class.text-slate-700]="value !== nodo.idNivel">
+                        {{ nodo.nombre }}
+                    </span>
+                    <span *ngIf="nodo.nombreCorto" class="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                        {{ nodo.codigo }}
+                    </span>
+                </div>
+            </div>
+
+            <div *ngIf="value === nodo.idNivel" class="w-5 h-5 bg-indigo-500 rounded-full flex items-center justify-center animate-in zoom-in duration-200">
+                <i class="fas fa-check text-[8px] text-white"></i>
+            </div>
+        </div>
+
+        <div *ngIf="(expandedNodes.has(nodo.idNivel) || searchTerm) && nodo.hijos?.length > 0">
+            <ng-container *ngFor="let hijo of nodo.hijos">
+                <ng-container *ngTemplateOutlet="treeNodeDropdown; context: { nodo: hijo, nivel: nivel + 1, hermanos: nodo.hijos }"></ng-container>
+            </ng-container>
+        </div>
+    </div>
+</ng-template>

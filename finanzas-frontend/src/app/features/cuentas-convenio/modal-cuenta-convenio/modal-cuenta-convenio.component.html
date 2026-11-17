@@ -1,0 +1,186 @@
+<app-modal [isOpen]="true" [title]="(cuenta ? 'Editar' : 'Nueva') + ' Cuenta de Convenio'" size="3xl"
+    (modalClose)="cerrar()">
+
+    <form (ngSubmit)="guardar()" class="space-y-5">
+
+        <!-- SECCIÓN 1: IDENTIFICACIÓN -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    DNI <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.dni" name="dni" placeholder="Ingrese DNI"
+                    (input)="onDniChange()"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm font-semibold">
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Nombres <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.nombre" name="nombre"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm">
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Ap. Paterno <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.apellidoPaterno" name="apellidoPaterno"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm">
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Ap. Materno
+                </label>
+                <input type="text" [(ngModel)]="formData.apellidoMaterno" name="apellidoMaterno"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm">
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: PLAN Y ASEGURADO -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Cód. Plan <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.codigoPlan" name="codigoPlan" (input)="onPlanCodeChange()"
+                    list="list-cod-plan" placeholder="Escriba o busque..."
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm font-semibold">
+                <datalist id="list-cod-plan">
+                    <option *ngFor="let p of planesData" [value]="p.codigo">{{ p.codigo }} - {{ p.nombre }}</option>
+                </datalist>
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Nombre Plan <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [(ngModel)]="formData.nombrePlan" name="nombrePlan" (input)="onPlanNameChange()"
+                    list="list-nom-plan" placeholder="Escriba o busque..."
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm font-semibold">
+                <datalist id="list-nom-plan">
+                    <option *ngFor="let p of planesData" [value]="p.nombre">{{ p.nombre }} ({{ p.codigo }})</option>
+                </datalist>
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 whitespace-nowrap">
+                    Nro. Cuenta <span class="text-sky-500 font-normal lowercase text-[10px]">(Ref.)</span>
+                </label>
+                <input type="text" [value]="getNroCuentaPreview()" readonly
+                    class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg outline-none transition-all text-xs text-slate-500 italic font-semibold shadow-inner cursor-not-allowed">
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 whitespace-nowrap">
+                    Cód. Asegurado
+                </label>
+                <input type="text" [(ngModel)]="formData.codAsegurado" name="codAsegurado" placeholder="Ej: DNI, Póliza"
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm font-semibold">
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: EMPRESA Y COMPAÑÍA -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Empresa / Convenio
+                </label>
+                <input type="text" [value]="getNombreEmpresa()" readonly
+                    class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg outline-none text-sm font-semibold text-slate-600 cursor-not-allowed">
+            </div>
+            <div>
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Compañía Aseguradora <span class="text-rose-500 text-base leading-none">*</span>
+                </label>
+                <input type="text" [value]="getNombreCompania()" readonly
+                    class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg outline-none text-sm font-semibold text-slate-600 cursor-not-allowed">
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: VIGENCIA Y OBSERVACIONES -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- VIGENCIA Y COBERTURA -->
+            <div class="flex flex-col">
+                <h4 class="text-[10px] font-black text-sky-600 uppercase tracking-wider flex items-center gap-2 mb-3">
+                    <span class="w-8 h-px bg-sky-200"></span> VIGENCIA Y COBERTURA
+                </h4>
+                <div class="flex gap-2 items-end">
+                    <div style="width:68px;flex-shrink:0">
+                        <label
+                            class="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase mb-1 leading-tight whitespace-nowrap">
+                            % Cob.
+                        </label>
+                        <input type="number" [(ngModel)]="formData.porcentajeCobertura" name="porcentajeCobertura"
+                            placeholder="%"
+                            class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm text-center text-slate-600 font-semibold appearance-none">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label
+                            class="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase mb-1 leading-tight whitespace-nowrap">
+                            Inicio Vig.
+                        </label>
+                        <input type="date" [(ngModel)]="formData.fechaInicio" name="fechaInicio"
+                            class="w-full px-1.5 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-xs text-slate-600 font-semibold cursor-pointer">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <label
+                            class="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase mb-1 leading-tight whitespace-nowrap">
+                            Fin Vig.
+                        </label>
+                        <input type="date" [(ngModel)]="formData.fechaFin" name="fechaFin"
+                            class="w-full px-1.5 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-xs text-slate-600 font-semibold cursor-pointer">
+                    </div>
+                    <div style="width:96px;flex-shrink:0">
+                        <label
+                            class="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase mb-1 leading-tight">
+                            Estado
+                        </label>
+                        <select [(ngModel)]="formData.estado" name="estado"
+                            class="w-full px-2 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-xs font-bold text-slate-600 cursor-pointer pr-6">
+                            <option value="ACTIVO">Activo</option>
+                            <option value="SUSPENDIDO">Suspendido</option>
+                            <option value="VENCIDO">Vencido</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OBSERVACIONES -->
+            <div class="flex flex-col justify-end">
+                <label
+                    class="flex items-center gap-1 text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    Observaciones Adicionales
+                </label>
+                <textarea [(ngModel)]="formData.observaciones" name="observaciones" rows="2"
+                    placeholder="Notas o detalles importantes sobre este convenio..."
+                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none transition-all text-sm resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- FOOTER ACCIONES -->
+        <div footer class="flex items-center justify-end gap-3 w-full">
+            <button type="button" (click)="cerrar()"
+                class="px-5 py-2 text-sm font-bold text-slate-500 hover:text-slate-700 hover:bg-slate-50 border border-slate-300 hover:border-slate-400 rounded-xl transition-all">
+                Cancelar
+            </button>
+            <button type="submit" [disabled]="loading"
+                class="px-8 py-2 bg-sky-500 hover:bg-sky-600 text-white text-sm font-bold rounded-xl transition-all shadow-md shadow-sky-500/20 disabled:opacity-50 flex items-center gap-2">
+                <svg *ngIf="loading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                {{ loading ? 'Procesando...' : (cuenta ? 'Actualizar Información' : 'Guardar Información') }}
+            </button>
+        </div>
+    </form>
+</app-modal>

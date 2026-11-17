@@ -1,0 +1,162 @@
+<div @slideInOut class="animate-in fade-in zoom-in-95 duration-500">
+    <!-- HEADER DEL MODO MASIVO (Standardized) -->
+    <div class="mb-8">
+        <app-page-header title="Registro de Pago Masivo" subtitle="Borrador de Planilla • Gestión en Tiempo Real"
+            iconType="lab" [counterValue]="filteredBulkItems.length" counterLabel="Registros totales">
+
+            <button (click)="cancelar()"
+                class="flex items-center gap-2 px-4 py-2 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 hover:bg-rose-600 dark:hover:bg-rose-600 rounded-xl transition-all group shadow-sm active:scale-95">
+                <span
+                    class="text-[10px] font-black text-rose-600 dark:text-rose-400 group-hover:text-white uppercase tracking-widest">
+                    Cancelar Operación
+                </span>
+                <i class="fas fa-times text-rose-400 group-hover:text-white transition-colors"></i>
+            </button>
+        </app-page-header>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+        <!-- COLUMNA IZQUIERDA: LISTADO DE PERSONAL (7/12) -->
+        <div class="lg:col-span-7 space-y-6">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 overflow-hidden">
+                <!-- Titulo y Buscador Interno -->
+                <div class="px-8 py-5 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-20 gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-1.5 h-6 bg-indigo-500 rounded-full"></div>
+                        <h3 class="text-[11px] font-black text-slate-800 dark:text-slate-300 uppercase tracking-widest">
+                            Listado de Personal
+                            <span class="ml-2 px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-500 italic lowercase font-bold text-[9px]">{{ filteredBulkItems.length }} registros</span>
+                        </h3>
+                    </div>
+                    <div class="w-full sm:w-72">
+                        <app-search-generic placeholder="Filtrar planilla..." [options]="bulkFilterOptions"
+                            (onSearch)="handleBulkSearch($event)">
+                        </app-search-generic>
+                    </div>
+                </div>
+
+                <div class="max-h-[600px] overflow-y-auto">
+                    <app-tabla-general [datos]="paginatedBulkItems" [columnas]="bulkColumnas" [showActions]="false"
+                        (onCheckboxChange)="onBulkCheckboxChange($event)"
+                        (onHeaderCheckboxChange)="onBulkHeaderCheckboxChange($event)"
+                        (onInputChange)="onBulkInputChange($event)">
+                    </app-tabla-general>
+                </div>
+
+                <div class="px-6 py-4 border-t border-slate-50 bg-slate-50/30">
+                    <app-pagination [currentPage]="bulkCurrentPage" [totalPages]="bulkTotalPages"
+                        [pageSize]="bulkPageSize" (pageChange)="onBulkPageChange($event)"
+                        (pageSizeChange)="onBulkPageSizeChange($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA DERECHA: CONFIG Y RESUMEN (5/12) -->
+        <div class="lg:col-span-5 sticky top-8">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-800 p-8 space-y-8">
+                <div>
+                    <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight mb-6">PAGO DE PERSONAL EMPLEADO
+                    </h3>
+                    <div class="grid grid-cols-2 gap-5">
+                        <!-- Fecha de Pago -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest pl-1">Fecha de Pago</label>
+                            <div class="relative">
+                                <input type="date" [(ngModel)]="bulkGlobalData.fechaPago"
+                                    class="w-full h-12 px-4 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 font-bold transition-all text-slate-700">
+                            </div>
+                        </div>
+
+                        <!-- Medio de Pago -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest pl-1">Medio de Pago</label>
+                            <app-dropdown-selector 
+                                [(value)]="bulkGlobalData.medioPago"
+                                [options]="medioPagoOptions">
+                            </app-dropdown-selector>
+                        </div>
+
+                        <!-- Cuenta / Banco -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest pl-1">Cuenta / Banco</label>
+                            <app-dropdown-selector 
+                                [(value)]="bulkGlobalData.idCuenta"
+                                [options]="cuentaOptions"
+                                placeholder="Seleccionar cuenta...">
+                            </app-dropdown-selector>
+                        </div>
+
+                        <!-- Tipo de Pago -->
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest pl-1">Tipo de Pago</label>
+                            <app-dropdown-selector 
+                                [(value)]="bulkGlobalData.tipoPago"
+                                [options]="tipoPagoOptions">
+                            </app-dropdown-selector>
+                        </div>
+
+                        <!-- Alerta de Saldo Insuficiente (Solo si realmente es insuficiente) -->
+                        <div class="col-span-2" *ngIf="saldoInsuficiente">
+                            <div class="flex items-center gap-3 px-4 py-3 bg-red-50 border border-red-100 rounded-2xl animate-pulse">
+                                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-red-500/20">
+                                    <i class="fas fa-exclamation-triangle text-xs"></i>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] font-black text-red-600 uppercase tracking-widest">Saldo Insuficiente</span>
+                                    <span class="text-[9px] font-bold text-red-500 italic">No hay fondos suficientes para cubrir esta planilla.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Glosa -->
+                        <div class="col-span-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase mb-2 tracking-widest pl-1">Glosa / Concepto General</label>
+                            <textarea [(ngModel)]="bulkGlobalData.glosaContable" rows="2"
+                                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-400 font-bold resize-none transition-all text-slate-700"
+                                placeholder="Escriba una descripción para el registro contable..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RESUMEN DE PAGO -->
+                <div
+                    class="bg-slate-800 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-slate-900/40 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-700">
+                    </div>
+                    <div class="relative z-10 space-y-6">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Personal
+                                Seleccionado</span>
+                            <span class="text-xl font-black">{{ selectedCount }}</span>
+                        </div>
+                        <div class="space-y-1">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Monto Total
+                                Estimado</span>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-3xl font-black" [class.text-red-400]="saldoInsuficiente">S/ {{
+                                    totalMasivo | number:'1.2-2' }}</span>
+                                <span class="text-xs text-slate-400 uppercase font-bold">{{ bulkGlobalData.moneda
+                                    }}</span>
+                            </div>
+                            <div *ngIf="saldoInsuficiente"
+                                class="flex items-center gap-2 mt-2 text-[9px] font-black text-red-400 uppercase tracking-widest animate-pulse">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Saldo insuficiente para esta planilla</span>
+                            </div>
+                        </div>
+                        <button (click)="procesarPagoMasivo()" [disabled]="selectedCount === 0 || loading"
+                            class="w-full py-4 bg-indigo-500 hover:bg-indigo-400 disabled:bg-slate-600 text-white font-black rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-95 uppercase text-xs tracking-widest flex items-center justify-center gap-3">
+                            <i class="fas fa-check-double"></i>
+                            {{ loading ? 'Procesando...' : 'Registrar Pago Masivo' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

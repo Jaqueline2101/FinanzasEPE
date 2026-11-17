@@ -1,0 +1,248 @@
+<app-modal [isOpen]="isOpen" [title]="(registro ? 'Actualizar Registro de ' : 'Nuevo Registro de ') + (form.get('tipoRegistro')?.value || 'Trabajador' | titlecase)"
+    size="3xl" iconType="edit" [showFooter]="true" (modalClose)="cancel()">
+
+    <!-- CONTENT AREA -->
+    <div class="bg-slate-50/50 dark:bg-slate-950/20 p-2 rounded-xl">
+        <form [formGroup]="form" (ngSubmit)="save()">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+
+                <!-- ── COLUMNA 1: GENERALES + BANCARIOS ── -->
+                <div class="flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Datos Generales -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-3 flex flex-col gap-2 shadow-sm">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <i class="fas fa-file-alt text-blue-500 text-[10px]"></i>
+                            <h3 class="text-[9px] font-black text-slate-700 dark:text-white uppercase tracking-widest">
+                                Datos Generales</h3>
+                        </div>
+
+                        <!-- Tipo + Estado -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center gap-1 h-5 field-label">Tipo Registro <span
+                                        class="text-rose-500 text-base leading-none">*</span></label>
+                                <select formControlName="tipoRegistro" class="form-input-compact">
+                                    <option value="TRABAJADOR">Trabajador</option>
+                                    <option value="MEDICO">Médico</option>
+                                    <option value="PROVEEDOR">Proveedor</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center h-5 field-label">Estado</label>
+                                <select formControlName="estado" class="form-input-compact">
+                                    <option value="ACTIVO">Activo</option>
+                                    <option value="INACTIVO">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Tipo Doc + Número -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center gap-1 h-5 field-label">Tipo Doc. <span
+                                        class="text-rose-500 text-base leading-none">*</span></label>
+                                <select formControlName="tipoDocumento" class="form-input-compact">
+                                    <option value="01">DNI</option>
+                                    <option value="06">RUC</option>
+                                    <option value="04">C.E.</option>
+                                    <option value="07">Pasaporte</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center gap-1 h-5 field-label">Nro. Documento <span
+                                        class="text-rose-500 text-base leading-none">*</span></label>
+                                <input type="text" formControlName="numeroDocumento" placeholder="12345678"
+                                    class="form-input-compact" [ngClass]="{'border-rose-500 bg-rose-50/10': isInvalid('numeroDocumento')}">
+                                <span *ngIf="isInvalid('numeroDocumento')" class="text-rose-500 text-[9px] font-bold">Documento requerido</span>
+                            </div>
+                        </div>
+
+                        <!-- Razón Social -->
+                        <div *ngIf="form.get('tipoRegistro')?.value === 'PROVEEDOR'" class="flex flex-col gap-1">
+                            <label class="flex items-center gap-1 h-5 field-label">Razón Social <span
+                                    class="text-rose-500 text-base leading-none">*</span></label>
+                            <input type="text" formControlName="razonSocial" placeholder="Nombre de la empresa"
+                                class="form-input-compact" [ngClass]="{'border-rose-500 bg-rose-50/10': isInvalid('razonSocial')}">
+                            <span *ngIf="isInvalid('razonSocial')" class="text-rose-500 text-[9px] font-bold">Razón social requerida</span>
+                        </div>
+
+                        <!-- Nombres -->
+                        <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                            <label class="flex items-center gap-1 h-5 field-label">Nombres <span
+                                    class="text-rose-500 text-base leading-none">*</span></label>
+                            <input type="text" formControlName="nombres" placeholder="Nombres completos"
+                                class="form-input-compact" [ngClass]="{'border-rose-500 bg-rose-50/10': isInvalid('nombres')}">
+                            <span *ngIf="isInvalid('nombres')" class="text-rose-500 text-[9px] font-bold">Nombres requeridos</span>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center gap-1 h-5 field-label">Ap. Paterno <span
+                                        class="text-rose-500 text-base leading-none">*</span></label>
+                                <input type="text" formControlName="apellidoPaterno" placeholder="Paterno"
+                                    class="form-input-compact" [ngClass]="{'border-rose-500 bg-rose-50/10': isInvalid('apellidoPaterno')}">
+                                <span *ngIf="isInvalid('apellidoPaterno')" class="text-rose-500 text-[9px] font-bold">Apellido requerido</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="flex items-center gap-1 h-5 field-label">Ap. Materno <span
+                                        class="text-rose-500 text-base leading-none">*</span></label>
+                                <input type="text" formControlName="apellidoMaterno" placeholder="Materno"
+                                    class="form-input-compact">
+                            </div>
+                        </div>
+
+                        <!-- Teléfono + Correo -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Teléfono</label>
+                                <input type="text" formControlName="telefono" placeholder="+51 999..."
+                                    class="form-input-compact">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Correo</label>
+                                <input type="email" formControlName="correo" placeholder="ejemplo@..."
+                                    class="form-input-compact" [ngClass]="{'border-rose-500 bg-rose-50/10': isInvalid('correo')}">
+                                <span *ngIf="form.get('correo')?.hasError('email') && form.get('correo')?.touched" class="text-rose-500 text-[9px] font-bold">Formato de correo inválido</span>
+                            </div>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="flex flex-col gap-1">
+                            <label class="field-label">Dirección</label>
+                            <input type="text" formControlName="direccion" placeholder="Av. Siempre viva 123..."
+                                class="form-input-compact">
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="flex flex-col gap-1">
+                            <label class="field-label">Observaciones</label>
+                            <textarea formControlName="observaciones" rows="1"
+                                class="form-input-compact resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── COLUMNA 2: VINCULACIÓN + ESPECÍFICOS ── -->
+                <div class="flex flex-col gap-3 min-h-0 overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Vinculación -->
+                    <div
+                        class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 p-3 flex flex-col gap-2 shadow-sm shrink-0">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <i class="fas fa-link text-emerald-500 text-[10px]"></i>
+                            <h3 class="text-[9px] font-black text-slate-700 dark:text-white uppercase tracking-widest">
+                                Vinculación</h3>
+                        </div>
+
+                        <!-- Fechas -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Fecha Inicio</label>
+                                <input type="date" formControlName="fechaInicio" class="form-input-compact">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Fecha Término</label>
+                                <input type="date" formControlName="fechaFin" class="form-input-compact">
+                            </div>
+                        </div>
+
+                        <!-- Estado Vínculo + Cargo -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Estado Vínculo</label>
+                                <select formControlName="estadoVinculo" class="form-input-compact">
+                                    <option value="ACTIVO">Activo</option>
+                                    <option value="FINALIZADO">Finalizado</option>
+                                    <option value="SUSPENDIDO">Suspendido</option>
+                                </select>
+                            </div>
+                            <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                                <label class="field-label">Cargo</label>
+                                <input type="text" formControlName="cargo" placeholder="Cargo oficial"
+                                    class="form-input-compact">
+                            </div>
+                        </div>
+
+                        <!-- Función Principal -->
+                        <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                            <label class="field-label">Función Principal</label>
+                            <input type="text" formControlName="funcionPrincipal" placeholder="Descripción breve"
+                                class="form-input-compact">
+                        </div>
+
+                        <!-- Área + Tipo Contrato -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Área / Dpto.</label>
+                                <input type="text" formControlName="area" placeholder="Logística..."
+                                    class="form-input-compact">
+                            </div>
+                            <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                                <label class="field-label">Tipo Contrato</label>
+                                <input type="text" formControlName="tipoContrato" placeholder="Fijo, Indet..."
+                                    class="form-input-compact">
+                            </div>
+                        </div>
+
+                        <!-- Modalidad Trabajo + Pago -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                                <label class="field-label">Modalidad Trabajo</label>
+                                <select formControlName="modalidadTrabajo" class="form-input-compact">
+                                    <option value="Presencial">Presencial</option>
+                                    <option value="Remoto">Remoto</option>
+                                    <option value="Híbrido">Híbrido</option>
+                                </select>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Modalidad Pago</label>
+                                <select formControlName="modalidadPago" class="form-input-compact">
+                                    <option value="Mensual">Mensual</option>
+                                    <option value="Quincenal">Quincenal</option>
+                                    <option value="Por horas">Por horas</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Centro Costo + Jefe -->
+                        <div class="grid grid-cols-2 gap-2">
+                            <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                                <label class="field-label">Centro Costo</label>
+                                <input type="text" formControlName="centroCosto" class="form-input-compact">
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <label class="field-label">Jefe Inmediato</label>
+                                <input type="text" formControlName="jefeInmediato" class="form-input-compact">
+                            </div>
+                        </div>
+
+                        <!-- Motivo Cese -->
+                        <div *ngIf="form.get('tipoRegistro')?.value !== 'PROVEEDOR'" class="flex flex-col gap-1">
+                            <label class="field-label">Motivo Cese <span
+                                    class="text-slate-400 normal-case font-medium">(Si aplica)</span></label>
+                            <textarea formControlName="motivoCese" rows="1"
+                                class="form-input-compact resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- ESPECÍFICOS CONDICIONALES REMOVED -->
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- FOOTER ACTIONS -->
+    <div footer class="flex items-center gap-2">
+        <button (click)="cancel()"
+            class="px-5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-xs uppercase">
+            Cancelar
+        </button>
+        <button (click)="save()"
+            class="px-6 py-2 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-500/20 active:scale-95 transition-all text-xs uppercase flex items-center gap-2">
+            <i class="fas fa-save"></i> {{ registro ? 'Actualizar' : 'Guardar' }} Registro
+        </button>
+    </div>
+
+</app-modal>

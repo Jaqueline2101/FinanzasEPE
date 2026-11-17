@@ -1,0 +1,83 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+
+  <!-- Breadcrumb -->
+  <div class="mb-3">
+    <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+  </div>
+
+  <!-- Header -->
+  <div class="mb-3">
+    <app-page-header 
+      title="Empresas más atendidas" 
+      subtitle="Reporte detallado de empresas con mayor número de atenciones registradas." 
+      [showCounter]="true" 
+      [counterValue]="empresasFiltradas.length"
+      iconType="lab">
+    </app-page-header>
+  </div>
+
+  <!-- CARD PRINCIPAL (Filtros + Tabla) -->
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden p-4 md:p-6">
+    
+    <!-- Barra de Filtros -->
+    <div class="mb-6">
+      <app-barra-filtros 
+        [searchOptions]="searchOptions"
+        [showStatus]="false" 
+        [showDates]="true"
+        [initialDesde]="fechaInicio"
+        [initialHasta]="fechaFin"
+        placeholder="Buscar empresa..."
+        (onFilter)="onFilter($event)">
+      </app-barra-filtros>
+    </div>
+
+    <!-- Results Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+        <thead class="bg-slate-50 dark:bg-slate-900">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ranking</th>
+            <th class="px-6 py-3 text-left text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Empresa</th>
+            <th class="px-6 py-3 text-center text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Atenciones</th>
+            <th class="px-6 py-3 text-right text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Total Monto</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700">
+          <tr *ngFor="let empresa of empresasFiltradas; let i = index" class="hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center justify-center">
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300': i === 0,
+                  'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300': i === 1,
+                  'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300': i === 2,
+                  'bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300': i > 2
+                }" class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm">
+                  {{ i + 1 }}
+                </span>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-semibold text-slate-900 dark:text-white">{{ empresa.nombreCompania || 'Sin nombre' }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <div class="text-sm font-bold text-indigo-600 dark:text-indigo-400">{{ empresa.totalAtenciones }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right">
+              <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                S/ {{ empresa.totalMonto | number: '1.2-2' }}
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="empresasFiltradas.length === 0 && !loading">
+            <td colspan="4" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400 font-semibold text-sm">
+              <i class="fas fa-search mr-2"></i>
+              No hay datos para el rango de fechas o búsqueda seleccionada
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>

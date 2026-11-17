@@ -1,0 +1,250 @@
+<div
+  class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-900 p-4 md:p-8 min-w-0 transition-all duration-300 ease-in-out">
+  <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" class="block mb-6"></app-breadcrumb>
+
+  <!-- HEADER SEPARADO -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden border border-slate-200 mb-6">
+    <app-page-header title="Gestión de Roles" subtitle="Administra los roles y permisos del sistema" iconType="users"
+      [counterValue]="roles.length" counterLabel="Roles" [showCounter]="true">
+    </app-page-header>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm overflow-hidden border border-slate-200 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="p-6">
+      <!-- FILTER SECTION (COMPACT) -->
+      <div class="flex flex-col lg:flex-row gap-3 mb-6 items-end lg:items-center">
+        <div class="flex-1 w-full">
+          <app-search-generic [options]="roleSearchOptions" placeholder="Buscar roles..." (onSearch)="handleSearch($event)">
+          </app-search-generic>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <label
+            class="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600 rounded-xl cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors h-[54px] min-w-[140px] justify-center">
+            <input type="checkbox" [(ngModel)]="showActiveOnly" (change)="executeSearch()"
+              class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500" />
+            <span class="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-tight">Solo
+              activos</span>
+          </label>
+
+          <button (click)="openCreateModal()"
+            class="flex items-center justify-center gap-2 px-6 py-2 bg-[#1E293B] dark:bg-slate-700 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest shadow-lg shadow-gray-200 dark:shadow-none hover:bg-black dark:hover:bg-slate-600 transition-all active:scale-95 h-[54px]">
+            <i class="fas fa-plus"></i>
+            <span class="hidden sm:inline">Nuevo</span>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="flex flex-col items-center justify-center py-20">
+        <div class="relative w-16 h-16">
+          <div class="absolute top-0 w-full h-full border-4 border-gray-100 dark:border-slate-700 rounded-full"></div>
+          <div
+            class="absolute top-0 w-full h-full border-4 border-blue-600 border-t-transparent rounded-full animate-spin">
+          </div>
+        </div>
+        <p class="mt-6 text-xs font-black text-gray-400 uppercase tracking-[0.2em]">
+          Sincronizando...
+        </p>
+      </div>
+
+      <!-- 5 COLUMNS LAYOUT -->
+      <div *ngIf="!loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div *ngFor="let role of roles"
+          class="group bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 dark:hover:shadow-black/20 hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col justify-between h-full">
+          <div>
+            <div class="flex items-start justify-between mb-3">
+              <div class="min-w-0 pr-2">
+                <h3 class="text-sm font-black text-[#1E293B] dark:text-white truncate tracking-tight uppercase"
+                  title="{{ role.name }}">
+                  {{ role.name }}
+                </h3>
+                <p class="text-[10px] font-medium text-gray-400 mt-0.5 line-clamp-2 leading-tight"
+                  title="{{ role.description }}">
+                  {{ role.description || 'Sin descripción' }}
+                </p>
+              </div>
+              <span class="shrink-0 w-2 h-2 rounded-full" [ngClass]="role.active ? 'bg-emerald-400' : 'bg-rose-400'"
+                title="{{ role.active ? 'Activo' : 'Inactivo' }}">
+              </span>
+            </div>
+
+            <div
+              class="flex items-center gap-2 mb-4 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-gray-100/50 dark:border-slate-600/50">
+              <div class="flex-1 text-center">
+                <p class="text-lg font-black text-[#1E293B] dark:text-white leading-none">
+                  {{ role.permissions.length }}
+                </p>
+                <p class="text-[8px] font-bold text-gray-400 uppercase tracking-wider mt-1">
+                  Permisos
+                </p>
+              </div>
+              <div class="w-px h-6 bg-gray-200 dark:bg-slate-600"></div>
+              <div class="flex-1 text-center">
+                <p class="text-lg font-black text-[#1E293B] dark:text-white leading-none">
+                  {{ role.userCount || 0 }}
+                </p>
+                <p class="text-[8px] font-bold text-gray-400 uppercase tracking-wider mt-1">
+                  Usuarios
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex gap-2 mt-auto pt-2 border-t border-gray-50 dark:border-slate-700">
+            <button (click)="openEditModal(role)"
+              class="flex-1 py-1.5 bg-white dark:bg-slate-700 text-gray-500 dark:text-slate-300 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all border border-gray-100 dark:border-slate-600 hover:border-blue-200 dark:hover:border-blue-500/30 shadow-sm">
+              Editar
+            </button>
+            <button (click)="openDeleteConfirm(role)"
+              class="py-1.5 px-3 bg-white dark:bg-slate-700 text-rose-400 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all border border-gray-100 dark:border-slate-600 hover:border-rose-200 dark:hover:border-rose-500/30 shadow-sm">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 pt-6 border-t border-gray-50 dark:border-slate-700">
+        <!-- PAGINACIÓN ESTANDARIZADA -->
+        @if (!loading && roles.length > 0) {
+          <app-pagination 
+            [currentPage]="currentRolePage" 
+            [totalPages]="totalRolePages" 
+            [pageSize]="rolePageSize" 
+            (pageChange)="onRolePageChange($event)" 
+            (pageSizeChange)="onRolePageSizeChange($event)">
+          </app-pagination>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPONENTE DE ALERTAS GLOBAL -->
+<app-alertas></app-alertas>
+
+
+<app-modal [isOpen]="showModal" [title]="isEditMode ? 'Editar Rol' : 'Nuevo Rol'" size="xl" iconType="info"
+  (modalClose)="closeModal()">
+  <form (ngSubmit)="saveRole()" class="space-y-6">
+    <!-- Información básica -->
+    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <h3 class="text-sm font-semibold text-gray-900 mb-4">Información del Rol</h3>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Nombre del Rol *</label>
+          <input type="text" [(ngModel)]="formData.name" name="name" required placeholder="Ejemplo: Administrador"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+          <input type="text" [(ngModel)]="formData.description" name="description"
+            placeholder="Descripción breve del rol"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Permisos -->
+    <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h3 class="text-sm font-semibold text-gray-900">Permisos del Sistema</h3>
+          <p class="text-xs text-gray-500 mt-1">Seleccione los permisos para este rol</p>
+        </div>
+        <div class="bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+          <span class="text-xs font-medium text-blue-700">
+            {{ selectedPermissions.size }} seleccionados
+          </span>
+        </div>
+      </div>
+
+      <!-- Buscador de Permisos -->
+      <div class="mb-4">
+        <app-search-generic [options]="permissionSearchOptions" placeholder="Buscar permisos..." (onSearch)="handlePermissionSearch($event)">
+        </app-search-generic>
+      </div>
+
+      <div class="border rounded-lg overflow-hidden bg-white shadow-sm">
+        <div class="overflow-x-auto max-h-[400px]">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50 sticky top-0 z-10">
+              <tr>
+                <th scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-10">
+                  <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" disabled />
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Permiso
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Descripción
+                </th>
+                <th scope="col"
+                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Tipo
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr *ngFor="let permission of permissions" class="hover:bg-gray-50 transition-colors cursor-pointer"
+                (click)="togglePermission(permission.id)">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <input type="checkbox" [checked]="hasPermission(permission.id)" (click)="$event.stopPropagation()"
+                    (change)="togglePermission(permission.id)"
+                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="text-sm font-medium text-gray-900">
+                    {{ getPermissionShortName(permission.name) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-sm text-gray-600">{{ permission.description }}</span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                  <span class="px-2 py-1 text-[10px] font-bold uppercase rounded-md inline-block tracking-wider" [ngClass]="{
+                      'bg-blue-50 text-blue-600 border border-blue-100':
+                        getPermissionActionType(permission.name) === 'read',
+                      'bg-emerald-50 text-emerald-600 border border-emerald-100':
+                        getPermissionActionType(permission.name) === 'create',
+                      'bg-amber-50 text-amber-600 border border-amber-100':
+                        getPermissionActionType(permission.name) === 'update',
+                      'bg-rose-50 text-rose-600 border border-rose-100':
+                        getPermissionActionType(permission.name) === 'delete',
+                      'bg-indigo-50 text-indigo-600 border border-indigo-100':
+                        getPermissionActionType(permission.name) === 'block',
+                      'bg-gray-50 text-gray-600 border border-gray-100':
+                        getPermissionActionType(permission.name) === 'other'
+                    }">
+                    {{ getPermissionActionType(permission.name) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Paginación de permisos -->
+    <app-pagination *ngIf="totalPermissionPages > 1" [currentPage]="currentPermissionPage"
+      [totalPages]="totalPermissionPages" [pageSize]="permissionPageSize" [pageSizeOptions]="[10, 25, 50, 100]"
+      recordsLabel="permisos" (pageChange)="onPermissionPageChange($event)"
+      (pageSizeChange)="onPermissionPageSizeChange($event)">
+    </app-pagination>
+
+    <!-- Botones del footer -->
+    <div footer class="flex justify-end gap-3 border-t border-gray-200 pt-6">
+      <button type="button" (click)="closeModal()" [disabled]="saving"
+        class="px-6 py-2 text-gray-700 bg-gray-100 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="saving"
+        class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
+        <div *ngIf="saving" class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+        <span>{{ isEditMode ? 'Actualizar' : 'Crear Rol' }}</span>
+      </button>
+    </div>
+  </form>
+</app-modal>

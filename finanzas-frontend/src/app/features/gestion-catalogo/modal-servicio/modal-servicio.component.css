@@ -1,0 +1,72 @@
+/* Estilo personalizado para los selects */
+select {
+    background-image: linear-gradient(45deg, transparent 50%, #94a3b8 50%),
+        linear-gradient(135deg, #94a3b8 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(1em + 2px),
+        calc(100% - 15px) calc(1em + 2px);
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+    padding-right: 2.5rem !important;
+}
+
+select:hover {
+    border-color: rgb(148 163 184);
+}
+
+select:focus {
+    outline: none;
+    border-color: rgb(59 130 246);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-image: linear-gradient(45deg, transparent 50%, #3b82f6 50%),
+        linear-gradient(135deg, #3b82f6 50%, transparent 50%);
+}
+
+select option {
+    padding: 8px 12px;
+    background-color: white;
+    color: rgb(51 65 85);
+}
+
+select option:hover {
+    background-color: rgb(241 245 249);
+}
+
+/* ===== SCROLLBAR CUSTOM ===== */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}
+
+/* ===== DROPDOWN FLOTANTE FIXED ===== */
+/*
+  El dropdown de Nivel usa position: fixed via [ngStyle] en el template
+  para escapar del overflow y z-index del modal.
+  Estos estilos complementan el comportamiento visual del panel flotante.
+*/
+.nivel-dropdown-panel {
+    animation: dropdownFadeIn 0.15s ease-out forwards;
+}
+
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

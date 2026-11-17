@@ -1,0 +1,137 @@
+<div class="h-full bg-slate-50/50 p-4 md:p-6 min-w-0" [@fadeIn]>
+
+    <!-- Breadcrumb -->
+    <div class="pt-0 pb-1">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- Header -->
+    <app-page-header title="Notas de Crédito" [showCounter]="true" [counterValue]="totalElements">
+    </app-page-header>
+
+
+
+    <!-- ═══════ TAB 1: EMITIR NC ═══════════════════════════════════════════════ -->
+    <div *ngIf="pestanaActiva === 'buscar'" [@fadeIn] class="space-y-6">
+        
+        <!-- Filtros -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row gap-3 items-end">
+            <div class="flex-1 min-w-0 h-[38px] flex items-end">
+                <app-search-generic 
+                    [options]="searchOptions" 
+                    placeholder="Buscar comprobante o paciente..."
+                    (onSearch)="handleSearch($event)">
+                </app-search-generic>
+            </div>
+            
+            <div class="w-full md:w-44">
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Desde</label>
+                <input type="date" [(ngModel)]="fechaDesde" name="fechaDesde" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700
+                 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 shadow-sm">
+            </div>
+            <div class="w-full md:w-44">
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Hasta</label>
+                <input type="date" [(ngModel)]="fechaHasta" name="fechaHasta" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700
+                 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 shadow-sm">
+            </div>
+            
+            <div class="flex gap-2">
+                <button (click)="onRestablecer()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg
+                   transition-colors border border-slate-200 flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                    Restablecer
+                </button>
+                <button (click)="onFiltrarVentas()" [disabled]="isLoadingVentas" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg
+                   transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
+                    <i class="fa-solid fa-rotate-right" [class.fa-spin]="isLoadingVentas"></i>
+                    Filtrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-0">
+                <app-tabla-general
+                    [columnas]="columnasVentas"
+                    [datos]="ventasPaginadas"
+                    [loading]="isLoadingVentas"
+                    [showActions]="false"
+                    [showLinkAction]="false"
+                    (onLinkAction)="handleActionVenta($event)">
+                </app-tabla-general>
+                
+                <div class="p-4 border-t border-slate-50 bg-slate-50/50" *ngIf="ventasPaginadas.length > 0">
+                    <app-pagination 
+                        [currentPage]="paginaVentas" 
+                        [pageSize]="tamanoVentas"
+                        [totalPages]="totalPagesVentas" 
+                        (pageChange)="onPageVentas($event)"
+                        (pageSizeChange)="onPageSizeVentas($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════ TAB 2: HISTORIAL NC ════════════════════════════════════════════ -->
+    <div *ngIf="pestanaActiva === 'historial'" [@fadeIn] class="space-y-6">
+
+        <!-- Filtros Historial -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col md:flex-row gap-3 items-end">
+            <div class="flex-1 min-w-0">
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Estado</label>
+                <select [(ngModel)]="filtroEstadoNC" (change)="cargarHistorial()" name="filtroEstadoNC" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700
+                 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400 shadow-sm">
+                    <option value="">TODOS</option>
+                    <option value="EMITIDA">EMITIDA</option>
+                    <option value="ANULADA">ANULADA</option>
+                </select>
+            </div>
+            <div class="w-full md:w-44">
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Desde</label>
+                <input type="date" [(ngModel)]="fechaDesdeNC" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
+            </div>
+            <div class="w-full md:w-44">
+                <label class="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wide">Hasta</label>
+                <input type="date" [(ngModel)]="fechaHastaNC" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm">
+            </div>
+            <button (click)="cargarHistorial()" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right" [class.fa-spin]="isLoadingNC"></i>
+                Actualizar
+            </button>
+        </div>
+
+        <!-- Lista de Notas de Crédito -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-0">
+                <app-tabla-general
+                    [columnas]="columnasHistorial"
+                    [datos]="notasCredito"
+                    [loading]="isLoadingNC"
+                    [showActions]="false"
+                    [showLinkAction]="false"
+                    (onLinkAction)="handleActionHistorial($event)">
+                </app-tabla-general>
+                
+                <div class="p-4 border-t border-slate-50 bg-slate-50/50" *ngIf="notasCredito.length > 0">
+                    <app-pagination 
+                        [currentPage]="paginaNC" 
+                        [pageSize]="tamanoNC" 
+                        [totalPages]="totalPagesNC"
+                        (pageChange)="onPageNC($event)">
+                    </app-pagination>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+<!-- Modal: EMITIR NOTA DE CRÉDITO — componente hijo -->
+<app-modal-nota *ngIf="mostrarModal" [venta]="ventaSeleccionada" [emitiendo]="emitiendo" (confirmar)="emitirNC($event)"
+    (cancelar)="cerrarModal()">
+</app-modal-nota>
+

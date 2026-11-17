@@ -1,0 +1,216 @@
+<div class="flex flex-col h-[calc(100vh-64px)] bg-white overflow-hidden">
+    <!-- Header Section -->
+    <div class="p-6 pb-0">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+        <div class="mt-1 mb-0">
+            <app-page-header title="Gestión de Compañías"
+                subtitle="Administra el catálogo de aseguradoras, convenios y EPS." [counterValue]="totalElements">
+            </app-page-header>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="flex-1 bg-gray-50 overflow-hidden flex flex-col">
+
+
+        <!-- VISTA DE COMPAÑÍAS (Diseño Principal) -->
+        <div class="flex flex-1 min-h-0">
+            <!-- Panel Lateral Izquierdo -->
+            <div class="w-80 bg-white border border-gray-200 rounded-lg flex flex-col ml-6 mt-4 mb-6">
+                <!-- Header del Panel - OPTIMIZADO -->
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-building text-white text-base"></i>
+                            </div>
+                            <h2 class="text-lg font-bold text-gray-900">Compañías</h2>
+                        </div>
+
+                        <!-- Botón Nueva Compañía - Más pequeño -->
+                        <button (click)="nuevaCompania()"
+                            class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md shadow-blue-500/20 transition-all duration-200 flex items-center gap-1.5 text-xs whitespace-nowrap">
+                            <i class="fas fa-plus text-xs"></i>
+                            <span>Nueva</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Búsqueda Premium -->
+                <div class="px-4 py-3 border-b border-gray-100">
+                    <app-search-generic 
+                        [options]="searchOptions" 
+                        placeholder="Buscar compañía..."
+                        (onSearch)="handleSearch($event)">
+                    </app-search-generic>
+                </div>
+
+                <!-- Listado de Compañías con SCROLL -->
+                <div class="flex-1 overflow-y-auto min-h-0">
+                    <div *ngFor="let compania of companiasFiltradas" (click)="selectCompania(compania)"
+                        [class]="'relative px-4 py-2 border-b border-gray-100 cursor-pointer transition-all duration-150 hover:bg-gray-200 ' + 
+                                 (selectedCompaniaView?.id === compania.id ? 'bg-blue-100 border-l-4 border-l-blue-600' : '')">
+
+                        <div class="flex items-start gap-3">
+                            <div class="flex-1 min-w-0">
+                                <!-- Nombre y Estado en la misma línea -->
+                                <div class="flex items-center justify-between gap-2 mb-0.5">
+                                    <h3 class="font-semibold text-gray-900 text-sm truncate">
+                                        {{ compania.nombre }}
+                                    </h3>
+
+                                    <!-- Estado Badge -->
+                                    <span [class]="'flex-shrink-0 inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium border ' + 
+                                                   (compania.estado == '1' 
+                                                    ? 'bg-green-50 text-green-700 border-green-200' 
+                                                    : 'bg-gray-50 text-gray-600 border-gray-200')">
+                                        <span
+                                            [class]="'w-1 h-1 rounded-full mr-1 ' + 
+                                                       (compania.estado == '1' ? 'bg-green-600' : 'bg-gray-400')"></span>
+                                        {{ compania.estado == '1' ? 'Activo' : 'Inactivo' }}
+                                    </span>
+                                </div>
+
+                                <!-- RUC -->
+                                <p class="text-xs text-gray-500 font-mono">
+                                    RUC: {{ compania.codigoIafa }}
+                                </p>
+                            </div>
+
+                            <!-- Menú de Tres Puntos -->
+                            <div class="relative flex-shrink-0">
+                                <button (click)="toggleMenu($event, compania.id)"
+                                    class="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+                                    <i class="fas fa-ellipsis-v text-gray-600 text-xs"></i>
+                                </button>
+
+                                <!-- Dropdown -->
+                                <div *ngIf="openMenuId === compania.id"
+                                    class="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg ring-1 ring-black/5 z-50">
+                                    <div class="py-1">
+                                        <button (click)="verDetalle(compania); $event.stopPropagation()"
+                                            class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors">
+                                            <i class="fas fa-eye text-gray-500 w-4"></i>
+                                            Ver detalle
+                                        </button>
+                                        <button (click)="editarCompania(compania); $event.stopPropagation()"
+                                            class="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors">
+                                            <i class="fas fa-edit text-gray-500 w-4"></i>
+                                            Editar
+                                        </button>
+                                        <button (click)="eliminarCompania(compania); $event.stopPropagation()"
+                                            class="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors border-t border-gray-100">
+                                            <i class="fas fa-trash text-red-600 w-4"></i>
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado Vacío -->
+                    <div *ngIf="companiasFiltradas.length === 0"
+                        class="flex flex-col items-center justify-center h-full p-8 text-center">
+                        <i class="fas fa-file-alt text-gray-300 text-5xl mb-3"></i>
+                        <p class="text-sm text-gray-500">No se encontraron compañías</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Derecho: Detalle y Configuración -->
+            <div class="flex-1 bg-white flex flex-col h-full min-h-0 overflow-hidden">
+
+                <!-- 2. HEADER COMPACTO (Solo visible si hay selección Y NO estamos en Beneficios NI en Descuentos) -->
+                <div *ngIf="selectedCompaniaView && activeInfoTab !== 'beneficios' && activeInfoTab !== 'descuentos'"
+                    class="mx-6 mt-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex-shrink-0 animate-fadeIn">
+                    <div class="flex items-center gap-4">
+                        <!-- Icono pequeño -->
+                        <div
+                            class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <i class="fas fa-building text-white text-base"></i>
+                        </div>
+
+                        <!-- Info en línea -->
+                        <div class="flex items-center gap-4 min-w-0 flex-1 flex-wrap">
+                            <h2 class="text-lg font-bold text-gray-900 truncate">
+                                {{ selectedCompaniaView.nombre }}
+                            </h2>
+
+                            <span class="h-4 w-px bg-gray-300"></span>
+
+                            <span
+                                class="font-mono text-xs font-medium bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-600">
+                                RUC: {{ selectedCompaniaView.codigoIafa }}
+                            </span>
+
+                            <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                                {{ selectedCompaniaView.tipoNombre || 'EPS' }}
+                            </span>
+
+                            <span
+                                [class]="'ml-auto text-xs font-medium px-2 py-0.5 rounded-full ' + 
+                                           (selectedCompaniaView.estado == '1' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600')">
+                                {{ selectedCompaniaView.estado == '1' ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Scrollable Content Area (Si hay compañia seleccionada O estamos en Beneficios) -->
+                <div class="flex-1 overflow-y-auto bg-white" [ngClass]="activeInfoTab === 'descuentos' ? '' : 'p-6'">
+
+                    <!-- TAB: EMPRESAS -->
+                    <div *ngIf="activeInfoTab === 'empresas' && selectedCompaniaView" class="animate-fadeIn">
+                        <app-empresas-list [companiaId]="selectedCompaniaView.id"
+                            [companiaNombre]="selectedCompaniaView.nombre"
+                            (onGestionarDescuentos)="onShowDiscounts($event)">
+                        </app-empresas-list>
+                    </div>
+
+                    <!-- TAB: GESTIONAR DESCUENTOS -->
+                    <div *ngIf="activeInfoTab === 'descuentos' && selectedPlanForDiscounts"
+                        class="animate-fadeIn h-full">
+                        <app-gestion-descuento [plan]="selectedPlanForDiscounts" (onBack)="onHideDiscounts()">
+                        </app-gestion-descuento>
+                    </div>
+
+                    <div *ngIf="activeInfoTab === 'beneficios'" class="animate-fadeIn">
+                        <app-beneficios-list>
+                        </app-beneficios-list>
+                    </div>
+
+                    <!-- Overlay para cerrar dropdown -->
+                    <div *ngIf="openMenuId" (click)="closeMenu()" class="fixed inset-0 z-40"></div>
+
+                    <!-- 4. Estado Sin Selección (Placeholder) - Solo si NO hay compañia Y NO es beneficios -->
+                    <div *ngIf="!selectedCompaniaView && activeInfoTab !== 'beneficios'"
+                        class="flex flex-col items-center justify-center h-full p-8 text-center text-gray-400">
+                        <div class="mb-5 w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-hand-pointer text-blue-400 text-2xl"></i>
+                        </div>
+                        <p class="text-base font-semibold text-gray-600 max-w-xs leading-relaxed">
+                            Selecciona una compañía para ver su información y configurar planes de descuento.
+                        </p>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Modales (se mantienen igual) -->
+    <app-modal-compania [isVisible]="showModal" [compania]="selectedCompania" (onClose)="closeModal()"
+        (onSave)="onSaveSuccess()">
+    </app-modal-compania>
+
+    <app-modal-detalle-compania [isVisible]="showModalDetalleCompania" [compania]="selectedCompania"
+        (onClose)="closeModalDetalleCompania()">
+    </app-modal-detalle-compania>
+
+
+</div>

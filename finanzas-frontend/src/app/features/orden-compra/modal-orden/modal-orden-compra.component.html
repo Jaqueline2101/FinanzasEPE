@@ -1,0 +1,455 @@
+
+    <form [formGroup]="form" (ngSubmit)="guardar()" class="space-y-3 mt-4">
+
+        <!-- ═══ FILA 1: DATOS GENERALES ═══ -->
+        <div>
+            <h3 class="text-xs font-bold text-slate-700 mb-2 pb-1.5 border-b border-slate-200 flex items-center gap-2">
+                <i class="fas fa-info-circle text-blue-600 text-[10px]"></i>
+                Datos Generales
+            </h3>
+            <div class="grid grid-cols-12 gap-x-3 gap-y-2">
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        Número de Orden
+                        <span class="text-rose-500 text-sm leading-none">*</span>
+                    </label>
+                    <input type="text" formControlName="numeroOrden"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                        placeholder="OC-0001">
+                    <p *ngIf="form.get('numeroOrden')?.touched && form.get('numeroOrden')?.errors?.['required']"
+                        class="text-[9px] text-red-500 font-bold mt-1 uppercase">Requerido</p>
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tipo de Compra</label>
+                    <select formControlName="tipoCompra"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold focus:ring-1 focus:ring-blue-500 outline-none">
+                        <option *ngFor="let t of tiposCompra" [value]="t">{{ t }}</option>
+                    </select>
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        Fecha Emisión
+                        <span class="text-rose-500 text-sm leading-none">*</span>
+                    </label>
+                    <input type="date" formControlName="fechaEmision"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                    <p *ngIf="form.get('fechaEmision')?.touched && form.get('fechaEmision')?.errors?.['required']"
+                        class="text-[9px] text-red-500 font-bold mt-1 uppercase">Requerido</p>
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">F. Est.
+                        Entrega</label>
+                    <input type="date" formControlName="fechaEstimadaEntrega"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Moneda</label>
+                    <select formControlName="moneda"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                        <option *ngFor="let m of monedas" [value]="m.code">{{ m.code }} ({{ m.symbol }})</option>
+                    </select>
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Centro Costo</label>
+                    <input type="text" formControlName="centroCosto"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Área
+                        Solicitante</label>
+                    <input type="text" formControlName="areaSolicitante"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Responsable</label>
+                    <input type="text" formControlName="responsableCompra"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+            </div>
+
+            <!-- Adelanto (más visible) -->
+            <div class="mt-4 bg-emerald-50 border-2 border-emerald-200 rounded-xl px-4 py-3 shadow-sm transition-all">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-hand-holding-usd text-emerald-600 text-sm"></i>
+                        <span class="text-xs font-black text-emerald-800 uppercase tracking-widest">Gestión de
+                            Adelanto</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer group">
+                        <input type="checkbox" formControlName="permiteAdelanto" class="sr-only peer">
+                        <div
+                            class="w-11 h-6 bg-slate-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600">
+                        </div>
+                        <span class="ml-3 text-[11px] font-black text-gray-700 uppercase tracking-widest group-hover:text-emerald-700 transition-colors">Permitir
+                            Adelanto</span>
+                    </label>
+                </div>
+                <div *ngIf="form.get('permiteAdelanto')?.value" class="grid grid-cols-12 gap-x-3 gap-y-1 mt-2">
+                    <div class="col-span-2 flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Tipo</label>
+                        <select formControlName="tipoAdelanto" (change)="calcularTotales()"
+                            class="h-8 bg-white border border-blue-200 rounded-lg px-2 text-xs font-bold outline-none">
+                            <option value="PORCENTAJE">PORCENTAJE (%)</option>
+                            <option value="MONTO FIJO">MONTO FIJO</option>
+                        </select>
+                    </div>
+                    <div class="col-span-2 flex flex-col gap-1"
+                        *ngIf="form.get('tipoAdelanto')?.value === 'PORCENTAJE'">
+                        <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Porcentaje
+                            (%)</label>
+                        <input type="number" formControlName="porcentajeAdelanto" (input)="calcularTotales()"
+                            class="h-8 bg-white border border-blue-200 rounded-lg px-2 text-xs font-bold outline-none">
+                    </div>
+                    <div class="col-span-2 flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Monto
+                            Adelanto</label>
+                        <input type="number" formControlName="montoAdelanto" (input)="calcularTotales()"
+                            class="h-8 bg-white border border-blue-200 rounded-lg px-2 text-xs font-bold outline-none">
+                    </div>
+                    <div class="col-span-2 flex flex-col gap-1">
+                        <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Fecha
+                            Adelanto</label>
+                        <input type="date" formControlName="fechaAdelanto"
+                            class="h-8 bg-white border border-blue-200 rounded-lg px-2 text-xs font-bold outline-none">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ FILA 2: PROVEEDOR (compacta) ═══ -->
+        <div>
+            <h3 class="text-xs font-bold text-slate-700 mb-2 pb-1.5 border-b border-slate-200 flex items-center gap-2">
+                <i class="fas fa-user-tie text-blue-600 text-[10px]"></i>
+                Proveedor
+            </h3>
+            <div class="grid grid-cols-12 gap-x-3 gap-y-2">
+                <!-- Buscador -->
+                <div class="col-span-4 relative flex flex-col gap-1" #containerProveedor>
+                    <label class="flex items-center gap-1 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        Buscar Proveedor (RUC o Razón Social)
+                        <span class="text-rose-500 text-sm leading-none">*</span>
+                    </label>
+                    <div class="relative">
+                        <i
+                            class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[10px]"></i>
+                        <input type="text" [value]="queryBusqueda" (input)="onInputSearch($event)" (click)="toggleDropdown()"
+                            class="w-full h-8 bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-12 text-xs font-bold focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            placeholder="Buscar proveedor (Click para listar todos)">
+                        
+                        <!-- Botón Limpiar (X) -->
+                        <button *ngIf="queryBusqueda || form.get('idProveedor')?.value" type="button" (click)="limpiarProveedor()"
+                            class="absolute right-8 top-1/2 -translate-y-1/2 text-slate-300 hover:text-rose-500 transition-colors">
+                            <i class="fas fa-times-circle text-xs"></i>
+                        </button>
+
+                        <div *ngIf="buscandoProveedor" class="absolute right-3 top-1/2 -translate-y-1/2 animate-spin">
+                            <i class="fas fa-spinner text-slate-400 text-xs"></i>
+                        </div>
+                        <div *ngIf="!buscandoProveedor" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-300">
+                            <i class="fas text-[10px]" [class.fa-chevron-down]="!mostrarDropdownProveedores" [class.fa-chevron-up]="mostrarDropdownProveedores"></i>
+                        </div>
+                    </div>
+                    <!-- Dropdown -->
+                    <div *ngIf="mostrarDropdownProveedores && proveedores.length > 0"
+                        class="absolute z-50 top-full w-full mt-1 bg-white rounded-lg shadow-xl border border-slate-100 max-h-48 overflow-y-auto p-1 space-y-0.5">
+                        <button *ngFor="let p of proveedores" type="button" (mousedown)="seleccionarProveedor(p)"
+                            class="w-full text-left px-3 py-2 rounded-lg hover:bg-blue-50 transition-all group flex items-center justify-between">
+                            <div class="flex flex-col">
+                                <span class="text-xs font-black text-slate-700 group-hover:text-blue-600">{{
+                                    p.razonSocial }}</span>
+                                <span class="text-[10px] font-bold text-slate-400">RUC: {{ p.numDocIdent }}</span>
+                            </div>
+                        </button>
+                    </div>
+                    <p *ngIf="form.get('idProveedor')?.touched && form.get('idProveedor')?.errors?.['required']"
+                        class="text-[9px] text-red-500 font-bold mt-1 uppercase">Debe seleccionar un proveedor</p>
+                </div>
+
+                <!-- Datos proveedor seleccionado -->
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Razón Social</label>
+                    <div
+                        class="h-8 bg-slate-100 border border-slate-200 rounded-lg px-3 flex items-center text-xs font-black text-slate-700 truncate">
+                        {{ form.get('razonSocialProveedor')?.value || 'NINGUNO SELECCIONADO' }}
+                    </div>
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">RUC</label>
+                    <div
+                        class="h-8 bg-slate-100 border border-slate-200 rounded-lg px-3 flex items-center text-xs font-black text-slate-700">
+                        {{ form.get('rucProveedor')?.value || '-' }}
+                    </div>
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Dirección
+                        Fiscal</label>
+                    <div
+                        class="h-8 bg-slate-100 border border-slate-200 rounded-lg px-3 flex items-center text-[10px] font-bold text-slate-500 truncate">
+                        {{ form.get('direccionFiscal')?.value || '-' }}
+                    </div>
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Condición Pago</label>
+                    <select formControlName="condicionPago"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-2 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                        <option *ngFor="let c of condicionesPago" [value]="c">{{ c }}</option>
+                    </select>
+                </div>
+                <div class="col-span-1 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Días Plazo</label>
+                    <input type="number" formControlName="plazoDias"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SECCIÓN: DETALLE ITEMS ═══ -->
+        <div>
+            <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-200">
+                <h3 class="text-xs font-bold text-slate-700 flex items-center gap-2">
+                    <i class="fas fa-list-ul text-blue-600 text-[10px]"></i>
+                    Detalle Items
+                    <span class="px-2 py-0.5 bg-slate-800 text-white text-[9px] font-black rounded-md">{{
+                        detallesFormArray.length }} Items</span>
+                </h3>
+                <button type="button" (click)="agregarItem()"
+                    class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-sm active:scale-95 transition-all text-[10px] uppercase flex items-center gap-1.5">
+                    <i class="fas fa-plus text-[9px]"></i>
+                    Agregar Producto/Servicio
+                </button>
+            </div>
+
+            <div class="overflow-hidden rounded-lg border border-slate-200 shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-800 text-white text-[9px] uppercase tracking-widest">
+                            <th class="px-3 py-2 w-[38%]">Descripción / Código</th>
+                            <th class="px-3 py-2 text-center">Cant / UN</th>
+                            <th class="px-3 py-2 text-center">P. Unit</th>
+                            <th class="px-3 py-2 text-center">Desc.</th>
+                            <th class="px-3 py-2 text-center">Subtotal</th>
+                            <th class="px-3 py-2 w-10 text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="detalles" class="divide-y divide-slate-100">
+                        <tr *ngFor="let item of detallesFormArray.controls; let i = index" [formGroupName]="i"
+                            class="text-xs hover:bg-slate-50/80 transition-colors group">
+                            <td class="px-3 py-1.5">
+                                <div class="flex flex-col gap-1">
+                                    <input type="text" formControlName="descripcion"
+                                        class="bg-transparent border-none p-0 text-xs font-bold text-slate-700 w-full outline-none placeholder:text-slate-300"
+                                        placeholder="Nombre del producto...">
+                                    <p *ngIf="item.get('descripcion')?.touched && item.get('descripcion')?.invalid"
+                                        class="text-[8px] text-red-500 font-black uppercase">Descripción requerida</p>
+                                    <input type="text" formControlName="codigoItem"
+                                        class="bg-transparent border-none p-0 text-[10px] font-bold text-slate-400 w-full outline-none placeholder:text-slate-300"
+                                        placeholder="Código opcional">
+                                </div>
+                            </td>
+                            <td class="px-3 py-1.5">
+                                <div class="flex items-center gap-1.5 justify-center">
+                                    <input type="number" formControlName="cantidad"
+                                        class="w-16 bg-slate-100 border-none rounded-lg px-2 py-1.5 text-center text-xs font-black outline-none">
+                                    <select formControlName="unidadMedida"
+                                        class="bg-transparent border-none text-[10px] font-black text-slate-400 outline-none">
+                                        <option value="UND">UND</option>
+                                        <option value="KG">KG</option>
+                                        <option value="SER">SER</option>
+                                        <option value="GL">GL</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td class="px-3 py-1.5">
+                                <div class="relative max-w-[90px] mx-auto">
+                                    <span
+                                        class="absolute left-2 top-1/2 -translate-y-1/2 text-[9px] font-black text-slate-400">S/</span>
+                                    <input type="number" formControlName="precioUnitario"
+                                        class="w-full bg-slate-100 border-none rounded-lg pl-5 pr-2 py-1.5 text-right text-xs font-black outline-none">
+                                </div>
+                            </td>
+                            <td class="px-3 py-1.5">
+                                <div class="relative max-w-[70px] mx-auto">
+                                    <input type="number" formControlName="descuento"
+                                        class="w-full bg-slate-100 border-none rounded-lg px-2 py-1.5 text-right text-xs font-black outline-none text-red-500">
+                                </div>
+                            </td>
+                            <td class="px-3 py-1.5">
+                                <div class="flex flex-col items-end gap-0.5">
+                                    <span class="font-black text-slate-700 text-xs">
+                                        {{ form.get('moneda')?.value === 'PEN' ? 'S/' : '$' }} {{
+                                        item.get('total')?.value | number:'1.2-2' }}
+                                    </span>
+                                    <label class="flex items-center gap-1 cursor-pointer">
+                                        <input type="checkbox" formControlName="afectoIgv"
+                                            class="w-3 h-3 rounded-sm accent-slate-800">
+                                        <span
+                                            class="text-[8px] font-black text-slate-400 uppercase tracking-widest">IGV</span>
+                                    </label>
+                                </div>
+                            </td>
+                            <td class="px-3 py-1.5 text-center">
+                                <button type="button" (click)="removerItem(i)"
+                                    class="w-7 h-7 rounded-lg bg-red-50 text-red-400 opacity-0 group-hover:opacity-100 hover:bg-red-500 hover:text-white transition-all">
+                                    <i class="fas fa-trash-alt text-[9px]"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr *ngIf="detallesFormArray.length === 0">
+                            <td colspan="6" class="px-6 py-8 text-center">
+                                <div class="flex flex-col items-center gap-2 opacity-30">
+                                    <i class="fas fa-box-open text-2xl"></i>
+                                    <span class="text-[10px] font-black uppercase tracking-widest">No hay items
+                                        registrados</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Totales compactos -->
+            <div class="flex justify-end pt-2">
+                <div class="bg-slate-800 text-white rounded-xl px-5 py-3 flex items-center gap-8 shadow-lg">
+                    <div class="flex flex-col items-center gap-0.5">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Subtotal</span>
+                        <span class="text-xs font-black text-slate-100">{{ form.get('moneda')?.value === 'PEN' ? 'S/' :
+                            '$' }} {{ totales.subtotal | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <span class="text-[9px] font-black text-red-400 uppercase tracking-widest">Descuento</span>
+                        <span class="text-xs font-black text-red-400">- {{ form.get('moneda')?.value === 'PEN' ? 'S/' :
+                            '$' }} {{ totales.descuento | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-0.5">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">IGV (18%)</span>
+                        <span class="text-xs font-black text-slate-100">{{ form.get('moneda')?.value === 'PEN' ? 'S/' :
+                            '$' }} {{ totales.igv | number:'1.2-2' }}</span>
+                    </div>
+                    <div class="border-l border-slate-600 pl-8 flex flex-col items-center gap-0.5">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total
+                            General</span>
+                        <span class="text-lg font-black text-blue-400">
+                            {{ form.get('moneda')?.value === 'PEN' ? 'S/' : '$' }} {{ totales.total | number:'1.2-2' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SECCIÓN COLAPSABLE: LOGÍSTICA ═══ -->
+        <div>
+            <h3 class="text-xs font-bold text-slate-700 mb-2 pb-1.5 border-b border-slate-200 flex items-center justify-between cursor-pointer"
+                (click)="mostrarLogistica = !mostrarLogistica">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-truck text-blue-600 text-[10px]"></i>
+                    Logística
+                </span>
+                <i class="fas text-slate-400 text-[10px]" [class.fa-chevron-down]="!mostrarLogistica"
+                    [class.fa-chevron-up]="mostrarLogistica"></i>
+            </h3>
+            <div *ngIf="mostrarLogistica" class="grid grid-cols-12 gap-x-3 gap-y-2">
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Lugar de
+                        Entrega</label>
+                    <input type="text" formControlName="lugarEntrega" placeholder="Ej. Almacén Principal..."
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Dirección
+                        Exacta</label>
+                    <input type="text" formControlName="direccionEntrega" placeholder="Dirección completa..."
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Fec. Compromiso
+                        Entrega</label>
+                    <input type="date" formControlName="fechaEntregaAcordada"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Responsable
+                        Recepción</label>
+                    <input type="text" formControlName="responsableRecepcion" placeholder="Nombre del encargado..."
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-2 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Observaciones
+                        Logísticas</label>
+                    <input type="text" formControlName="observacionesLogisticas"
+                        placeholder="Horarios, restricciones..."
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-bold outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SECCIÓN COLAPSABLE: CONTROL INTERNO ═══ -->
+        <div>
+            <h3 class="text-xs font-bold text-slate-700 mb-2 pb-1.5 border-b border-slate-200 flex items-center justify-between cursor-pointer"
+                (click)="mostrarControlInterno = !mostrarControlInterno">
+                <span class="flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-blue-600 text-[10px]"></i>
+                    Control Interno
+                </span>
+                <i class="fas text-slate-400 text-[10px]" [class.fa-chevron-down]="!mostrarControlInterno"
+                    [class.fa-chevron-up]="mostrarControlInterno"></i>
+            </h3>
+            <div *ngIf="mostrarControlInterno" class="grid grid-cols-12 gap-x-3 gap-y-2">
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">N° Cotización
+                        Proveedor</label>
+                    <input type="text" formControlName="numCotizacionRelacionada"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-black outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">N° Requerimiento
+                        Interno</label>
+                    <input type="text" formControlName="numRequerimientoInterno"
+                        class="h-8 bg-slate-50 border border-slate-200 rounded-lg px-3 text-xs font-black outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Estado</label>
+                    <div class="h-8 flex items-center">
+                        <span [class]="getEstadoClass() + ' px-3 py-1 rounded-full text-[10px] font-black uppercase border transition-all shadow-sm'">
+                            {{ form.get('estado')?.value || 'PENDIENTE' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-span-3 flex flex-col gap-1">
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Fecha Sistema</label>
+                    <div
+                        class="h-8 bg-slate-100 border border-slate-200 rounded-lg px-3 flex items-center text-xs font-bold text-slate-600">
+                        {{ (orden?.fechaRegistro | date:'dd/MM/yyyy HH:mm') || 'AHORA' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ BOTONES DE ACCIÓN ═══ -->
+        <div class="flex justify-between items-center pt-3 border-t border-slate-200">
+            <span *ngIf="form.invalid && form.touched"
+                class="text-[10px] font-black text-red-500 uppercase flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle"></i>
+                Campos pendientes por completar
+            </span>
+            <span *ngIf="!(form.invalid && form.touched)"></span>
+            <div class="flex gap-3">
+                <button type="button" (click)="close()"
+                    class="px-5 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold rounded-lg transition-colors text-xs uppercase tracking-wide">
+                    Cancelar
+                </button>
+                <button *ngIf="orden?.id && orden?.estado === 'PENDIENTE'" type="button" (click)="aprobar()" [disabled]="loading"
+                    class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-sm transition-colors text-xs uppercase tracking-wide flex items-center gap-2 disabled:opacity-50 justify-center">
+                    <i *ngIf="loading" class="fas fa-spinner fa-spin text-xs"></i>
+                    <i *ngIf="!loading" class="fas fa-check-double text-xs"></i>
+                    APROBAR ORDEN
+                </button>
+                <button *ngIf="!orden || orden?.estado === 'PENDIENTE'" type="submit" [disabled]="loading"
+                    class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-sm transition-colors text-xs uppercase tracking-wide flex items-center gap-2 disabled:opacity-50 min-w-[140px] justify-center">
+                    <i *ngIf="loading" class="fas fa-spinner fa-spin text-xs"></i>
+                    <i *ngIf="!loading" class="fas fa-save text-xs"></i>
+                    {{ loading ? 'GUARDANDO...' : (orden ? 'ACTUALIZAR ORDEN' : 'GUARDAR') }}
+                </button>
+            </div>
+        </div>
+
+    </form>

@@ -1,0 +1,550 @@
+@import 'tailwindcss';
+
+/* ========================================
+   BASE STYLES - SISTEMA DE TEMAS
+   ======================================== */
+
+@layer base {
+  html,
+  body {
+    @apply h-full;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Configuración base del body */
+  body {
+    font-family: 'Lato', sans-serif;
+    @apply antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    
+    /* MODO CLARO (por defecto) */
+    background-color: #ffffff;
+    color: #0f172a; /* slate-900 */
+  }
+
+  /* Tipografía para encabezados */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    transition: color 0.3s ease;
+  }
+
+  /* MODO OSCURO */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.dark body {
+    background-color: #0f172a; /* slate-900 */
+    color: #f1f5f9; /* slate-100 */
+  }
+
+  /* Modo claro explícito */
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  html:not(.dark) body {
+    background-color: #ffffff;
+    color: #0f172a; /* slate-900 */
+  }
+}
+
+/* ========================================
+   IMÁGENES - MANEJO POR MODO
+   ======================================== */
+
+/* Transiciones suaves para todas las imágenes */
+img {
+  transition: filter 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
+}
+
+/* Logo - Ajuste para modo oscuro */
+html.dark .logo-image,
+html.dark img[alt*="Logo"],
+html.dark img[alt*="logo"] {
+  filter: brightness(1.2) contrast(1.1);
+  opacity: 0.95;
+}
+
+/* Imágenes de perfil en header - SIN filtros en modo oscuro */
+html.dark header img[alt*="perfil"],
+html.dark header img[alt*="Perfil"],
+html.dark header img[alt*="Foto de Perfil"] {
+  filter: none !important;
+  border-color: #64748b !important; /* slate-500 */
+}
+
+/* Imágenes de perfil en sidebar - Mejor contraste */
+html.dark aside img[alt*="perfil"],
+html.dark aside img[alt*="Perfil"],
+html.dark aside img[alt*="avatar"],
+html.dark aside img[alt*="Avatar"] {
+  filter: brightness(1.1);
+  border-color: #475569 !important; /* slate-600 */
+}
+
+/* Imágenes generales - Mejor visibilidad en oscuro */
+html.dark img:not(.logo-image):not([alt*="perfil"]):not([alt*="Perfil"]):not([alt*="avatar"]) {
+  filter: brightness(1.05) contrast(1.02);
+}
+
+/* ========================================
+   COMPONENTS LAYER - ESTILOS REUTILIZABLES
+   ======================================== */
+
+@layer components {
+  
+  /* ========================================
+     BOTONES
+     ======================================== */
+  
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium shadow-sm transition-all duration-200;
+    background-color: #1D4ED8; /* blue-700 */
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: #1E40AF; /* blue-800 */
+    @apply shadow-md;
+  }
+
+  .dark .btn-primary {
+    background-color: #2563eb; /* blue-600 */
+  }
+
+  .dark .btn-primary:hover {
+    background-color: #1d4ed8; /* blue-700 */
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200;
+    background-color: #E5E7EB; /* gray-200 */
+    color: #475569; /* slate-600 */
+  }
+
+  .btn-secondary:hover {
+    background-color: #CBD5E1; /* gray-300 */
+  }
+
+  .dark .btn-secondary {
+    background-color: #334155; /* slate-700 */
+    color: #e2e8f0; /* slate-200 */
+  }
+
+  .dark .btn-secondary:hover {
+    background-color: #475569; /* slate-600 */
+  }
+
+  /* ========================================
+     INPUTS
+     ======================================== */
+  
+  .input-field {
+    @apply w-full px-4 py-2 rounded-lg transition-all;
+    border: 1px solid #CBD5E1; /* slate-300 */
+    background-color: white;
+    color: #0f172a; /* slate-900 */
+  }
+
+  .input-field:focus {
+    outline: none;
+    border-color: #1D4ED8; /* blue-700 */
+    @apply ring-2 ring-blue-700/20;
+  }
+
+  .dark .input-field {
+    background-color: #1e293b; /* slate-800 */
+    border-color: #475569; /* slate-600 */
+    color: #f1f5f9; /* slate-100 */
+  }
+
+  .dark .input-field:focus {
+    border-color: #3b82f6; /* blue-500 */
+    @apply ring-2 ring-blue-500/20;
+  }
+
+  .input-error {
+    border-color: #ef4444 !important; /* red-500 */
+  }
+
+  .input-error:focus {
+    @apply ring-2 ring-red-500/20;
+  }
+
+  .dark .input-error {
+    border-color: #f87171 !important; /* red-400 */
+  }
+
+  .dark .input-error:focus {
+    @apply ring-2 ring-red-400/20;
+  }
+
+  /* ========================================
+     CARDS
+     ======================================== */
+  
+  .card {
+    @apply rounded-xl shadow-lg p-6 transition-all;
+    background-color: white;
+    border: 1px solid #f3f4f6; /* gray-100 */
+    color: #0f172a; /* slate-900 */
+  }
+
+  .dark .card {
+    background-color: #1e293b; /* slate-800 */
+    border-color: #334155; /* slate-700 */
+    color: #f1f5f9; /* slate-100 */
+  }
+
+  /* ========================================
+     ALERTAS
+     ======================================== */
+  
+  .alert-success {
+    @apply px-4 py-3 rounded-lg transition-all;
+    background-color: #f0fdf4; /* green-50 */
+    border: 1px solid #bbf7d0; /* green-200 */
+    color: #166534; /* green-800 */
+  }
+
+  .dark .alert-success {
+    background-color: rgba(34, 197, 94, 0.15); /* green-900/30 */
+    border-color: #166534; /* green-800 */
+    color: #bbf7d0; /* green-200 */
+  }
+
+  .alert-error {
+    @apply px-4 py-3 rounded-lg transition-all;
+    background-color: #fef2f2; /* red-50 */
+    border: 1px solid #fecaca; /* red-200 */
+    color: #991b1b; /* red-800 */
+  }
+
+  .dark .alert-error {
+    background-color: rgba(239, 68, 68, 0.15); /* red-900/30 */
+    border-color: #991b1b; /* red-800 */
+    color: #fecaca; /* red-200 */
+  }
+
+  .alert-warning {
+    @apply px-4 py-3 rounded-lg transition-all;
+    background-color: #fefce8; /* yellow-50 */
+    border: 1px solid #fef08a; /* yellow-200 */
+    color: #854d0e; /* yellow-800 */
+  }
+
+  .dark .alert-warning {
+    background-color: rgba(234, 179, 8, 0.15); /* yellow-900/30 */
+    border-color: #854d0e; /* yellow-800 */
+    color: #fef08a; /* yellow-200 */
+  }
+
+  .alert-info {
+    @apply px-4 py-3 rounded-lg transition-all;
+    background-color: #eff6ff; /* blue-50 */
+    border: 1px solid #bfdbfe; /* blue-200 */
+    color: #1e40af; /* blue-800 */
+  }
+
+  .dark .alert-info {
+    background-color: rgba(59, 130, 246, 0.15); /* blue-900/30 */
+    border-color: #1e40af; /* blue-800 */
+    color: #bfdbfe; /* blue-200 */
+  }
+}
+
+/* ========================================
+   UTILITIES LAYER - UTILIDADES PERSONALIZADAS
+   ======================================== */
+
+@layer utilities {
+  
+  /* ========================================
+     ANIMACIONES
+     ======================================== */
+  
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* ========================================
+     SCROLLBAR PERSONALIZADO
+     ======================================== */
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: #1e293b; /* slate-800 */
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+    transition: background 0.3s ease;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #475569; /* slate-600 */
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #64748b; /* slate-500 */
+  }
+
+  /* Scrollbar para chips */
+  .custom-scrollbar-chips::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .custom-scrollbar-chips::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar-chips::-webkit-scrollbar-thumb {
+    background: #e2e8f0; /* slate-200 */
+    border-radius: 10px;
+  }
+
+  .dark .custom-scrollbar-chips::-webkit-scrollbar-thumb {
+    background: #475569; /* slate-600 */
+  }
+
+  .custom-scrollbar-chips::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1; /* slate-300 */
+  }
+
+  .dark .custom-scrollbar-chips::-webkit-scrollbar-thumb:hover {
+    background: #64748b; /* slate-500 */
+  }
+
+  /* Sin scrollbar */
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ========================================
+   SPINNER DE CARGA
+   ======================================== */
+
+.spinner {
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  transition: border-color 0.3s ease;
+}
+
+.dark .spinner {
+  border: 2px solid #334155; /* slate-700 */
+  border-top: 2px solid #60a5fa; /* blue-400 */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ========================================
+   TRANSICIONES GLOBALES SUAVES
+   ======================================== */
+
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Excepciones que no necesitan transición */
+*:where([class*="animate-"]),
+*:where([class*="transition-none"]) {
+  transition: none;
+}
+
+/* ========================================
+   TEXTOS SEGÚN EL TEMA
+   ======================================== */
+
+/* Textos generales */
+.text-slate-900 {
+  color: #0f172a;
+}
+
+.dark .text-slate-900 {
+  color: #f1f5f9; /* slate-100 */
+}
+
+.text-slate-800 {
+  color: #1e293b;
+}
+
+.dark .text-slate-800 {
+  color: #e2e8f0; /* slate-200 */
+}
+
+.text-slate-700 {
+  color: #334155;
+}
+
+.dark .text-slate-700 {
+  color: #cbd5e1; /* slate-300 */
+}
+
+.text-slate-600 {
+  color: #475569;
+}
+
+.dark .text-slate-600 {
+  color: #94a3b8; /* slate-400 */
+}
+
+.text-slate-500 {
+  color: #64748b;
+}
+
+.dark .text-slate-500 {
+  color: #94a3b8; /* slate-400 */
+}
+
+/* ========================================
+   FONDOS SEGÚN EL TEMA
+   ======================================== */
+
+.bg-white {
+  background-color: white;
+}
+
+.dark .bg-white {
+  background-color: #0f172a; /* slate-900 */
+}
+
+.bg-slate-50 {
+  background-color: #f8fafc;
+}
+
+.dark .bg-slate-50 {
+  background-color: #1e293b; /* slate-800 */
+}
+
+.bg-slate-100 {
+  background-color: #f1f5f9;
+}
+
+.dark .bg-slate-100 {
+  background-color: #334155; /* slate-700 */
+}
+
+/* ========================================
+   BORDES SEGÚN EL TEMA
+   ======================================== */
+
+.border-slate-200 {
+  border-color: #e2e8f0;
+}
+
+.dark .border-slate-200 {
+  border-color: #334155; /* slate-700 */
+}
+
+.border-slate-300 {
+  border-color: #cbd5e1;
+}
+
+.dark .border-slate-300 {
+  border-color: #475569; /* slate-600 */
+}
+
+/* ========================================
+   HOVER STATES
+   ======================================== */
+
+.hover\:bg-slate-50:hover {
+  background-color: #f8fafc;
+}
+
+.dark .hover\:bg-slate-50:hover {
+  background-color: #1e293b; /* slate-800 */
+}
+
+.hover\:bg-slate-100:hover {
+  background-color: #f1f5f9;
+}
+
+.dark .hover\:bg-slate-100:hover {
+  background-color: #334155; /* slate-700 */
+}
+
+/* ========================================
+   FOCUS STATES
+   ======================================== */
+
+.focus\:ring-blue-700:focus {
+  --tw-ring-color: #1d4ed8;
+}
+
+.dark .focus\:ring-blue-700:focus {
+  --tw-ring-color: #3b82f6;
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* Optimizar renderizado de elementos frecuentemente actualizados */
+.will-change-auto {
+  will-change: auto;
+}
+
+/* Aceleración por hardware para transiciones */
+.transform-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}

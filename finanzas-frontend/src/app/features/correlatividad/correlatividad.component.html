@@ -1,0 +1,222 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+    <div class="pt-0 pb-1">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Punto de Venta</span>
+            <span
+                class="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-black rounded-full border border-blue-200 shadow-sm">
+                01-Caja 1 - 207
+            </span>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+            <i class="fa-solid fa-chart-pie text-blue-500"></i>
+            Reportes / Correlatividad
+        </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+        <!-- TABS -->
+        <div class="flex bg-slate-50 border-b border-slate-200 p-1 gap-1">
+            <button (click)="cambiarTab('MES')"
+                [ngClass]="tabActiva === 'MES' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-500 hover:bg-slate-100 border-transparent'"
+                class="px-4 py-2 text-xs font-bold rounded-lg transition-all border outline-none">
+                Resumen por mes
+            </button>
+            <button (click)="cambiarTab('TIPO_DOC')"
+                [ngClass]="tabActiva === 'TIPO_DOC' ? 'bg-white text-blue-600 shadow-sm border-slate-200' : 'text-slate-500 hover:bg-slate-100 border-transparent'"
+                class="px-4 py-2 text-xs font-bold rounded-lg transition-all border outline-none">
+                Resumen por tipo doc.
+            </button>
+        </div>
+
+        <!-- FILTROS UNIFICADOS -->
+        <div class="px-6 py-4 bg-white border-b border-slate-100">
+            <app-barra-filtros 
+                placeholder="Buscar por serie..."
+                [showDates]="false"
+                [searchOptions]="searchOptions"
+                [estadoOptions]="sucursalOptions"
+                statusLabel="Establecimiento"
+                (onFilter)="handleFilter($event)">
+                
+                <!-- Año (Custom slot) -->
+                <div class="relative w-full lg:w-32">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5 px-1">Año</label>
+                    <div class="relative group">
+                        <select [(ngModel)]="filtros.anio" name="anio" (change)="generarReporte()"
+                            class="w-full pl-3 pr-10 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer appearance-none font-medium shadow-sm">
+                            <option *ngFor="let y of anios" [value]="y">{{ y }}</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors pt-4">
+                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mes (Custom slot) -->
+                <div class="relative w-full lg:w-48">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-0.5 px-1">Mes</label>
+                    <div class="relative group">
+                        <select [(ngModel)]="filtros.mes" name="mes" (change)="generarReporte()"
+                            class="w-full pl-3 pr-10 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all cursor-pointer appearance-none font-medium shadow-sm">
+                            <option *ngFor="let m of meses" [value]="m.value">{{ m.label }}</option>
+                        </select>
+                        <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400 group-hover:text-blue-500 transition-colors pt-4">
+                            <i class="fa-solid fa-chevron-down text-[10px]"></i>
+                        </div>
+                    </div>
+                </div>
+            </app-barra-filtros>
+        </div>
+
+        <!-- TABLA CORRELATIVIDAD -->
+        <div class="p-0 overflow-x-auto relative min-h-[400px]">
+            <!-- Overlay carga -->
+            <div *ngIf="isLoading"
+                class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
+                <div class="w-10 h-10 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+                <span class="mt-4 text-[10px] font-black text-slate-500 uppercase tracking-widest">Calculando
+                    correlativos...</span>
+            </div>
+
+            <table class="w-full text-left border-collapse min-w-[1000px]">
+                <tbody class="bg-white">
+                    <ng-container *ngFor="let group of groupedResumen">
+                        <!-- GROUP HEADER -->
+                        <tr [ngClass]="group.bgColor + ' ' + group.borderColor" class="text-white border-b">
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider border-r border-white/10 italic">
+                                {{ group.label }}
+                            </th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider border-r border-white/10">
+                                Serie</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-center border-r border-white/10">
+                                Cant.</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider border-r border-white/10">
+                                Desde</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider border-r border-white/10">
+                                Hasta</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-right border-r border-white/10">
+                                Base Imp.</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-right border-r border-white/10">
+                                Igv.</th>
+                            <th
+                                class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-right border-r border-white/10">
+                                Total</th>
+                            <th class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-center">Ver</th>
+                        </tr>
+
+                        <!-- DATA ROWS -->
+                        <tr *ngFor="let item of group.items"
+                            class="border-b border-slate-100 hover:bg-slate-50 transition-colors group">
+                            <td class="px-3 py-2.5 text-[11px] font-bold text-blue-600 border-r border-slate-50">{{
+                                item.tipoDoc }}</td>
+                            <td
+                                class="px-3 py-2.5 text-[11px] font-medium text-slate-600 border-r border-slate-50 text-center">
+                                {{ item.serie }}</td>
+                            <td
+                                class="px-3 py-2.5 text-[11px] font-black text-slate-900 border-r border-slate-50 text-center">
+                                {{ item.cantidad }}</td>
+                            <td class="px-3 py-2.5 text-[11px] font-mono text-slate-500 border-r border-slate-50">{{
+                                item.desde }}</td>
+                            <td class="px-3 py-2.5 text-[11px] font-mono text-slate-500 border-r border-slate-50">{{
+                                item.hasta }}</td>
+                            <td
+                                class="px-3 py-2.5 text-[11px] font-mono text-slate-600 text-right border-r border-slate-50">
+                                {{ item.baseImp | number:'1.2-2' }}</td>
+                            <td
+                                class="px-3 py-2.5 text-[11px] font-mono text-slate-600 text-right border-r border-slate-50">
+                                {{ item.igv | number:'1.2-2' }}</td>
+                            <td
+                                class="px-3 py-2.5 text-[11px] font-mono font-bold text-slate-900 text-right border-r border-slate-50">
+                                {{
+                                item.total | number:'1.2-2' }}</td>
+                            <td class="px-3 py-2.5 text-center">
+                                <button (click)="verDetalles(item)"
+                                    class="w-7 h-7 bg-slate-100 hover:bg-blue-600 text-slate-400 hover:text-white rounded-full transition-all duration-200 shadow-xs flex items-center justify-center mx-auto group-hover:scale-110">
+                                    <i class="fa-solid fa-eye text-xs"></i>
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- SUB TOTAL ROW -->
+                        <tr class="border-b border-slate-200">
+                            <td colspan="5"
+                                class="px-3 py-1 text-right text-[10px] font-bold text-slate-500 italic bg-gray-50/50">
+                                Sub Total {{ group.label }}:</td>
+                            <td [ngClass]="group.subTotalColor"
+                                class="px-3 py-1 text-[11px] font-black text-right shadow-inner">{{ group.subTotalBase |
+                                number:'1.2-2' }}</td>
+                            <td
+                                class="px-3 py-1 text-[11px] font-black text-slate-800 text-right bg-amber-400 shadow-inner">
+                                {{ group.subTotalIgv | number:'1.2-2' }}</td>
+                            <td [ngClass]="group.bgColor"
+                                class="px-3 py-1 text-[11px] font-black text-white text-right shadow-inner">{{
+                                group.subTotalTotal | number:'1.2-2' }}</td>
+                            <td class="bg-gray-50/30"></td>
+                        </tr>
+
+                        <!-- SPACER ROW -->
+                        <tr class="h-8 bg-slate-50/30">
+                            <td colspan="9"></td>
+                        </tr>
+                    </ng-container>
+
+                    <!-- NO DATA STATE -->
+                    <tr *ngIf="groupedResumen.length === 0 && !isLoading">
+                        <td colspan="9" class="px-3 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                                    <i class="fa-solid fa-folder-open text-3xl"></i>
+                                </div>
+                                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">No se
+                                    encontraron registros en este periodo</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <!-- FOOTER TOTALS -->
+                <tfoot *ngIf="groupedResumen.length > 0" class="bg-white border-t-2 border-slate-400">
+                    <tr>
+                        <td colspan="5"
+                            class="px-3 py-2 text-right text-[11px] font-black text-slate-700 uppercase tracking-widest">
+                            Total:</td>
+                        <td class="px-3 py-2 text-[12px] font-black text-white text-right bg-slate-600">{{
+                            resumen.totalBaseImp | number:'1.2-2' }}</td>
+                        <td class="px-3 py-2 text-[12px] font-black text-slate-900 text-right bg-amber-500">{{
+                            resumen.totalIgv | number:'1.2-2' }}</td>
+                        <td class="px-3 py-2 text-[12px] font-black text-white text-right bg-blue-700">{{
+                            resumen.totalGeneral | number:'1.2-2' }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- PAGO INFO BAR (KPIs rápidos) -->
+        <div *ngIf="resumen.items.length > 0"
+            class="p-3 bg-slate-50 flex items-center justify-end gap-6 border-t border-slate-100">
+            <div class="flex flex-col items-end">
+                <span class="text-[9px] font-black text-slate-400 uppercase">Documentos Totales</span>
+                <span class="text-xs font-black text-slate-700">{{ getTotDocumentos() }}</span>
+            </div>
+            <div class="w-px h-8 bg-slate-200"></div>
+            <div class="flex flex-col items-end">
+                <span class="text-[9px] font-black text-slate-400 uppercase">Resumen Imponible</span>
+                <span class="text-sm font-black text-blue-600">S/ {{ resumen.totalGeneral | number:'1.2-2' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <app-modal-correlatividad-detalle *ngIf="showModalDetalle" [data]="selectedItem" [docs]="selectedDocs" (close)="showModalDetalle = false">
+    </app-modal-correlatividad-detalle>
+</div>

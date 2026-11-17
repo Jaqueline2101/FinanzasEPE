@@ -1,0 +1,209 @@
+<div class="rp-overlay" (click)="cerrar()"></div>
+<div class="rp-modal">
+    <div class="rp-modal-content rp-modal--xl" (click)="$event.stopPropagation()">
+
+        <!-- HEADER -->
+        <div class="rp-modal-header !bg-white">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 text-xl">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="rp-modal-title-group">
+                    <span class="rp-modal-tag">{{ moduloLabel }}</span>
+                    <h4 class="rp-modal-title">Detalle del Documento</h4>
+                    <span class="rp-modal-serie">{{ documento?.serie }}-{{ documento?.numero }}</span>
+                </div>
+            </div>
+            <button class="rp-modal-close" (click)="cerrar()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <div class="rp-modal-body bg-[#F8FAFC]">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                <!-- Columna Izquierda: Info Principal -->
+                <div class="md:col-span-2 space-y-6">
+
+                    <!-- Card: Beneficiario -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Información del
+                            Beneficiario</h5>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Nombre / Razón
+                                    Social</label>
+                                <p class="text-sm font-bold text-slate-700 uppercase">{{ documento?.clienteBeneficiario
+                                    }}</p>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">N° Documento</label>
+                                <p class="text-sm font-semibold text-slate-600 font-mono">{{
+                                    dataAdicional?.numeroDocumento || '---' }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Concepto y Detalle -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Concepto de Pago
+                        </h5>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase">Descripción del
+                                    Servicio</label>
+                                <p
+                                    class="text-[13px] text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                    {{ dataAdicional?.pago?.conceptoPago || 'Sin concepto detallado' }}
+                                </p>
+                            </div>
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Tipo Documento</label>
+                                    <p class="text-xs font-medium text-slate-600">{{ documento?.tipoDocumento }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Método de Pago</label>
+                                    <p class="text-xs font-medium text-slate-600 uppercase">{{ dataAdicional?.metodoPago
+                                        || '---' }}</p>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Moneda</label>
+                                    <p class="text-xs font-medium text-slate-600">{{ documento?.moneda }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Detalle de Ítems (Sólo si hay carrito) -->
+                    <div *ngIf="carrito && carrito.length > 0"
+                        class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Detalle de Servicios
+                            / Ítems</h5>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="text-xs uppercase bg-slate-50 text-slate-500 border-b border-slate-200">
+                                    <tr>
+                                        <th class="px-4 py-3 font-semibold">Descripción</th>
+                                        <th class="px-4 py-3 font-semibold text-center w-20">Cant.</th>
+                                        <th class="px-4 py-3 font-semibold text-right w-28">Precio</th>
+                                        <th class="px-4 py-3 font-semibold text-right w-28">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of carrito; let last = last" [class.border-b]="!last"
+                                        class="border-slate-100 hover:bg-slate-50/50">
+                                        <td class="px-4 py-3 align-top">
+                                            <div class="font-medium text-slate-700">{{ item.nombre }}</div>
+                                            <div *ngIf="item.descuento > 0"
+                                                class="text-[10px] text-red-500 font-bold mt-0.5">
+                                                Descuento aplicado: -S/ {{ item.descuento | number:'1.2-2' }}
+                                            </div>
+                                        </td>
+                                        <td class="px-4 py-3 text-center align-top">{{ item.cantidad }}</td>
+                                        <td class="px-4 py-3 text-right align-top">S/ {{ item.precioFinal |
+                                            number:'1.2-2' }}</td>
+                                        <td class="px-4 py-3 text-right align-top font-medium text-slate-700">S/ {{
+                                            (item.precioFinal * item.cantidad) | number:'1.2-2' }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Auditoría y Totales -->
+                <div class="space-y-6">
+
+                    <!-- Card: Auditoría -->
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Auditoría</h5>
+                        <div class="space-y-3">
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-calendar-alt text-slate-300"></i>
+                                <div>
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase block">Fecha
+                                        Emisión</label>
+                                    <span class="text-xs font-bold text-slate-600">{{ documento?.fecha |
+                                        date:'dd/MM/yyyy HH:mm' }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-user text-slate-300"></i>
+                                <div>
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase block">Registrado
+                                        por</label>
+                                    <span class="text-xs font-bold text-slate-600 uppercase">{{ dataAdicional?.usuario
+                                        || '---' }}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <i class="fas fa-cash-register text-slate-300"></i>
+                                <div>
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase block">Caja /
+                                        Punto</label>
+                                    <span class="text-xs font-bold text-slate-600 uppercase">{{ dataAdicional?.caja ||
+                                        '---' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card: Totales (Highlight) -->
+                    <div class="bg-blue-600 p-6 rounded-2xl shadow-lg shadow-blue-200 text-white">
+                        <label class="text-[10px] font-bold text-blue-200 uppercase tracking-widest block mb-2">Total
+                            Documento</label>
+
+                        <!-- Si es honorario y tiene retención u otros descuentos comprobamos -->
+                        <div *ngIf="documento?.moduloOrigen === 'HONORARIOS' || documento?.moduloOrigen === 'PAGO_PERSONAL'"
+                            class="mb-4 space-y-2 border-b border-blue-500/50 pb-4">
+                            <div class="flex justify-between items-center text-sm font-medium">
+                                <span class="text-blue-200">Monto Bruto:</span>
+                                <span>{{ documento?.moneda === 'USD' ? '$' : 'S/' }} {{
+                                    (dataAdicional?.pagoOriginal?.montoBruto || documento?.total) | number:'1.2-2'
+                                    }}</span>
+                            </div>
+                            <div *ngIf="dataAdicional?.pagoOriginal?.retencion > 0"
+                                class="flex justify-between items-center text-sm font-bold text-red-200 drop-shadow-sm">
+                                <span>Retención (8%):</span>
+                                <span>-{{ documento?.moneda === 'USD' ? '$' : 'S/' }} {{
+                                    dataAdicional?.pagoOriginal?.retencion | number:'1.2-2' }}</span>
+                            </div>
+                            <div *ngIf="dataAdicional?.pagoOriginal?.otrosDescuentos > 0"
+                                class="flex justify-between items-center text-sm font-bold text-red-200 drop-shadow-sm">
+                                <span>Otros Descuentos:</span>
+                                <span>-{{ documento?.moneda === 'USD' ? '$' : 'S/' }} {{
+                                    dataAdicional?.pagoOriginal?.otrosDescuentos | number:'1.2-2' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-baseline gap-2">
+                            <span class="text-lg font-medium opacity-80">{{ documento?.moneda === 'USD' ? '$' : 'S/'
+                                }}</span>
+                            <span class="text-3xl font-black">{{ documento?.total | number:'1.2-2' }}</span>
+                        </div>
+                        <div
+                            class="mt-4 pt-4 border-t border-blue-500/50 flex justify-between items-center text-[10px] font-bold">
+                            <span class="uppercase tracking-widest">Estado:</span>
+                            <span class="bg-white/20 px-2 py-1 rounded-md uppercase">{{ documento?.estado }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="rp-modal-footer bg-white border-none py-6">
+            <button class="rp-btn rp-btn--ghost min-w-[120px]" (click)="cerrar()">
+                <i class="fas fa-arrow-left"></i> Volver
+            </button>
+            <div class="flex-1"></div>
+            <button class="rp-btn rp-btn--primary min-w-[150px] !bg-blue-600" (click)="cerrar()">
+                <i class="fas fa-check"></i> Finalizar Vista
+            </button>
+        </div>
+
+    </div>
+</div>

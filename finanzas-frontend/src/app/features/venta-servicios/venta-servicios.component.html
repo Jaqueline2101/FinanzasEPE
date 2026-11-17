@@ -1,0 +1,261 @@
+<div class="h-[calc(100vh-4rem)] w-full max-w-none bg-slate-50 flex overflow-hidden">
+    <!-- LEFT SIDEBAR -->
+    <div
+        class="w-80 md:w-96 flex-shrink-0 bg-white border-r border-slate-200 flex flex-col h-full z-10 relative shadow-sm">
+        <!-- Title and actions -->
+        <div class="p-4 flex items-center justify-between">
+            <h2 class="text-sm font-black text-slate-800 uppercase tracking-widest">{{ sidebarMode === 'PAQUETES' ?
+                'Paquetes' : 'Pendientes' }}</h2>
+            <div class="flex gap-2">
+                <button (click)="loadDashboardData()"
+                    class="px-3 py-1 rounded-lg text-slate-400 hover:text-indigo-600 hover:bg-slate-100 flex items-center gap-2 transition-colors border border-transparent hover:border-slate-200"
+                    title="Actualizar Datos">
+                    <i class="fas fa-sync-alt text-[10px]" [class.fa-spin]="isLoading"></i>
+                    <span class="text-[10px] font-black uppercase tracking-wider">Actualizar</span>
+                </button>
+                <button (click)="irAPaquetes()"
+                    [ngClass]="sidebarMode === 'PAQUETES' ? 'bg-indigo-600 text-white shadow-md' : 'bg-amber-100 text-amber-700 hover:bg-amber-500 hover:text-white border border-amber-200'"
+                    class="px-3 py-1 rounded-lg flex items-center justify-center transition-all text-[10px] font-black uppercase tracking-wider"
+                    [title]="sidebarMode === 'PAQUETES' ? 'Ver Pendientes' : 'Ver Paquetes'">
+                    {{ sidebarMode === 'PAQUETES' ? 'Pendientes' : 'Paquetes' }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Omnibox Search -->
+        <div class="px-4 pb-4 sticky top-0 z-20 bg-white">
+            <div class="relative group">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" [(ngModel)]="terminoBusqueda" (ngModelChange)="onOmniboxSearch($event)"
+                    [placeholder]="sidebarMode === 'PAQUETES' ? 'Buscar paquete...' : 'Buscar paciente o DNI...'"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 pl-9 pr-4 text-xs font-semibold text-slate-700 placeholder-slate-400 focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all outline-none shadow-sm">
+                <div *ngIf="loadingResultados" class="absolute right-3 top-1/2 -translate-y-1/2">
+                    <i class="fas fa-circle-notch fa-spin text-indigo-500 text-xs"></i>
+                </div>
+                <button *ngIf="!loadingResultados && terminoBusqueda" type="button"
+                    (click)="terminoBusqueda = ''; onOmniboxSearch('')"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- List -->
+        <div class="flex-1 overflow-y-auto px-4 pb-20 space-y-2 scrollbar-thin scrollbar-thumb-slate-200">
+            <!-- PENDIENTES MODE -->
+            <ng-container *ngIf="sidebarMode === 'PENDIENTES'; else paquetesList">
+                <!-- Search Results -->
+                <ng-container *ngIf="terminoBusqueda.trim().length > 0; else listaPendientes">
+                    <div *ngIf="!loadingResultados && resultadosBusqueda.length === 0"
+                        class="text-center p-6 text-slate-500 text-xs font-bold">
+                        No se encontraron coincidencias
+                    </div>
+                    <div *ngFor="let res of resultadosBusqueda" (click)="selectResult(res)"
+                        class="p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-indigo-300 hover:shadow-md hover:bg-slate-50 transition-all group">
+                        <div class="flex justify-between items-start mb-1">
+                            <span
+                                class="text-xs font-bold text-slate-800 group-hover:text-indigo-600 line-clamp-1 truncate pr-2">
+                                {{ res.type === 'ORDER' ? res.data.pacienteNombre : res.label }}
+                            </span>
+                            <span class="text-[9px] font-black px-1.5 py-0.5 rounded uppercase"
+                                [ngClass]="res.type === 'ORDER' ? 'bg-orange-100 text-orange-600 border border-orange-200' : 'bg-blue-100 text-blue-600 border border-blue-200'">
+                                {{ res.type === 'ORDER' ? 'ORDEN' : 'PACIENTE' }}
+                            </span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-medium">
+                            {{ res.type === 'ORDER' ? 'DNI: ' + res.data.pacienteDoc : res.subLabel }}
+                        </div>
+                    </div>
+                </ng-container>
+
+                <!-- Pending Orders -->
+                <ng-template #listaPendientes>
+                    <div *ngIf="!isLoading && ordenesPendientesGlobales.length === 0" class="text-center p-8 mt-4">
+                        <i class="fas fa-check-circle text-slate-200 justify-center mx-auto mb-3 text-4xl block"></i>
+                        <div class="text-xs font-black text-slate-400 uppercase">Sin pendientes</div>
+                    </div>
+
+                    <div *ngIf="isLoading && ordenesPendientesGlobales.length === 0" class="space-y-2">
+                        <div *ngFor="let i of [1,2,3,4,5]" class="h-20 bg-slate-100 animate-pulse rounded-xl"></div>
+                    </div>
+
+                    <div *ngFor="let orden of ordenesPendientesGlobales" (click)="buscarYCargarOrden(orden.idOrden)"
+                        [ngClass]="{'ring-2 ring-indigo-500 border-indigo-500 bg-indigo-50/50 shadow-md': ordenSeleccionada?.idOrden === orden.idOrden, 'bg-white border-slate-200': ordenSeleccionada?.idOrden !== orden.idOrden}"
+                        class="p-4 border rounded-2xl cursor-pointer hover:border-indigo-300 hover:shadow-md hover:bg-slate-50 transition-all group flex flex-col gap-2 relative overflow-hidden">
+                        
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-black text-slate-800 group-hover:text-indigo-600 truncate uppercase leading-tight mb-1">
+                                    {{ orden.pacienteNombre || 'Paciente Sin Nombre' }}
+                                </div>
+                                <div class="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
+                                    <i class="fas fa-id-card"></i>
+                                    <span>{{ orden.pacienteDoc || 'N/A' }}</span>
+                                </div>
+                            </div>
+                            <div class="text-[10px] font-black text-slate-300">#{{ orden.idOrden }}</div>
+                        </div>
+
+                        <div class="flex items-center gap-3 mt-1 pt-2 border-t border-slate-50">
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                                <i class="far fa-calendar-alt text-indigo-400"></i>
+                                {{ orden.fecha | date:'dd/MM/yyyy HH:mm' }}
+                            </div>
+                            <div class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400">
+                                <i class="fas fa-user-md text-emerald-400"></i>
+                                <span class="truncate max-w-[100px]">{{ orden.medicoNombre || 'Particular' }}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-end justify-between mt-1">
+                            <div>
+                                <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Total Orden</div>
+                                <div class="text-sm font-black text-indigo-600">S/ {{ (orden.totalEstimado || 0) | number:'1.2-2' }}</div>
+                            </div>
+                            <span [ngClass]="getTipoPacienteClass(orden)"
+                                class="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border shadow-sm">
+                                {{ getTipoPacienteLabel(orden) }}
+                            </span>
+                        </div>
+                    </div>
+                </ng-template>
+            </ng-container>
+
+            <!-- PAQUETES MODE -->
+            <ng-template #paquetesList>
+                <div *ngIf="!isLoading && paquetesSidebarFiltrados.length === 0" class="text-center p-8 mt-4">
+                    <i class="fas fa-box-open text-slate-200 justify-center mx-auto mb-3 text-4xl block"></i>
+                    <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sin paquetes
+                        disponibles</div>
+                </div>
+
+                <div *ngIf="isLoading && paquetesDisponibles.length === 0" class="space-y-2">
+                    <div *ngFor="let i of [1,2,3,4,5]"
+                        class="h-24 bg-slate-100 animate-pulse rounded-xl border border-slate-200"></div>
+                </div>
+
+                <div *ngFor="let pkg of paquetesSidebarFiltrados" (click)="onPaqueteSidebarClick(pkg)"
+                    class="p-3 bg-white border border-slate-200 rounded-2xl cursor-pointer hover:border-amber-300 hover:shadow-md hover:bg-amber-50/30 transition-all group flex flex-col gap-2 relative overflow-hidden">
+                    <div
+                        class="absolute left-0 top-0 bottom-0 w-1 bg-amber-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+
+                    <div class="flex justify-between items-start">
+                        <div
+                            class="font-bold text-slate-800 text-sm group-hover:text-amber-600 line-clamp-2 mr-2 leading-tight">
+                            {{ pkg.nombre }}
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] text-slate-500 font-medium line-clamp-2 leading-snug mb-1">
+                        {{ pkg.descripcion }}
+                    </div>
+
+                    <div class="flex gap-2 text-[9px] font-bold text-slate-400 mt-1">
+                        <span *ngIf="pkg.fechaInicio"
+                            class="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-1">
+                            <i class="far fa-calendar-alt"></i> Inicio: {{ pkg.fechaInicio | date:'dd/MM/yyyy' }}
+                        </span>
+                        <span *ngIf="pkg.fechaFin"
+                            class="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 flex items-center gap-1">
+                            <i class="far fa-calendar-check"></i> Fin: {{ pkg.fechaFin | date:'dd/MM/yyyy' }}
+                        </span>
+                    </div>
+
+                    <div class="flex items-end justify-between mt-2 pt-2 border-t border-slate-100">
+                        <div>
+                            <div
+                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                                PRECIO FINAL</div>
+                            <div class="text-sm font-black text-amber-600">S/ {{ getSumaPreciosFinalesPaquete(pkg) |
+                                number:'1.2-2' }}</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button (click)="toggleDetallePaquete(pkg, $event)"
+                                class="w-7 h-7 flex items-center justify-center rounded-lg bg-slate-50 text-slate-400 hover:bg-amber-100 hover:text-amber-600 transition-colors border border-slate-200"
+                                title="Ver detalles del paquete">
+                                <i class="fas" [ngClass]="pkg.expanded ? 'fa-eye-slash text-amber-500' : 'fa-eye'"></i>
+                            </button>
+                            <span
+                                class="text-[9px] font-black uppercase px-2 py-0.5 rounded-lg border border-amber-200 text-amber-700 bg-amber-50 shadow-sm flex items-center gap-1">
+                                <i class="fas fa-layer-group text-[8px]"></i>
+                                {{ pkg.servicios?.length || 0 }} serv.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Area expandible de servicios -->
+                    <div *ngIf="pkg.expanded" class="mt-3 pt-3 border-t border-dashed border-slate-200 animate-fadeIn"
+                        (click)="$event.stopPropagation()">
+                        <div class="text-[10px] font-bold text-slate-600 uppercase mb-2">Servicios Incluidos:</div>
+                        <div class="space-y-2">
+                            <div *ngFor="let s of pkg.servicios"
+                                class="bg-slate-50 rounded-lg p-2 border border-slate-100 flex flex-col gap-1">
+                                <div class="text-xs font-bold text-slate-700 leading-tight">
+                                    {{ s.nombreServicio || s.nombre }}
+                                    <span *ngIf="s.cantidad > 1" class="text-amber-500 ml-1 block text-[10px]">CANTIDAD:
+                                        x{{ s.cantidad }}</span>
+                                </div>
+                                <div class="flex items-center justify-between mt-1 text-[10px]">
+                                    <div class="text-slate-400 line-through">
+                                        Real: S/ {{ getPrecioRealServicioPaquete(s) | number:'1.2-2' }}
+                                    </div>
+                                    <div
+                                        class="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100">
+                                        Final: S/ {{ getPrecioFinalServicioPaquete(s) | number:'1.2-2' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="mt-3 flex flex-col justify-end items-end gap-1 text-xs font-black bg-amber-50/50 rounded-lg p-2 border border-amber-100">
+                            <div class="flex items-center gap-2 text-[10px] text-slate-400 font-medium">
+                                <span>TOTAL REAL:</span>
+                                <span class="line-through">S/ {{ getSumaPreciosRealesPaquete(pkg) | number:'1.2-2'
+                                    }}</span>
+                            </div>
+                            <div
+                                class="flex items-center gap-2 text-amber-600 border-t border-amber-100 pt-1 w-full justify-end">
+                                <span>TOTAL FINAL:</span>
+                                <span class="text-sm">S/ {{ getSumaPreciosFinalesPaquete(pkg) | number:'1.2-2' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+
+        <!-- Bottom User Info / Ver Todos -->
+        <div class="p-3 border-t border-slate-100 text-center bg-slate-50">
+            <a class="text-[10px] font-black text-indigo-500 uppercase hover:text-indigo-600 cursor-pointer transition-colors"
+                (click)="loadDashboardData()">Ver todas las órdenes</a>
+        </div>
+    </div>
+
+    <!-- RIGHT CONTENT -->
+    <div
+        class="flex-1 bg-slate-50/50 h-full overflow-y-auto relative rounded-tl-3xl shadow-inner border-t border-l border-slate-200">
+        <ng-container [ngSwitch]="currentView">
+
+            <ng-container *ngSwitchCase="'CHECKOUT'">
+                <div class="h-full w-full">
+                    <app-cobrar-servicio [paciente]="paciente" [ordenSeleccionada]="ordenSeleccionada"
+                        [(carrito)]="carrito" [tipoCliente]="tipoCliente" [idPlan]="manualConvenioId" [(totalVenta)]="totalVenta"
+                        [cacheBeneficios]="cacheBeneficios" (volver)="volverAlDashboard()"
+                        (procesarPago)="onProcesarPago($event)" (pacienteSeleccionado)="onPacienteSeleccionado($event)"
+                        (loadOrderById)="buscarYCargarOrden($event)" (registrarPaciente)="abrirModalRegistroPaciente()">
+                    </app-cobrar-servicio>
+
+                </div>
+            </ng-container>
+
+        </ng-container>
+    </div>
+
+    <!-- Modals -->
+    <app-registrar-paciente-modal #modalRegistroPaciente (pacienteRegistrado)="onPacienteRegistrado($event)"
+        (cerrarModal)="onCerrarModal()">
+    </app-registrar-paciente-modal>
+</div>

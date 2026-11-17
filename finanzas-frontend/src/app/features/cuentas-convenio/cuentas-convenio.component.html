@@ -1,0 +1,55 @@
+<div class="h-full bg-linear-to-br from-gray-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+    <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true"></app-breadcrumb>
+
+    <!-- Header Separado -->
+    <div class="mb-3">
+        <app-page-header title="Cuentas de Convenio" subtitle="Gestión de trabajadores asociados a convenios y seguros."
+            [showCounter]="true" [counterLabel]="'Total'" [counterValue]="filteredCuentas.length">
+        </app-page-header>
+    </div>
+
+    <!-- Contenedor Principal (Card) -->
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-6">
+        <div class="space-y-6 animate-fadeIn">
+            
+            <!-- Barra de Filtros Compartida -->
+            <app-barra-filtros 
+                [placeholder]="'Buscar por código, paciente, empresa o compañía...'" 
+                [searchOptions]="searchOptions"
+                (onFilter)="handleFilters($event)">
+            </app-barra-filtros>
+
+            <!-- Acciones -->
+            <div class="flex justify-end">
+                <button (click)="nuevaCuenta()"
+                    class="flex items-center gap-2 bg-[#00AEEF] hover:bg-[#0096ce] text-white px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-sky-500/30 font-bold whitespace-nowrap active:scale-95">
+                    <i class="fas fa-plus"></i>
+                    Nueva Cuenta
+                </button>
+            </div>
+
+            <!-- Tabla General -->
+            <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                <app-tabla-general [datos]="paginatedCuentas" [columnas]="columnas" [loading]="loading" [showViewDetails]="true"
+                    (onEdit)="onEdit($event)" (onDelete)="onDelete($event)"
+                    (viewDetails)="onDetailView($event)">
+                </app-tabla-general>
+            </div>
+
+            <!-- Paginación -->
+            <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                [recordsLabel]="'registros'" (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>
+
+<!-- Modales -->
+<app-modal-cuenta-convenio *ngIf="mostrarModal" [cuenta]="selectedCuenta" (onSave)="onSaveSuccess()"
+    (onClose)="closeModal()">
+</app-modal-cuenta-convenio>
+
+<app-modal-detalle-cuenta *ngIf="showDetailModal" [isOpen]="showDetailModal" [cuenta]="selectedCuenta"
+    (onClose)="closeModal()">
+</app-modal-detalle-cuenta>

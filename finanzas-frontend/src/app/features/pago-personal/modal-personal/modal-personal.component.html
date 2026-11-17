@@ -1,0 +1,148 @@
+<div class="animate-in fade-in slide-in-from-bottom-2 duration-400">
+    <!-- BODY -->
+    <form [formGroup]="form" class="space-y-6">
+
+        <!-- ── DATOS GENERALES ── -->
+        <div>
+            <div class="flex items-center gap-2 mb-4 border-l-4 border-blue-500 pl-3">
+                <i class="fas fa-file-invoice text-blue-500 text-[10px]"></i>
+                <h3 class="text-[11px] font-black text-slate-700 uppercase tracking-wider">Información del Pago</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="md:col-span-1">
+                    <label class="f-label">Tipo de Pago <span class="req">*</span></label>
+                    <select formControlName="tipoPago" class="f-input">
+                        <option value="SUELDO">SUELDO</option>
+                        <option value="ADELANTO">ADELANTO</option>
+                        <option value="CTS">CTS</option>
+                        <option value="BONO">BONO</option>
+                        <option value="COMISIÓN">COMISIÓN</option>
+                        <option value="REEMBOLSO">REEMBOLSO</option>
+                        <option value="OTRO">OTRO</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="f-label">Concepto del Pago <span class="req">*</span></label>
+                    <input type="text" formControlName="conceptoPago" placeholder="Ej: Pago de planilla mes de Enero"
+                        class="f-input">
+                </div>
+                <div>
+                    <label class="f-label">Fecha Pago <span class="req">*</span></label>
+                    <input type="date" formControlName="fechaPago" class="f-input">
+                </div>
+                <div>
+                    <label class="f-label">Mes <span class="req">*</span></label>
+                    <select formControlName="periodoMes" class="f-input">
+                        <option *ngFor="let mes of MESES" [value]="mes">{{ mes }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="f-label">Año <span class="req">*</span></label>
+                    <input type="number" formControlName="periodoAnio" class="f-input">
+                </div>
+            </div>
+        </div>
+
+        <!-- ── DATOS DEL TRABAJADOR ── -->
+        <div>
+            <div class="flex items-center gap-2 mb-4 border-l-4 border-indigo-500 pl-3">
+                <i class="fas fa-user-tag text-indigo-500 text-[10px]"></i>
+                <h3 class="text-[11px] font-black text-slate-700 uppercase tracking-wider">Datos del Trabajador</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div class="md:col-span-4 relative">
+                    <label class="f-label">N° Doc. (DNI/CE) <span class="req">*</span></label>
+                    <input type="text" formControlName="numeroDocumento" class="f-input"
+                           (focus)="onFieldFocus('dni')" (blur)="showSuggestions = false">
+                    
+                    <!-- Sugerencias DNI -->
+                    <div *ngIf="showSuggestions && currentSearchField === 'dni'" class="suggestions-box">
+                        <div *ngFor="let emp of filteredEmpleados" (mousedown)="seleccionarEmpleado(emp)" class="suggestion-item">
+                            <span class="font-bold">{{ emp.identificacion }}</span> - {{ emp.nombreCompleto }}
+                        </div>
+                    </div>
+                </div>
+                <div class="md:col-span-8 relative">
+                    <label class="f-label">Nombres Completos <span class="req">*</span></label>
+                    <input type="text" formControlName="nombreRazonSocial" class="f-input text-blue-700 font-bold"
+                        (focus)="onFieldFocus('nombre')" (blur)="showSuggestions = false">
+
+                    <!-- Sugerencias Nombre -->
+                    <div *ngIf="showSuggestions && currentSearchField === 'nombre'" class="suggestions-box">
+                        <div *ngFor="let emp of filteredEmpleados" (mousedown)="seleccionarEmpleado(emp)" class="suggestion-item">
+                            <span class="font-bold">{{ emp.nombreCompleto }}</span> ({{ emp.identificacion }})
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── DETALLE ECONÓMICO Y FORMA DE PAGO ── -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-4">
+            <!-- Izquierda: Importe -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 mb-2 border-l-4 border-emerald-500 pl-3">
+                    <i class="fas fa-calculator text-emerald-500 text-[10px]"></i>
+                    <h3 class="text-[11px] font-black text-slate-700 uppercase tracking-wider">Resumen Económico</h3>
+                </div>
+                <div class="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-3xl border border-slate-100 dark:border-slate-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Sueldo Base / Monto</label>
+                        <div class="flex items-center gap-2">
+                             <span class="text-xs font-black text-slate-400">S/</span>
+                             <input type="number" formControlName="sueldoBase"
+                                class="w-32 h-10 px-3 bg-white border border-slate-200 rounded-xl text-right font-black text-blue-600 outline-none focus:border-blue-500 transition-all">
+                        </div>
+                    </div>
+                    <div class="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                         <div class="flex justify-between items-end">
+                             <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Total Neto</span>
+                             <div class="text-right">
+                                 <span class="text-2xl font-black text-slate-800 dark:text-white">S/ {{ form.get('montoNeto')?.value | number:'1.2-2' }}</span>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Derecha: Forma de Pago -->
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 mb-2 border-l-4 border-blue-500 pl-3">
+                    <i class="fas fa-credit-card text-blue-500 text-[10px]"></i>
+                    <h3 class="text-[11px] font-black text-slate-700 uppercase tracking-wider">Forma de Pago</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2">
+                        <label class="f-label">Medio de Pago <span class="req">*</span></label>
+                        <select formControlName="medioPago" class="f-input">
+                            <option value="DEPÓSITO">DEPÓSITO A CUENTA</option>
+                            <option value="EFECTIVO">EFECTIVO</option>
+                            <option value="CHEQUE">CHEQUE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="f-label">Banco</label>
+                        <input type="text" formControlName="bancoDestino" class="f-input">
+                    </div>
+                    <div>
+                        <label class="f-label">Número de Cuenta</label>
+                        <input type="text" formControlName="numeroCuenta" class="f-input">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="flex justify-end gap-3 pt-8 mt-4 border-t border-slate-100 dark:border-slate-800">
+            <button (click)="close()" type="button"
+                class="px-8 py-3 rounded-2xl border-2 border-slate-100 text-[10px] font-black text-slate-400 hover:bg-slate-50 transition-all uppercase tracking-widest">
+                Cancelar
+            </button>
+            <button (click)="save()" [disabled]="form.invalid" type="button"
+                class="px-10 py-3 rounded-2xl bg-indigo-600 text-[10px] font-black text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-30 uppercase tracking-widest flex items-center gap-2">
+                <i class="fas fa-save text-[10px]"></i>
+                Guardar Pago
+            </button>
+        </div>
+    </form>
+</div>

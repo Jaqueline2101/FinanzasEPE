@@ -1,0 +1,173 @@
+<app-modal [isOpen]="visible" title="Registrar Nuevo Paciente" size="lg" (modalClose)="cerrar()">
+    <!-- Form -->
+    <form [formGroup]="pacienteForm" (ngSubmit)="guardar()" class="space-y-4">
+        <!-- Datos Personales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+                <input type="text" id="nombre" formControlName="nombre"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="apepat" class="block text-sm font-medium text-gray-700 mb-1">Apellido Paterno
+                    *</label>
+                <input type="text" id="apepat" formControlName="apepat"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="apemat" class="block text-sm font-medium text-gray-700 mb-1">Apellido
+                    Materno</label>
+                <input type="text" id="apemat" formControlName="apemat"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="nacfec" class="block text-sm font-medium text-gray-700 mb-1">Fecha Nacimiento
+                    *</label>
+                <input type="date" id="nacfec" formControlName="nacfec"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="tipodoc" class="block text-sm font-medium text-gray-700 mb-1">Tipo Documento
+                    *</label>
+                <select id="tipodoc" formControlName="tipodoc"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Seleccione...</option>
+                    <option *ngFor="let tipo of tiposDocumento" [value]="tipo.value">{{tipo.label}}</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="numdoc" class="block text-sm font-medium text-gray-700 mb-1">Número Documento
+                    *</label>
+                <input type="text" id="numdoc" formControlName="numdoc" maxlength="8"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="pacienteForm.get('numdoc')?.invalid && pacienteForm.get('numdoc')?.touched || dniRegistrado">
+                <div *ngIf="pacienteForm.get('numdoc')?.touched">
+                    <p *ngIf="pacienteForm.get('numdoc')?.errors?.['required']" class="text-xs text-red-500 mt-1">
+                        El número de documento es obligatorio
+                    </p>
+                    <p *ngIf="pacienteForm.get('numdoc')?.errors?.['pattern']" class="text-xs text-red-500 mt-1">
+                        El DNI debe tener exactamente 8 dígitos numéricos
+                    </p>
+                    <p *ngIf="dniRegistrado" class="text-xs text-red-500 mt-1 font-bold">
+                        ¡Este DNI ya se encuentra registrado en la base de datos!
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <label for="sexo" class="block text-sm font-medium text-gray-700 mb-1">Sexo *</label>
+                <select id="sexo" formControlName="sexo"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">Seleccione...</option>
+                    <option *ngFor="let s of sexos" [value]="s.value">{{s.label}}</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="fonLocal" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <input type="tel" id="fonLocal" formControlName="fonLocal"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" formControlName="email"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [class.border-red-500]="pacienteForm.get('email')?.invalid && pacienteForm.get('email')?.touched || emailRegistrado">
+                <div *ngIf="pacienteForm.get('email')?.touched">
+                    <p *ngIf="pacienteForm.get('email')?.errors?.['email']" class="text-xs text-red-500 mt-1">
+                        El formato del correo electrónico no es válido
+                    </p>
+                    <p *ngIf="emailRegistrado" class="text-xs text-red-500 mt-1 font-bold">
+                        ¡Este correo electrónico ya se encuentra registrado!
+                    </p>
+                </div>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="direcc" class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                <textarea id="direcc" formControlName="direcc" rows="2"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 my-4"></div>
+
+        <!-- Familiar de Trabajador -->
+        <div class="space-y-4">
+            <div class="flex items-center">
+                <input type="checkbox" id="esFamiliar" formControlName="esFamiliar"
+                    class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                <label for="esFamiliar" class="ml-2 text-sm font-medium text-gray-700">
+                    Es familiar de trabajador
+                </label>
+            </div>
+
+            <div *ngIf="esFamiliar" class="space-y-4 pl-6 border-l-2 border-blue-200">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="dniTrabajador" class="block text-sm font-medium text-gray-700 mb-1">DNI
+                            Trabajador *</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="dniTrabajador" formControlName="dniTrabajador"
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <button type="button" (click)="validarTrabajador()" [disabled]="validandoTrabajador"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400">
+                                {{validandoTrabajador ? 'Validando...' : 'Validar'}}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div *ngIf="trabajadorValido"
+                        class="flex items-center p-3 bg-green-50 border border-green-200 rounded-md">
+                        <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm text-green-700">{{nombreTrabajador}}</span>
+                    </div>
+
+                    <div *ngIf="!trabajadorValido && !validandoTrabajador && pacienteForm.get('dniTrabajador')?.touched"
+                        class="flex items-center p-3 bg-red-50 border border-red-200 rounded-md">
+                        <svg class="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm text-red-700">DNI no válido</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label for="parentesco" class="block text-sm font-medium text-gray-700 mb-1">Parentesco
+                        *</label>
+                    <select id="parentesco" formControlName="parentesco"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Seleccione...</option>
+                        <option *ngFor="let p of parentescos" [value]="p.value">{{p.label}}</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div footer class="flex justify-end gap-3">
+            <button type="button" (click)="cerrar()"
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
+                Cancelar
+            </button>
+            <button type="submit" (click)="guardar()"
+                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                [disabled]="pacienteForm.invalid || dniRegistrado || emailRegistrado || validandoDni || validandoEmail">
+                Guardar
+            </button>
+        </div>
+    </form>
+</app-modal>

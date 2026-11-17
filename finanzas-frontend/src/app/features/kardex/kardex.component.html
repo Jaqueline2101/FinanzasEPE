@@ -1,0 +1,78 @@
+<div class="min-h-screen bg-slate-50/50 pb-10 pt-6 px-4 sm:px-6 lg:px-8">
+  <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+
+  <!-- Header -->
+  <app-page-header title="Kardex de Inventario" subtitle="Movimientos, trazabilidad de lotes y alertas de vencimiento"
+    iconType="examenes" [showCounter]="true" counterLabel="Movimientos" [counterValue]="movimientos.length"
+    gradientFrom="from-indigo-700" gradientTo="to-slate-900">
+  </app-page-header>
+
+  <!-- Acciones Superiores -->
+  <div class="flex justify-end mt-6">
+    <button (click)="exportarExcel()"
+      class="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-lg shadow-emerald-200 transition-all active:scale-95 uppercase tracking-wider">
+      <i class="fas fa-file-excel text-sm"></i> Exportar Excel
+    </button>
+  </div>
+
+  <!-- CARD UNIFICADO (FILTROS + TABLA) -->
+  <div class="mt-4 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+
+    <!-- FILTROS UNIFICADOS (Sin borde inferior) -->
+    <div class="px-6 py-5">
+      <app-barra-filtros placeholder="Buscar producto..." [showDates]="true" [estadoOptions]="sucursalOptions"
+        statusLabel="Establecimiento" (onFilter)="handleFilter($event)">
+      </app-barra-filtros>
+    </div>
+
+    <!-- Metadata Row (Dentro del card) -->
+    <div class="flex gap-2 text-[10px] mb-4 px-6">
+      <span
+        class="px-2 py-1 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-md font-bold uppercase tracking-wider flex items-center gap-1">
+        <i class="fas fa-check-circle"></i> FEFO Activo
+      </span>
+      <span
+        class="px-2 py-1 bg-amber-50 text-amber-600 border border-amber-100 rounded-md font-bold uppercase tracking-wider flex items-center gap-1">
+        <i class="fas fa-calculator"></i> PMP Calculado
+      </span>
+    </div>
+
+    <!-- Contenedor de Tabla -->
+    <div class="relative min-h-[400px]">
+      <!-- Loading -->
+      <div *ngIf="isLoading"
+        class="absolute inset-0 bg-white/70 backdrop-blur-sm z-10 flex items-center justify-center">
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-sm font-medium text-slate-500">Cargando kardex...</span>
+        </div>
+      </div>
+
+      <!-- Tabla con estilo Premium -->
+      <div *ngIf="!isLoading && movimientos.length > 0" @fadeIn class="p-6 pt-0">
+        <app-tabla-general [columnas]="columnas" [datos]="movimientos" [showEdit]="false" [showDelete]="false"
+          [showViewDetails]="true" tituloAcciones="Auditoría" (viewDetails)="verDetalles($event)">
+        </app-tabla-general>
+
+        <!-- Paginación -->
+        <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+          (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && movimientos.length === 0"
+        class="flex flex-col items-center justify-center py-20 text-slate-400">
+        <i class="fas fa-folder-open text-5xl mb-4 opacity-20"></i>
+        <p class="font-medium">No hay movimientos registrados aún.</p>
+        <p class="text-sm mt-1">Registro un nuevo producto para que aparezca aquí.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-kardex 
+    [visible]="modalVisible" 
+    [movimiento]="selectedMovimiento" 
+    (onClose)="modalVisible = false">
+</app-modal-kardex>

@@ -1,0 +1,187 @@
+<div class="animate-fadeIn p-6 min-h-screen bg-slate-50 dark:bg-slate-950">
+    
+    <!-- 1. Breadcrumb -->
+    <div class="mb-4">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <!-- 2. Header -->
+    <div class="mb-4">
+        <app-page-header 
+            title="Reporte de Valorización de Inventario" 
+            [showCounter]="true"
+            counterLabel="Productos"
+            [counterValue]="resumen.totalProductos"
+            iconType="chart">
+        </app-page-header>
+    </div>
+
+    <!-- 3. INDICADORES (KPI Cards) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        
+        <!-- Valor Total -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <i class="fa-solid fa-sack-dollar text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Valor Inventario</p>
+                    <p class="text-xl font-bold text-slate-800 dark:text-white">{{ resumen.valorTotalInventario | currency:'PEN' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Productos -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+                    <i class="fa-solid fa-boxes-stacked text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Productos</p>
+                    <p class="text-xl font-bold text-slate-800 dark:text-white">{{ resumen.totalProductos }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sin Stock -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Sin Stock</p>
+                    <p class="text-xl font-bold text-rose-600 dark:text-rose-400">{{ resumen.productosSinStock }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Bajo -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+                    <i class="fa-solid fa-arrow-trend-down text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Stock Bajo</p>
+                    <p class="text-xl font-bold text-orange-600 dark:text-orange-400">{{ resumen.productosStockBajo }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos a Vencer -->
+        <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <i class="fa-solid fa-calendar-xmark text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Vence < 90d</p>
+                    <p class="text-xl font-bold text-amber-600 dark:text-amber-400">{{ resumen.productosProximosVencer }}</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 4. GRÁFICOS Y ANALÍTICA -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <!-- Valorización por Categoría -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-blue-500"></i>
+                Valorización por Categoría
+            </h3>
+            <div class="space-y-4">
+                <div *ngFor="let cat of getCategorias()" class="space-y-1">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-slate-600 dark:text-slate-400">{{ cat }}</span>
+                        <span class="font-bold text-slate-800 dark:text-slate-200">{{ resumen.valorizacionPorCategoria[cat] | currency:'PEN' }}</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div class="bg-blue-500 h-full rounded-full transition-all duration-500" 
+                             [style.width.%]="(resumen.valorizacionPorCategoria[cat] / resumen.valorTotalInventario) * 100">
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="!getCategorias().length" class="text-center py-8 text-slate-400 italic">
+                    Cargando datos analíticos...
+                </div>
+            </div>
+        </div>
+
+        <!-- Top 5 Productos más Valorizados -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <i class="fa-solid fa-ranking-star text-amber-500"></i>
+                Productos con Mayor Valor
+            </h3>
+            <div class="space-y-4">
+                <div *ngFor="let prod of getTopProductos(); let i = index" class="flex items-center gap-4">
+                    <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-slate-500">
+                        {{ i + 1 }}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">{{ prod }}</p>
+                        <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mt-1 overflow-hidden">
+                            <div class="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                                 [style.width.%]="(resumen.topProductosValorizados[prod] / resumen.valorTotalInventario) * 1000"> <!-- Multiplicador para visibilidad -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-sm font-bold text-slate-700 dark:text-slate-300">
+                        {{ resumen.topProductosValorizados[prod] | currency:'PEN' }}
+                    </div>
+                </div>
+                <div *ngIf="!getTopProductos().length" class="text-center py-8 text-slate-400 italic">
+                    Sin datos disponibles
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 5. TABLA PRINCIPAL -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        
+        <!-- Barra de Filtros -->
+        <div class="p-4 border-b border-slate-50 dark:border-slate-800">
+            <app-barra-filtros 
+                placeholder="Buscar por nombre o código..."
+                [searchOptions]="searchOptions"
+                [estadoOptions]="estadoOptions"
+                statusLabel="Estado de Stock"
+                (onFilter)="handleFilter($event)">
+            </app-barra-filtros>
+        </div>
+
+        <!-- Table Area -->
+        <div class="overflow-hidden px-4 py-2">
+            <app-tabla-general 
+                [datos]="detalle" 
+                [columnas]="columnasTabla"
+                [loading]="isLoading"
+                [showIndex]="true"
+                [autoSort]="false"
+                [currentPage]="paginaActual"
+                [pageSize]="tamanoPagina"
+                [showActions]="false">
+            </app-tabla-general>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 bg-slate-50/30 dark:bg-slate-800/50 border-t border-slate-50 dark:border-slate-800">
+            <app-pagination 
+                [currentPage]="paginaActual" 
+                [pageSize]="tamanoPagina" 
+                [totalPages]="totalPaginas"
+                (pageChange)="onPageChange($event)" 
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+
+</div>

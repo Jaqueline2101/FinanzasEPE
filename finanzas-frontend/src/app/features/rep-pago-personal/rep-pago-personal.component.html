@@ -1,0 +1,65 @@
+<div class="animate-fadeIn p-6 min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div class="mb-4">
+        <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true" [showBackButton]="true"></app-breadcrumb>
+    </div>
+
+    <div class="mb-4">
+        <app-page-header 
+            title="Reporte de Pagos de Personal" 
+            [showCounter]="true"
+            counterLabel="Pagos"
+            [counterValue]="allPagos.length"
+            iconType="users">
+        </app-page-header>
+    </div>
+
+    <!-- Acciones Superiores -->
+    <div class="flex justify-end items-center mb-6">
+        <button (click)="exportarExcel()" 
+                class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-2 text-[12px] uppercase tracking-wider">
+            <i class="fa-solid fa-file-excel text-lg"></i>
+            <span>Exportar Excel</span>
+        </button>
+    </div>
+
+    <!-- Unified Card (Filters + Table) -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden">
+        
+        <!-- Barra de Filtros -->
+        <div class="p-4">
+            <app-barra-filtros 
+                placeholder="Buscar por trabajador o documento..."
+                [showStatus]="false"
+                (onFilter)="handleFilter($event)">
+            </app-barra-filtros>
+        </div>
+
+        <!-- Table Area -->
+        <div class="overflow-hidden px-4">
+            <app-tabla-general 
+                [columnas]="columnas" 
+                [datos]="recentPagos" 
+                [loading]="loading"
+                [showIndex]="true"
+                [autoSort]="false"
+                [showEdit]="false" 
+                [showDelete]="false" 
+                [showViewDetails]="false" 
+                [showActions]="false"
+                [currentPage]="paginaActual"
+                [pageSize]="tamanoPagina">
+            </app-tabla-general>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4 bg-slate-50/30 dark:bg-slate-800/50">
+            <app-pagination 
+                [currentPage]="paginaActual" 
+                [pageSize]="tamanoPagina" 
+                [totalPages]="totalPaginas"
+                (pageChange)="onPageChange($event)" 
+                (pageSizeChange)="onPageSizeChange($event)">
+            </app-pagination>
+        </div>
+    </div>
+</div>

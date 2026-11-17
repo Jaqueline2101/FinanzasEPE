@@ -1,0 +1,88 @@
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Asegurar que el fondo cubra toda la pantalla */
+.min-h-screen {
+  min-height: 100vh;
+}
+
+/* =========================================
+   LOGIN DARK MODE SPECIFIC STYLES
+   ========================================= */
+
+/* Login Container Background Dark Mode Override */
+:host-context(.dark) .login-container {
+  background-color: #0f172a !important;
+  /* Fondo general oscuro */
+}
+
+/* Glassmorphism Card in Dark Mode */
+:host-context(.dark) .bg-white\/80,
+:host-context(.dark) .backdrop-blur-md {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+  /* slate-800 con transparencia */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Titles in Login */
+:host-context(.dark) h1,
+:host-context(.dark) h2,
+:host-context(.dark) .text-slate-800 {
+  color: #f8fafc !important;
+  /* slate-50 */
+}
+
+:host-context(.dark) .text-slate-500 {
+  color: #94a3b8 !important;
+  /* slate-400 */
+}
+
+/* Inputs in Login */
+:host-context(.dark) input {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  /* slate-900 transparent */
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+}
+
+:host-context(.dark) input:focus {
+  border-color: #3b82f6 !important;
+  background-color: rgba(15, 23, 42, 1) !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* Label & Icons */
+:host-context(.dark) label,
+:host-context(.dark) i.fas,
+:host-context(.dark) i.far {
+  color: #cbd5e1 !important;
+  /* slate-300 */
+}
+
+/* Login Button Glow */
+:host-context(.dark) button.bg-blue-600 {
+  box-shadow: 0 0 15px rgba(37, 99, 235, 0.5);
+}
+
+/* Checkbox specific */
+:host-context(.dark) input[type="checkbox"] {
+  accent-color: #3b82f6;
+}
+
+/* Footer links */
+:host-context(.dark) a {
+  color: #60a5fa !important;
+}

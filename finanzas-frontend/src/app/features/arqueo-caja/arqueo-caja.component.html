@@ -1,0 +1,130 @@
+<div
+    class="h-full bg-linear-to-br from-gray-50 to-slate-50 dark:from-slate-900 dark:to-slate-800 p-4 md:p-6 min-w-0 transition-all duration-300 ease-in-out">
+    <app-breadcrumb [items]="breadcrumbItems" [showIcon]="true"></app-breadcrumb>
+
+    <!-- Header Section -->
+    <div class="mb-6">
+        <app-page-header title="Arqueo de Caja"
+            subtitle="Audita y registra el cierre de caja verificando el dinero físico contra el sistema."
+            [showCounter]="false">
+        </app-page-header>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        <!-- Tarjeta de Arqueo (Izquierda) -->
+        <div
+            class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-6 flex flex-col h-full animate-slideUp">
+            <h3
+                class="text-base font-bold text-slate-800 dark:text-white mb-4 border-b border-slate-100 dark:border-slate-700 pb-2">
+                <i class="fas fa-calculator text-blue-500 mr-2"></i> Nuevo Cierre
+            </h3>
+
+            <!-- Saldo del Sistema -->
+            <div
+                class="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 flex justify-between items-center border border-slate-100 dark:border-slate-700 mb-4">
+                <div>
+                    <span class="text-xs uppercase font-bold text-slate-500">Saldo del Sistema</span>
+                    <p class="text-[10px] text-slate-400">Ingresos - Egresos (No Bancarios)</p>
+                </div>
+                <div class="text-lg font-bold text-slate-800 dark:text-white">
+                    S/ {{ saldoEsperado() | number:'1.2-2' }}
+                </div>
+            </div>
+
+            <!-- Entrada de Efectivo Físico -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Dinero Físico Total
+                    (S/)</label>
+                <input type="number" [(ngModel)]="saldoFisico" placeholder="0.00" step="0.01" min="0"
+                    (focus)="$any($event.target).select()"
+                    class="w-full text-lg p-3 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white dark:bg-slate-900 text-slate-800 dark:text-white transition-shadow text-right font-bold">
+            </div>
+
+            <!-- Calculo de Diferencia -->
+            <div class="mb-4 flex items-center justify-between px-2">
+                <span class="text-sm font-bold text-slate-600 dark:text-slate-300">Diferencia:</span>
+                <span class="text-lg font-bold"
+                    [ngClass]="diferencia === 0 ? 'text-green-500' : (diferencia < 0 ? 'text-red-500' : 'text-blue-500')">
+                    S/ {{ diferencia | number:'1.2-2' }}
+                    <span class="text-[10px] ml-1 opacity-80" *ngIf="diferencia < 0">(Faltante)</span>
+                    <span class="text-[10px] ml-1 opacity-80" *ngIf="diferencia > 0">(Sobrante)</span>
+                    <span class="text-[10px] ml-1 text-green-500" *ngIf="diferencia === 0"><i
+                            class="fas fa-check-circle"></i> Cuadrado</span>
+                </span>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="mb-6 flex-1">
+                <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-2">Observaciones</label>
+                <textarea [(ngModel)]="observaciones" rows="3"
+                    placeholder="Ej. Billetes deteriorados, error en un vuelto, etc."
+                    class="w-full text-sm p-3 border border-slate-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white dark:bg-slate-900 text-slate-800 dark:text-white resize-none"></textarea>
+            </div>
+
+            <!-- Action Button -->
+            <button (click)="registrarArqueo()"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-blue-500/30 transition-all active:scale-[0.98] flex justify-center items-center">
+                <i class="fas fa-save mr-2"></i> Registrar Arqueo
+            </button>
+        </div>
+
+        <!-- Tabla Historial (Derecha) -->
+        <div class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 p-6 animate-slideUp"
+            style="animation-delay: 100ms;">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h3 class="text-base font-bold text-slate-800 dark:text-white mb-4 sm:mb-0">
+                    <i class="fas fa-history text-slate-400 mr-2"></i> Historial de Arqueos
+                </h3>
+
+                <!-- Filter Date Group -->
+                <div
+                    class="flex flex-col sm:flex-row items-end gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-100 dark:border-slate-700">
+                    <div class="flex items-center gap-2">
+                        <label
+                            class="text-[10px] sm:text-xs font-bold text-slate-500 px-1 hidden lg:block">Desde:</label>
+                        <input type="date" [(ngModel)]="fechaInicio"
+                            class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 outline-none w-[130px]">
+
+                        <label
+                            class="text-[10px] sm:text-xs font-bold text-slate-500 px-1 hidden lg:block">Hasta:</label>
+                        <input type="date" [(ngModel)]="fechaFin"
+                            class="p-2 border border-slate-200 dark:border-slate-700 rounded-lg text-xs bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 outline-none w-[130px]">
+                    </div>
+
+                    <div class="flex gap-1 w-full sm:w-auto mt-2 sm:mt-0">
+                        <button (click)="onDateChange()"
+                            class="flex-1 sm:flex-none bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400 px-3 py-2 rounded-lg text-xs font-bold transition-colors">
+                            <i class="fas fa-search"></i>
+                        </button>
+                        <button (click)="restablecer()"
+                            class="flex-1 sm:flex-none bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 px-3 py-2 rounded-lg text-xs font-bold transition-colors">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Table -->
+            <!-- Data Table -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <app-tabla-general [datos]="historial()" [columnas]="columnas" [showEdit]="false" [showDelete]="false"
+                    [showActions]="false" (onLinkAction)="onDetailView($event)" [loading]="loading()">
+                </app-tabla-general>
+            </div>
+
+            <app-modal-detalle-arqueo *ngIf="showDetailModal" [isOpen]="showDetailModal" [arqueo]="selectedArqueo"
+                (modalClose)="closeDetailModal()">
+            </app-modal-detalle-arqueo>
+
+            <!-- Pagination -->
+            <div class="mt-4">
+                <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [pageSize]="pageSize"
+                    (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
+                </app-pagination>
+            </div>
+
+        </div>
+
+    </div>
+</div>
