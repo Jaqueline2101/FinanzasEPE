@@ -25,5 +25,5 @@ COPY --from=build /app/finanzas-backend/target/*.jar app.jar
 ENV PORT=8080
 EXPOSE 8080
 
-# Control de memoria JVM optimizado para el contenedor en Render (Free tier: 512MB RAM)
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]
+# Control estricto de memoria JVM para no sobrepasar nunca los 512MB de Render
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:+UseSerialGC", "-Xms64m", "-Xmx220m", "-XX:MaxMetaspaceSize=110m", "-XX:ReservedCodeCacheSize=48m", "-Xss512k", "-jar", "app.jar"]
