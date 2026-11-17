@@ -9,8 +9,8 @@ import java.util.Map;
 @RestController
 public class RootController {
 
-    @GetMapping("/")
-    public ResponseEntity<Map<String, Object>> root() {
+    @GetMapping("/api/status")
+    public ResponseEntity<Map<String, Object>> status() {
         return ResponseEntity.ok(Map.of(
                 "status", "UP",
                 "app", "Finanzas Backend API",
@@ -20,4 +20,3 @@ public class RootController {
         ));
     }
 }
-

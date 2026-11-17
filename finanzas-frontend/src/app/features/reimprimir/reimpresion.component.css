@@ -4,7 +4,8 @@
    Paleta: Azul profundo #0F1C3F, Acento #2563EB, Blanco roto #F8F9FC
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+/* Fuente cargada globalmente en index.html */
+/* @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap'); */
 
 /* ── Variables ─────────────────────────────────────────── */
 :root {
