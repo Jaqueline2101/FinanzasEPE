@@ -42,27 +42,27 @@ public class Kardex {
     @Column(name = "id_usuario", nullable = false)
     private Long idUsuario;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_catalogo", insertable = false, updatable = false)
     @JsonIncludeProperties({ "id", "nombre" })
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @NotFound(action = NotFoundAction.IGNORE)
     private Catalogo catalogo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_alm_articulo", insertable = false, updatable = false)
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @NotFound(action = NotFoundAction.IGNORE)
     private Producto producto; // This is the batch/lot record
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_sucursal", insertable = false, updatable = false)
     @JsonIncludeProperties({ "idSucursal", "nombreSucursal" })
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @NotFound(action = NotFoundAction.IGNORE)
     private Sucursal sucursal;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
     @JsonIncludeProperties({ "id", "nombre" })
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
@@ -129,7 +129,7 @@ public class Kardex {
     @Column(name = "id_clasificacion")
     private Long idClasificacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_clasificacion", insertable = false, updatable = false)
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @NotFound(action = NotFoundAction.IGNORE)

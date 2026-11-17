@@ -62,7 +62,7 @@ public class Catalogo {
     @Column(name = "margen_ganancia", precision = 12, scale = 4)
     private BigDecimal margenGanancia;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_nivel", nullable = false)
     @JsonIgnoreProperties({ "nivelesHijos", "nivelPadre", "hibernateLazyInitializer", "handler" })
     @org.hibernate.annotations.NotFound(action = org.hibernate.annotations.NotFoundAction.IGNORE)

@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=build /app/finanzas-backend/target/*.jar app.jar
 
 # Render expone el servicio dinámicamente mediante la variable de entorno PORT
+ENV PORT=8080
 EXPOSE 8080
 
 # Control de memoria JVM optimizado para el contenedor en Render (Free tier: 512MB RAM)
