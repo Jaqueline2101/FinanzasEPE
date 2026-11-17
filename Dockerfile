@@ -21,9 +21,9 @@ WORKDIR /app
 # Copiamos el JAR generado desde la etapa de compilación
 COPY --from=build /app/finanzas-backend/target/*.jar app.jar
 
-# Render expone el servicio dinámicamente mediante la variable de entorno PORT
-ENV PORT=8080
+# Render usa el puerto 10000 por defecto para servicios web
+EXPOSE 10000
 EXPOSE 8080
 
 # Control de memoria JVM optimizado para el plan gratuito de Render (512MB RAM)
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:+UseSerialGC", "-Xms64m", "-Xmx180m", "-XX:MaxMetaspaceSize=180m", "-XX:ReservedCodeCacheSize=32m", "-Xss512k", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:+UseSerialGC", "-Xms64m", "-Xmx200m", "-XX:MaxMetaspaceSize=200m", "-XX:ReservedCodeCacheSize=48m", "-Xss512k", "-jar", "app.jar"]
