@@ -56,7 +56,6 @@ public class DataInitializer implements CommandLineRunner {
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    @Transactional
     public void run(String... args) throws Exception {
         log.info("🚀 Starting Clean Professional System Seeding (JSON-Driven)...");
 

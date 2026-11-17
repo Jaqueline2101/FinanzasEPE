@@ -27,14 +27,14 @@ public class AuditService {
 
     private final AuditRepository auditRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void logAction(String module, String action, String details,
             String username, Long userId, String ipAddress,
             String status, String userAgent, String url, String method) {
         logAction(module, action, details, username, userId, ipAddress, status, userAgent, url, method, null, null);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void logAction(String module, String action, String details,
             String username, Long userId, String ipAddress,
             String status, String userAgent, String url, String method,

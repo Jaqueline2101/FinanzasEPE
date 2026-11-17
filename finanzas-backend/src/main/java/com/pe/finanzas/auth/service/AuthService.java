@@ -38,7 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
 public class AuthService {
 
         private final DatosPersonalesRepository datosPersonalesRepository;
@@ -258,6 +257,7 @@ public class AuthService {
                 }
         }
 
+        @Transactional
         public RegisterResponse register(RegisterRequest request) {
                 log.info("Register attempt for username: {}", request.getUsername());
 

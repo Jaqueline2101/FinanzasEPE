@@ -82,12 +82,13 @@ public class DataSourceConfig {
             config.setPassword(defaultPassword);
         }
 
-        // Ajustes de resiliencia HikariCP para entornos cloud (optimizado para 512MB RAM)
-        config.setMaximumPoolSize(3);
-        config.setMinimumIdle(1);
-        config.setConnectionTimeout(20000); // 20 segundos
+        // Ajustes de resiliencia HikariCP para entornos cloud (robusto ante picos concurrentes)
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000); // 30 segundos
         config.setIdleTimeout(300000);      // 5 minutos
         config.setMaxLifetime(600000);      // 10 minutos
+        config.setLeakDetectionThreshold(10000); // Alerta si una conexion tarda mas de 10s
 
         return new HikariDataSource(config);
     }
