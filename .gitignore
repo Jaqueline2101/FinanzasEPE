@@ -3,3 +3,6 @@ run.log
 target/
 target/
 .idea/
+
+.m2/
+
