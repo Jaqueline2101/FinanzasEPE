@@ -45,31 +45,21 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. Endpoints publicos de la API y documentacion
                         .requestMatchers(
-                                "/",
-                                "/index.html",
-                                "/*.js",
-                                "/*.css",
-                                "/*.ico",
-                                "/*.png",
-                                "/*.jpg",
-                                "/assets/**",
+                                "/api/auth/**",
                                 "/api/status",
-                                "/api/auth/login",
-                                "/api/auth/register",
-                                "/api/auth/health",
-                                "/api/auth/refresh-token",
-                                "/api/auth/token-info",
-                                "/api/auth/logout",
-                                // Swagger UI
+                                "/api/test-notifications/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
-                                "/error",
-                                "/api/auth/**",
-                                "/api/test-notifications/**")
-                        .permitAll()
-                        .anyRequest().authenticated())
+                                "/error"
+                        ).permitAll()
+                        // 2. Endpoints protegidos de la API (requieren token JWT)
+                        .requestMatchers("/api/**").authenticated()
+                        // 3. Frontend Angular SPA y recursos estaticos (permite cargar index.html, JS, CSS, imagenes y rutas como /login)
+                        .anyRequest().permitAll()
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter,
                         org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);

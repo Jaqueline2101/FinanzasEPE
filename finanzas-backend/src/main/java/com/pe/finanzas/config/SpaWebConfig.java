@@ -24,8 +24,9 @@ public class SpaWebConfig implements WebMvcConfigurer {
                         if (requestedResource.exists() && requestedResource.isReadable()) {
                             return requestedResource;
                         }
-                        // Si la ruta no es un archivo físico ni una llamada API, devolvemos index.html para Angular Router
-                        if (!resourcePath.startsWith("api") && !resourcePath.startsWith("swagger-ui") && !resourcePath.startsWith("v3")) {
+                        // Si la ruta no es un archivo físico ni una llamada API ni Swagger, devolvemos index.html para Angular Router
+                        String cleanPath = resourcePath.startsWith("/") ? resourcePath.substring(1) : resourcePath;
+                        if (!cleanPath.startsWith("api") && !cleanPath.startsWith("swagger-ui") && !cleanPath.startsWith("v3")) {
                             return new ClassPathResource("/static/index.html");
                         }
                         return null;

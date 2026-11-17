@@ -1,31 +1,18 @@
 # ==========================================
-# Etapa 1: Compilación de Frontend con Angular (Node.js 20)
-# ==========================================
-FROM node:20-alpine AS frontend-build
-WORKDIR /app/frontend
-
-COPY finanzas-frontend/package*.json ./
-RUN npm install --legacy-peer-deps
-
-COPY finanzas-frontend/ ./
-RUN npm run build
-
-# ==========================================
-# Etapa 2: Compilación de Backend con Maven y Java 21
+# Etapa 1: Compilación de Backend con Maven y Java 21
+# (Los archivos estáticos de Angular ya están en src/main/resources/static/)
 # ==========================================
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 COPY finanzas-backend/ ./finanzas-backend/
-# Inyectar el frontend compilado en los recursos estáticos de Spring Boot
-COPY --from=frontend-build /app/frontend/dist/laboratorio/browser/ /app/finanzas-backend/src/main/resources/static/
 
 WORKDIR /app/finanzas-backend
 ENV MAVEN_OPTS="-Xmx1024m -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 RUN mvn clean package -DskipTests
 
 # ==========================================
-# Etapa 3: Imagen Ligera de Ejecución con Java 21 JRE Alpine
+# Etapa 2: Imagen Ligera de Ejecución con Java 21 JRE Alpine
 # ==========================================
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
