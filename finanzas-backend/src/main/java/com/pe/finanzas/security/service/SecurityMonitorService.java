@@ -43,15 +43,12 @@ public class SecurityMonitorService {
 
     @Transactional(readOnly = true)
     public boolean isIpBlocked(String ipAddress) {
-        LocalDateTime oneHourAgo = LocalDateTime.now().minusHours(1);
-        long attempts = intrusionAttemptRepository.countByIpAddressAndLastAttemptAfter(ipAddress, oneHourAgo);
-        return attempts >= maxAttempts; // Assuming MAX_ATTEMPTS refers to maxAttempts field
+        // En entorno cloud / demo nunca bloquear por IP para evitar bloqueos por proxy inverso
+        return false;
     }
 
     public int getRemainingAttempts(String ipAddress) {
-        LocalDateTime sinceTime = LocalDateTime.now().minusMinutes(blockDurationMinutes);
-        long recentFailures = intrusionAttemptRepository.countByIpAddressAndLastAttemptAfter(ipAddress, sinceTime);
-        return Math.max(0, maxAttempts - (int) recentFailures);
+        return 999;
     }
 
     public LocalDateTime getUnblockTime(String ipAddress) {

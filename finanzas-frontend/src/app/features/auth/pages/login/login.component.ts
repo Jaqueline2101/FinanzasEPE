@@ -13,14 +13,14 @@ import Swal from 'sweetalert2';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-  usuario: string = '';
-  contrasena: string = '';
+  usuario: string = 'admin';
+  contrasena: string = 'admin123';
   mostrarContrasena: boolean = false;
   error: boolean = false;
   mensajeError: string = '';
   cargando: boolean = false;
 
-  // Bloqueo por intentos excesivos
+  // Bloqueo por intentos excesivos (desactivado para acceso directo)
   isBlocked: boolean = false;
   unblockTime: Date | null = null;
   countdownInterval: any = null;
@@ -29,7 +29,6 @@ export class LoginComponent {
   constructor(private router: Router, private authService: AuthService) { }
 
   ngOnDestroy() {
-    // Limpiar intervalo al destruir componente
     if (this.countdownInterval) {
       clearInterval(this.countdownInterval);
     }
@@ -39,30 +38,30 @@ export class LoginComponent {
     this.mostrarContrasena = !this.mostrarContrasena;
   }
 
-  async iniciarSesion() {
-    // No permitir login si está bloqueado
-    if (this.isBlocked) {
-      return;
-    }
+  usarAdmin() {
+    this.usuario = 'admin';
+    this.contrasena = 'admin123';
+    this.iniciarSesion();
+  }
 
-    // Resetear el estado de error antes de intentar login
+  async iniciarSesion() {
     this.error = false;
     this.mensajeError = '';
 
+    const user = (this.usuario || '').trim();
+    const pass = (this.contrasena || '').trim();
+
     // Validación básica
-    if (!this.usuario || !this.contrasena) {
+    if (!user || !pass) {
       this.error = true;
       this.mensajeError = 'Por favor complete todos los campos';
       return;
     }
 
+    this.cargando = true;
 
-
-    this.authService.login(this.usuario, this.contrasena).subscribe({
+    this.authService.login(user, pass).subscribe({
       next: (response) => {
-        this.cargando = true;
-        
-        // Verificar si el usuario debe cambiar su contraseña obligatoriamente
         const currentUser = this.authService.currentUser();
         if (currentUser?.mustChangePassword) {
           Swal.fire({
@@ -80,33 +79,18 @@ export class LoginComponent {
         this.router.navigate(['/admin/dashboard']);
       },
       error: (err) => {
+        this.cargando = false;
         this.error = true;
 
-        console.log('=== ERROR COMPLETO ===');
-        console.log('err:', err);
-        console.log('err.error:', err.error);
-        console.log('err.error.message:', err.error?.message);
-        console.log('err.error.remainingAttempts:', err.error?.remainingAttempts);
-        console.log('err.error.blocked:', err.error?.blocked);
-        console.log('======================');
+        console.error('=== ERROR DE LOGIN ===', err);
 
-        let mensajeError = 'Ha ocurrido un error inesperado.';
-
-        // Extraer el mensaje específico del backend
+        let mensajeError = 'Ha ocurrido un error inesperado al conectar con el servidor.';
         if (err.error && err.error.message) {
           mensajeError = err.error.message;
         }
 
         this.mensajeError = mensajeError;
 
-        // Si está bloqueado, capturar unblockTime e iniciar countdown
-        if (err.error?.blocked && err.error?.unblockTime) {
-          this.isBlocked = true;
-          this.unblockTime = new Date(err.error.unblockTime);
-          this.startCountdown();
-        }
-
-        // Mostrar SweetAlert
         Swal.fire({
           icon: 'error',
           title: 'Error de Autenticación',
@@ -124,49 +108,5 @@ export class LoginComponent {
   onSubmit(event: Event) {
     event.preventDefault();
     this.iniciarSesion();
-  }
-
-  startCountdown() {
-    // Limpiar intervalo anterior si existe
-    if (this.countdownInterval) {
-      clearInterval(this.countdownInterval);
-    }
-
-    // Actualizar inmediatamente
-    this.updateRemainingTime();
-
-    // Actualizar cada segundo
-    this.countdownInterval = setInterval(() => {
-      this.updateRemainingTime();
-    }, 1000);
-  }
-
-  updateRemainingTime() {
-    if (!this.unblockTime) {
-      this.remainingTimeString = '';
-      return;
-    }
-
-    const now = new Date().getTime();
-    const unblockTimestamp = this.unblockTime.getTime();
-    const difference = unblockTimestamp - now;
-
-    if (difference <= 0) {
-      // Tiempo expirado, desbloquear
-      this.isBlocked = false;
-      this.unblockTime = null;
-      this.remainingTimeString = '';
-      if (this.countdownInterval) {
-        clearInterval(this.countdownInterval);
-        this.countdownInterval = null;
-      }
-      return;
-    }
-
-    // Calcular minutos y segundos restantes
-    const minutes = Math.floor((difference / 1000 / 60) % 60);
-    const seconds = Math.floor((difference / 1000) % 60);
-
-    this.remainingTimeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 }
