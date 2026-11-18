@@ -454,6 +454,8 @@ public class DemoDataInitializer implements CommandLineRunner {
                         .valorAfecto(baseImp)
                         .estado(1)
                         .modo("N")
+                        .idPersonalUser(1L)
+                        .idCtacte(1L)
                         .detalles(new ArrayList<>())
                         .build();
 
@@ -523,6 +525,8 @@ public class DemoDataInitializer implements CommandLineRunner {
                         .valorAfecto(baseImp)
                         .estado(estado)
                         .modo("N")
+                        .idPersonalUser(1L)
+                        .idCtacte(1L)
                         .detalles(new ArrayList<>())
                         .build();
 
