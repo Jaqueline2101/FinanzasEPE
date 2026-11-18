@@ -81,7 +81,6 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final AuditRepository auditRepository;
 
     @Override
-    @Transactional
     public void run(String... args) throws Exception {
         log.info("🚀 INICIANDO VERIFICACIÓN Y POBLADO DE DATOS DE DEMOSTRACIÓN EN TODOS LOS MÓDULOS...");
 
