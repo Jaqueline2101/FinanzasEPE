@@ -30,6 +30,12 @@ import com.pe.finanzas.puntos.entity.Punto;
 import com.pe.finanzas.puntos.repository.PuntoRepository;
 import com.pe.finanzas.reports.audit.entity.AuditLog;
 import com.pe.finanzas.reports.audit.repository.AuditRepository;
+import com.pe.finanzas.activos_fijos.entity.Activo;
+import com.pe.finanzas.activos_fijos.repository.ActivoRepository;
+import com.pe.finanzas.caja_general.entity.CajaGeneral;
+import com.pe.finanzas.caja_general.repository.CajaGeneralRepository;
+import com.pe.finanzas.paquetes.entity.Paquete;
+import com.pe.finanzas.paquetes.repository.PaqueteRepository;
 import com.pe.finanzas.sucursales.entity.Sucursal;
 import com.pe.finanzas.sucursales.repository.SucursalRepository;
 import com.pe.finanzas.users.entity.DatosPersonales;
@@ -79,6 +85,9 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final KardexRepository kardexRepository;
     private final DatosPersonalesRepository datosPersonalesRepository;
     private final AuditRepository auditRepository;
+    private final PaqueteRepository paqueteRepository;
+    private final CajaGeneralRepository cajaGeneralRepository;
+    private final ActivoRepository activoRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -130,6 +139,15 @@ public class DemoDataInitializer implements CommandLineRunner {
 
             // 15. Auditoría
             seedAudit();
+
+            // 16. Paquetes Médicos
+            seedPaquetes();
+
+            // 17. Caja General
+            seedCajaGeneral(sedePrincipal);
+
+            // 18. Activos Fijos
+            seedActivos(servicios);
 
             log.info("🎉 ¡DATOS DE DEMOSTRACIÓN CARGADOS EXITOSAMENTE EN TODOS LOS CAMPOS!");
         } catch (Exception e) {
@@ -454,7 +472,7 @@ public class DemoDataInitializer implements CommandLineRunner {
                         .valorAfecto(baseImp)
                         .estado(1)
                         .modo("N")
-                        .idPersonalUser(1L)
+                        .idPersonalUser("1")
                         .idCtacte(1L)
                         .detalles(new ArrayList<>())
                         .build();
@@ -525,7 +543,7 @@ public class DemoDataInitializer implements CommandLineRunner {
                         .valorAfecto(baseImp)
                         .estado(estado)
                         .modo("N")
-                        .idPersonalUser(1L)
+                        .idPersonalUser("1")
                         .idCtacte(1L)
                         .detalles(new ArrayList<>())
                         .build();
@@ -791,5 +809,80 @@ public class DemoDataInitializer implements CommandLineRunner {
                     .build();
             auditRepository.save(a);
         }
+    }
+
+    private void seedPaquetes() {
+        if (paqueteRepository.count() >= 2) return;
+
+        Object[][] paqs = {
+                { "PAQ001", "CHEQUEO CLÍNICO INTEGRAL PREVENTIVO", "Consulta Medicina General + Hemograma + Glucosa + Perfil Lipídico", "180.00" },
+                { "PAQ002", "PERFIL EJECUTIVO CARDIOVASCULAR", "Consulta Especializada Cardiología + Perfil Lipídico Completo", "220.00" },
+                { "PAQ003", "PAQUETE CONTROL MATERNO - PRENATAL", "Ecografía Abdominal + Hemograma Completo + Examen de Orina", "210.00" },
+                { "PAQ004", "PAQUETE PEDIÁTRICO SALUD TOTAL", "Consulta Pediatría + Hemograma + Examen Completo de Orina", "150.00" }
+        };
+
+        for (Object[] p : paqs) {
+            Paquete paq = Paquete.builder()
+                    .codigo((String) p[0])
+                    .nombre((String) p[1])
+                    .descripcion((String) p[2])
+                    .precioPaquete(new BigDecimal((String) p[3]))
+                    .categoria("PAQUETE_REGULAR")
+                    .estado("1")
+                    .fechaInicio(LocalDate.of(2026, 1, 1))
+                    .fechaFin(LocalDate.of(2026, 12, 31))
+                    .build();
+            paqueteRepository.save(paq);
+        }
+    }
+
+    private void seedCajaGeneral(Sucursal sucursal) {
+        if (cajaGeneralRepository.count() >= 1) return;
+
+        Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
+        CajaGeneral cg = CajaGeneral.builder()
+                .nombre("CAJA GENERAL BANCARIA Y DE SEGURIDAD")
+                .idSucursal(idSuc)
+                .saldoActual(new BigDecimal("35000.00"))
+                .usuarioCreacion("admin")
+                .build();
+        cajaGeneralRepository.save(cg);
+    }
+
+    private void seedActivos(List<Catalogo> servicios) {
+        if (activoRepository.count() >= 2 || servicios.isEmpty()) return;
+
+        Catalogo eco = servicios.stream().filter(s -> s.getNombreServicio() != null && s.getNombreServicio().contains("ECOGRAFÍA")).findFirst().orElse(servicios.get(0));
+        Catalogo rx = servicios.stream().filter(s -> s.getNombreServicio() != null && s.getNombreServicio().contains("RADIOGRAFÍA")).findFirst().orElse(servicios.get(0));
+
+        Activo a1 = Activo.builder()
+                .catalogo(eco)
+                .codigoPatrimonial("ACT-MED-00142")
+                .numeroSerie("SN-GE-VOLUSON-E8")
+                .estadoFisico("BUENO")
+                .situacion("OPERATIVO")
+                .ubicacionDetallada("SALA DE ECOGRAFÍA - CONSULTORIO 3")
+                .valorCompra(new BigDecimal("85000.00"))
+                .fechaCompra(LocalDate.of(2025, 3, 15))
+                .idResponsable(1L)
+                .vidaUtilAnios(5)
+                .observaciones("Mantenimiento preventivo semestral al día")
+                .build();
+        activoRepository.save(a1);
+
+        Activo a2 = Activo.builder()
+                .catalogo(rx)
+                .codigoPatrimonial("ACT-MED-00143")
+                .numeroSerie("SN-SIEMENS-MULTIX-PRO")
+                .estadoFisico("BUENO")
+                .situacion("OPERATIVO")
+                .ubicacionDetallada("SALA DE RAYOS X DIGITAL - PISO 1")
+                .valorCompra(new BigDecimal("120000.00"))
+                .fechaCompra(LocalDate.of(2025, 1, 10))
+                .idResponsable(1L)
+                .vidaUtilAnios(7)
+                .observaciones("Calibración digital vigente")
+                .build();
+        activoRepository.save(a2);
     }
 }
