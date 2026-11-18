@@ -50,8 +50,8 @@ export class PermissionService2 {
         }
 
         // Verificar si es admin
-        const roles = userData.roleNames || [];
-        const isAdmin = roles.includes('ADMIN') || roles.includes('ADMINISTRADOR');
+        const roles = userData.roles || userData.roleNames || [];
+        const isAdmin = roles.includes('ADMIN') || roles.includes('ADMINISTRADOR') || roles.includes('SUPER_ADMIN');
         this.isAdminSubject.next(isAdmin);
         localStorage.setItem('isAdmin', isAdmin.toString());
 

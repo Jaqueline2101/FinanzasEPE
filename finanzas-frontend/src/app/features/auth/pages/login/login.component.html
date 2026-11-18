@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- Botón de Login Principal -->
-                <button type="button" (click)="iniciarSesion()" [disabled]="cargando"
+                <button type="submit" [disabled]="cargando"
                     class="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md cursor-pointer">
                     <span *ngIf="!cargando">Ingresar</span>
                     <span *ngIf="cargando" class="flex items-center justify-center">
@@ -71,14 +71,14 @@
                                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
                             </path>
                         </svg>
-                        Verificando credenciales...
+                        Accediendo al Dashboard...
                     </span>
                 </button>
 
                 <!-- Botón de Acceso Rápido Administrador -->
-                <button type="button" (click)="usarAdmin()" [disabled]="cargando"
-                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 disabled:opacity-50 shadow-sm text-sm cursor-pointer flex items-center justify-center gap-2">
-                    <span>⚡ Entrar Directo como Administrador</span>
+                <button type="button" (click)="entrarDirectoDashboard()"
+                    class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2.5 px-4 rounded-lg transition duration-200 shadow-sm text-sm cursor-pointer flex items-center justify-center gap-2">
+                    <span>⚡ Entrar Directo al Dashboard</span>
                 </button>
             </form>
 

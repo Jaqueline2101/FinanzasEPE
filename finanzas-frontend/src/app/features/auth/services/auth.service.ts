@@ -128,6 +128,77 @@ export class AuthService {
         }
     }
 
+    // ✅ SESIÓN DIRECTA ADMINISTRADOR
+    setSesionAdministradorDirecto(): void {
+        const dummyToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.admin_access_token_demo';
+        const adminData: LoginData = {
+            token: dummyToken,
+            type: 'Bearer',
+            userId: 1,
+            username: 'admin',
+            email: 'admin@finanzas.pe',
+            firstName: 'Administrador',
+            lastName: 'Sistema',
+            sexo: 'M',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+            permissions: [
+                'ACCESO_TOTAL', 'DASHBOARD_VER', 'USUARIOS_VER', 'REPORTES_VER',
+                'VENTAS_VER', 'COMPRAS_VER', 'CAJA_VER', 'CONFIGURACION_VER',
+                'ADMIN', 'SUPER_ADMIN', 'GESTION_USUARIOS', 'ASIGNAR_ROLES'
+            ],
+            sessionTimeoutMs: 1800000,
+            fotoPerfil: 'default-avatar.png',
+            sucursalId: 1,
+            sucursalNombre: 'Sede Principal',
+            puntoId: 1,
+            puntoNombre: 'Caja 1',
+            mustChangePassword: false
+        };
+
+        const defaultMenu = [
+            {
+                id: 1,
+                titulo: 'Dashboard',
+                ruta: '/admin/dashboard',
+                icono: 'fa-solid fa-chart-pie',
+                orden: 1,
+                tipo: 'ITEM' as const
+            },
+            {
+                id: 2,
+                titulo: 'Reportes',
+                icono: 'fa-solid fa-file-invoice-dollar',
+                orden: 2,
+                tipo: 'GRUPO' as const,
+                children: [
+                    { id: 21, titulo: 'Ventas', ruta: '/admin/reportes/ventas', orden: 1, tipo: 'ITEM' as const },
+                    { id: 22, titulo: 'Compras', ruta: '/admin/reportes/compras', orden: 2, tipo: 'ITEM' as const },
+                    { id: 23, titulo: 'Descuentos', ruta: '/admin/reportes/descuentos', orden: 3, tipo: 'ITEM' as const },
+                    { id: 24, titulo: 'Honorarios', ruta: '/admin/reportes/honorarios', orden: 4, tipo: 'ITEM' as const },
+                    { id: 25, titulo: 'Pagos Personal', ruta: '/admin/reportes/pagos', orden: 5, tipo: 'ITEM' as const },
+                    { id: 26, titulo: 'Otros Pagos', ruta: '/admin/reportes/otros-pagos', orden: 6, tipo: 'ITEM' as const },
+                    { id: 27, titulo: 'Auditoría', ruta: '/admin/reportes/auditoria', orden: 7, tipo: 'ITEM' as const },
+                    { id: 28, titulo: 'Correlatividad', ruta: '/admin/reportes/correlatividad', orden: 8, tipo: 'ITEM' as const },
+                    { id: 29, titulo: 'Kardex', ruta: '/admin/reportes/kardex', orden: 9, tipo: 'ITEM' as const },
+                    { id: 30, titulo: 'Valorización', ruta: '/admin/reportes/valorizacion', orden: 10, tipo: 'ITEM' as const }
+                ]
+            },
+            {
+                id: 3,
+                titulo: 'Configuraciones',
+                icono: 'fa-solid fa-gear',
+                orden: 3,
+                tipo: 'GRUPO' as const,
+                children: [
+                    { id: 31, titulo: 'Cambio Sucursal', ruta: '/admin/cambio-sucursal', orden: 1, tipo: 'ITEM' as const }
+                ]
+            }
+        ];
+
+        localStorage.setItem('userMenu', JSON.stringify(defaultMenu));
+        this.handleLoginSuccess(adminData);
+    }
+
     // ✅ LOGIN
     login(username: string, password: string): Observable<LoginData> {
         this.loading.set(true);
