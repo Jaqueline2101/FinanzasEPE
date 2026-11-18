@@ -44,6 +44,7 @@ export class HasPermissionDirective implements OnDestroy {
   }
 
   private checkPermissions(): boolean {
+    if (this.permissionService.isAdmin() || this.currentPermissions.has('ACCESO_TOTAL')) return true;
     if (this.requiredPermissions.length === 0) return true;
 
     if (this.logicalOp === 'OR') {

@@ -125,8 +125,12 @@ export class BarraFiltrosComponent implements OnInit, OnDestroy {
     }
 
     getEstadoLabel(): string {
-        const option = this.estadoOptions.find(opt => opt.value === this.filters.estado);
-        return option ? option.label : 'Estado';
+        const option = this.estadoOptions.find(opt => opt.value === this.filters.estado || (opt.value === 'null' && (this.filters.estado === 'TODOS' || !this.filters.estado)));
+        if (option) return option.label;
+        if (this.estadoOptions && this.estadoOptions.length > 0) {
+            return this.estadoOptions[0].label;
+        }
+        return this.statusLabel || 'Seleccionar';
     }
 
     @HostListener('document:click', ['$event'])

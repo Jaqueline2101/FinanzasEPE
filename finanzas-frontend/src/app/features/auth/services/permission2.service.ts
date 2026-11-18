@@ -153,7 +153,23 @@ export class PermissionService2 {
     // ========================================
 
     isAdmin(): boolean {
-        return this.isAdminSubject.value;
+        if (this.isAdminSubject.value || this.permisosSubject.value.has('ACCESO_TOTAL')) {
+            return true;
+        }
+        try {
+            if (localStorage.getItem('isAdmin') === 'true') return true;
+            const userStr = localStorage.getItem('currentUser');
+            if (userStr) {
+                const u = JSON.parse(userStr);
+                const username = (u.username || u.login || u.nombreUsuario || '').toLowerCase();
+                if (username === 'admin' || username === 'superadmin') return true;
+                const roles = u.roles || u.roleNames || [];
+                if (Array.isArray(roles) && roles.some(r => typeof r === 'string' && r.toUpperCase().includes('ADMIN'))) {
+                    return true;
+                }
+            }
+        } catch (e) {}
+        return false;
     }
 
     hasPermission(permiso: string): boolean {

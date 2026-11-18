@@ -28,6 +28,8 @@ import com.pe.finanzas.proveedores.entity.Proveedor;
 import com.pe.finanzas.proveedores.repository.ProveedorRepository;
 import com.pe.finanzas.puntos.entity.Punto;
 import com.pe.finanzas.puntos.repository.PuntoRepository;
+import com.pe.finanzas.reports.audit.entity.AuditLog;
+import com.pe.finanzas.reports.audit.repository.AuditRepository;
 import com.pe.finanzas.sucursales.entity.Sucursal;
 import com.pe.finanzas.sucursales.repository.SucursalRepository;
 import com.pe.finanzas.users.entity.DatosPersonales;
@@ -76,16 +78,12 @@ public class DemoDataInitializer implements CommandLineRunner {
     private final MetodoPagoRepository metodoPagoRepository;
     private final KardexRepository kardexRepository;
     private final DatosPersonalesRepository datosPersonalesRepository;
+    private final AuditRepository auditRepository;
 
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (ventaRegistroRepository.count() >= 20) {
-            log.info("✅ Datos de demostración completos ya existen en la base de datos ({} ventas).", ventaRegistroRepository.count());
-            return;
-        }
-
-        log.info("🚀 INICIANDO POBLADO MASIVO DE DATOS DE DEMOSTRACIÓN PARA TODOS LOS MÓDULOS...");
+        log.info("🚀 INICIANDO VERIFICACIÓN Y POBLADO DE DATOS DE DEMOSTRACIÓN EN TODOS LOS MÓDULOS...");
 
         try {
             // 1. Sucursales
@@ -112,7 +110,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             // 8. Compras y Detalle de Compras (Histórico 2026 + Noviembre 2026)
             seedCompras(proveedores, servicios, sedePrincipal);
 
-            // 9. Ventas y Detalle de Ventas (Histórico 2026 + Noviembre 2026 para Correlatividad y Reportes)
+            // 9. Ventas y Detalle de Ventas (Histórico 2026 + Noviembre 2026 para
+            // Correlatividad y Reportes)
             seedVentas(servicios, sedePrincipal, punto1);
 
             // 10. Descuentos Autorizados
@@ -129,6 +128,9 @@ public class DemoDataInitializer implements CommandLineRunner {
 
             // 14. Kardex de Movimientos
             seedKardex(productos, servicios, sedePrincipal);
+
+            // 15. Auditoría
+            seedAudit();
 
             log.info("🎉 ¡DATOS DE DEMOSTRACIÓN CARGADOS EXITOSAMENTE EN TODOS LOS CAMPOS!");
         } catch (Exception e) {
@@ -299,11 +301,16 @@ public class DemoDataInitializer implements CommandLineRunner {
         }
 
         String[][] provData = {
-                { "20100012341", "MEDIFARMA S.A.", "Av. República de Panamá 2577, Lima", "(01) 411-2000", "ventas@medifarma.com.pe" },
-                { "20100123456", "LABORATORIOS ROCHE PERÚ S.A.", "Calle Dionisio Derteano 144, San Isidro", "(01) 618-8000", "pedidos@roche.com" },
-                { "20200234567", "B. BRAUN MEDICAL PERÚ S.A.", "Av. Separadora Industrial 2451, Ate", "(01) 625-7000", "contacto@bbraun.com.pe" },
-                { "20300345678", "SIEMENS HEALTHCARE S.A.C.", "Av. Domingo Orué 971, Surquillo", "(01) 513-8700", "soporte@siemens-health.com" },
-                { "20400456789", "ABBOTT LABORATORIES S.A.", "Av. Víctor Andrés Belaúnde 147, San Isidro", "(01) 617-1000", "atencion@abbott.com.pe" }
+                { "20100012341", "MEDIFARMA S.A.", "Av. República de Panamá 2577, Lima", "(01) 411-2000",
+                        "ventas@medifarma.com.pe" },
+                { "20100123456", "LABORATORIOS ROCHE PERÚ S.A.", "Calle Dionisio Derteano 144, San Isidro",
+                        "(01) 618-8000", "pedidos@roche.com" },
+                { "20200234567", "B. BRAUN MEDICAL PERÚ S.A.", "Av. Separadora Industrial 2451, Ate", "(01) 625-7000",
+                        "contacto@bbraun.com.pe" },
+                { "20300345678", "SIEMENS HEALTHCARE S.A.C.", "Av. Domingo Orué 971, Surquillo", "(01) 513-8700",
+                        "soporte@siemens-health.com" },
+                { "20400456789", "ABBOTT LABORATORIES S.A.", "Av. Víctor Andrés Belaúnde 147, San Isidro",
+                        "(01) 617-1000", "atencion@abbott.com.pe" }
         };
 
         List<Proveedor> creados = new ArrayList<>();
@@ -325,7 +332,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedCompras(List<Proveedor> proveedores, List<Catalogo> servicios, Sucursal sucursal) {
-        if (compraRepository.count() >= 10) return;
+        if (compraRepository.count() >= 10)
+            return;
 
         Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
         Random random = new Random(42);
@@ -380,6 +388,17 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedVentas(List<Catalogo> servicios, Sucursal sucursal, Punto punto) {
+        if (servicios == null || servicios.isEmpty())
+            return;
+
+        boolean hasVentasNov2026 = ventaRegistroRepository.findAll().stream()
+                .anyMatch(v -> v.getFecha() != null && v.getFecha().getYear() == 2026
+                        && v.getFecha().getMonthValue() == 11);
+        if (hasVentasNov2026) {
+            log.info("✅ Ventas de Noviembre 2026 ya están presentes en la base de datos.");
+            return;
+        }
+
         Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
         Long idPunto = punto.getPunto();
 
@@ -401,7 +420,8 @@ public class DemoDataInitializer implements CommandLineRunner {
         int correlativoFactura = 1;
         int correlativoTicket = 1;
 
-        // 1. Ventas históricas para meses anteriores (Enero a Octubre 2026) -> 2 por mes
+        // 1. Ventas históricas para meses anteriores (Enero a Octubre 2026) -> 2 por
+        // mes
         for (int mes = 1; mes <= 10; mes++) {
             for (int i = 1; i <= 2; i++) {
                 LocalDate fecha = LocalDate.of(2026, mes, i * 12);
@@ -414,7 +434,8 @@ public class DemoDataInitializer implements CommandLineRunner {
 
                 String tipoDoc = (i % 2 == 0) ? "F" : "B";
                 String serie = (tipoDoc.equals("F")) ? "F001" : "B001";
-                String numdoc = String.format("%08d", (tipoDoc.equals("F")) ? correlativoFactura++ : correlativoBoleta++);
+                String numdoc = String.format("%08d",
+                        (tipoDoc.equals("F")) ? correlativoFactura++ : correlativoBoleta++);
 
                 VentaRegistro v = VentaRegistro.builder()
                         .idSucursal(idSuc)
@@ -450,7 +471,8 @@ public class DemoDataInitializer implements CommandLineRunner {
             }
         }
 
-        // 2. Ventas masivas en el mes actual (NOVIEMBRE 2026) -> 24 ventas para correlatividad y métricas reales
+        // 2. Ventas masivas en el mes actual (NOVIEMBRE 2026) -> 24 ventas para
+        // correlatividad y métricas reales
         for (int dia = 2; dia <= 17; dia++) {
             int ventasDelDia = (dia % 2 == 0) ? 2 : 1;
 
@@ -520,14 +542,20 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedDescuentos() {
-        if (autorizacionDescuentoRepository.count() >= 5) return;
+        if (autorizacionDescuentoRepository.count() >= 5)
+            return;
 
         Object[][] descData = {
-                { "MARIA ELENA ROJAS TORRES", "72145890", "DR. JUAN RAMOS", "160.00", "30.00", "130.00", "Convenio Adulto Mayor", "APROBADO" },
-                { "CARLOS ANDRES MENDOZA", "10293847", "DRA. SOFIA VALDIVIA", "150.00", "25.00", "125.00", "Campaña Salud Ocupacional", "APROBADO" },
-                { "ROBERTO PAOLO GUERRERO", "09283741", "DR. ALBERTO FARFAN", "120.00", "20.00", "100.00", "Descuento por Paquete Familiar", "APROBADO" },
-                { "ANA CECILIA FLORES", "48192034", "DR. JUAN RAMOS", "85.00", "15.00", "70.00", "Paciente vulnerable", "PENDIENTE" },
-                { "VICTOR HUGO MORALES", "08291823", "DRA. SOFIA VALDIVIA", "95.00", "15.00", "80.00", "Cortesía primera consulta", "RECHAZADO" }
+                { "MARIA ELENA ROJAS TORRES", "72145890", "DR. JUAN RAMOS", "160.00", "30.00", "130.00",
+                        "Convenio Adulto Mayor", "APROBADO" },
+                { "CARLOS ANDRES MENDOZA", "10293847", "DRA. SOFIA VALDIVIA", "150.00", "25.00", "125.00",
+                        "Campaña Salud Ocupacional", "APROBADO" },
+                { "ROBERTO PAOLO GUERRERO", "09283741", "DR. ALBERTO FARFAN", "120.00", "20.00", "100.00",
+                        "Descuento por Paquete Familiar", "APROBADO" },
+                { "ANA CECILIA FLORES", "48192034", "DR. JUAN RAMOS", "85.00", "15.00", "70.00", "Paciente vulnerable",
+                        "PENDIENTE" },
+                { "VICTOR HUGO MORALES", "08291823", "DRA. SOFIA VALDIVIA", "95.00", "15.00", "80.00",
+                        "Cortesía primera consulta", "RECHAZADO" }
         };
 
         for (Object[] row : descData) {
@@ -546,16 +574,21 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedPagos() {
-        if (pagoComprobanteRepository.count() >= 8) return;
+        if (pagoComprobanteRepository.count() >= 8)
+            return;
 
         LocalDate hoy = LocalDate.of(2026, 11, 15);
 
         // 1. Honorarios Médicos
         Object[][] honData = {
-                { "DR. JUAN CARLOS RAMOS DIAZ", "41829012", "E001", "000145", "4500.00", "360.00", "4140.00", "Cardiología" },
-                { "DRA. SOFÍA VALDIVIA ROMERO", "42918203", "E001", "000146", "3800.00", "304.00", "3496.00", "Pediatría" },
-                { "DR. ALBERTO FARFÁN CASTRO", "40192834", "E001", "000147", "5200.00", "416.00", "4784.00", "Traumatología" },
-                { "DRA. MONICA SUAREZ VEGA", "45019283", "E001", "000148", "4100.00", "328.00", "3772.00", "Ginecología" }
+                { "DR. JUAN CARLOS RAMOS DIAZ", "41829012", "E001", "000145", "4500.00", "360.00", "4140.00",
+                        "Cardiología" },
+                { "DRA. SOFÍA VALDIVIA ROMERO", "42918203", "E001", "000146", "3800.00", "304.00", "3496.00",
+                        "Pediatría" },
+                { "DR. ALBERTO FARFÁN CASTRO", "40192834", "E001", "000147", "5200.00", "416.00", "4784.00",
+                        "Traumatología" },
+                { "DRA. MONICA SUAREZ VEGA", "45019283", "E001", "000148", "4100.00", "328.00", "3772.00",
+                        "Ginecología" }
         };
 
         for (Object[] row : honData) {
@@ -610,7 +643,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedCajaChica(Sucursal sucursal) {
-        if (cajaChicaRepository.count() >= 1) return;
+        if (cajaChicaRepository.count() >= 1)
+            return;
 
         Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
         CajaChica cc = CajaChica.builder()
@@ -628,9 +662,12 @@ public class DemoDataInitializer implements CommandLineRunner {
 
         if (efectivo != null) {
             Object[][] movs = {
-                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "45.00", "Compra de papel bond y útiles de oficina", "B002-341" },
-                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "85.00", "Artículos de limpieza y desinfección", "F001-9872" },
-                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "150.00", "Movilidad y mensajería médica urgente", "REC-012" },
+                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "45.00", "Compra de papel bond y útiles de oficina",
+                            "B002-341" },
+                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "85.00", "Artículos de limpieza y desinfección",
+                            "F001-9872" },
+                    { CajaChicaMovimiento.TipoMovimiento.EGRESO, "150.00", "Movilidad y mensajería médica urgente",
+                            "REC-012" },
                     { CajaChicaMovimiento.TipoMovimiento.INGRESO, "500.00", "Reembolso parcial fondo fijo", "CHQ-8902" }
             };
 
@@ -650,7 +687,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedArqueos(Sucursal sucursal, Punto punto) {
-        if (arqueoCajaRepository.count() >= 2) return;
+        if (arqueoCajaRepository.count() >= 2)
+            return;
 
         Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
         Long idPunto = punto.getPunto();
@@ -683,7 +721,8 @@ public class DemoDataInitializer implements CommandLineRunner {
     }
 
     private void seedKardex(List<Producto> productos, List<Catalogo> servicios, Sucursal sucursal) {
-        if (kardexRepository.count() >= 5 || productos.isEmpty() || servicios.isEmpty()) return;
+        if (kardexRepository.count() >= 5 || productos.isEmpty() || servicios.isEmpty())
+            return;
 
         Long idSuc = sucursal.getIdSucursal() != null ? sucursal.getIdSucursal() : 1L;
 
@@ -716,5 +755,38 @@ public class DemoDataInitializer implements CommandLineRunner {
             kardexRepository.save(k);
         }
     }
-}
 
+    private void seedAudit() {
+        if (auditRepository.count() >= 5)
+            return;
+
+        Object[][] logs = {
+                { 1L, "admin", "AUTH", "LOGIN", "Inicio de sesión exitoso desde consola web", "192.168.1.100",
+                        "SUCCESS", "/api/auth/login", "POST" },
+                { 1L, "admin", "VENTAS", "EMITIR_COMPROBANTE", "Emisión de Boleta B001-00000024 por S/. 120.00",
+                        "192.168.1.100", "SUCCESS", "/api/ventas", "POST" },
+                { 1L, "admin", "COMPRAS", "REGISTRAR_ORDEN", "Registro de Factura de Compra F001-000110",
+                        "192.168.1.100", "SUCCESS", "/api/compras", "POST" },
+                { 1L, "admin", "CAJA_CHICA", "EGRESO_CAJA", "Egreso de Caja Chica S/. 85.00 para útiles",
+                        "192.168.1.100", "SUCCESS", "/api/caja-chica/movimientos", "POST" },
+                { 1L, "admin", "DESCUENTOS", "AUTORIZAR", "Aprobación de descuento especial convenio 20%",
+                        "192.168.1.100", "SUCCESS", "/api/descuentos/autorizar", "POST" }
+        };
+
+        for (Object[] row : logs) {
+            AuditLog a = AuditLog.builder()
+                    .userId((Long) row[0])
+                    .username((String) row[1])
+                    .module((String) row[2])
+                    .action((String) row[3])
+                    .details((String) row[4])
+                    .ipAddress((String) row[5])
+                    .status((String) row[6])
+                    .url((String) row[7])
+                    .method((String) row[8])
+                    .timestamp(LocalDateTime.now().minusHours(2))
+                    .build();
+            auditRepository.save(a);
+        }
+    }
+}

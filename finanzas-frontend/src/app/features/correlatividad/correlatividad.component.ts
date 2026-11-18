@@ -72,7 +72,7 @@ export class CorrelatividadComponent implements OnInit {
 
     get sucursalOptions() {
         return [
-            { label: 'TODOS LOS ESTABLECIMIENTOS', value: 'null' },
+            { label: 'TODOS LOS ESTABLECIMIENTOS', value: 'TODOS' },
             ...this.sucursales.map(s => ({ label: s.nombreSucursal, value: s.idSucursal.toString() }))
         ];
     }
@@ -136,8 +136,8 @@ export class CorrelatividadComponent implements OnInit {
 
     handleFilter(criteria: FilterCriteria) {
         this.searchCriteria = criteria;
-        // Mapear el filtro de "Estado" (que usamos para Sucursal)
-        this.filtros.idSucursal = criteria.estado === 'null' || criteria.estado === 'TODOS' ? null : Number(criteria.estado);
+        // Mapear el filtro de Sucursal
+        this.filtros.idSucursal = (!criteria.estado || criteria.estado === 'null' || criteria.estado === 'TODOS') ? null : Number(criteria.estado);
         
         this.generarReporte();
     }

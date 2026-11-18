@@ -1,0 +1,1 @@
+import"./chunk-C6Q5SG76.js";var t=[{path:"empleados",loadComponent:()=>import("./chunk-5MYMGF6V.js").then(o=>o.GestionEmpleadosComponent),data:{title:"Gesti\xF3n de Empleados"}},{path:"planillas",loadComponent:()=>import("./chunk-OZ2TPBEX.js").then(o=>o.PagoPersonalComponent),data:{title:"Planilla de Pagos"}}];export{t as RRHH_ROUTES};
