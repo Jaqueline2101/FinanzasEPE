@@ -23,16 +23,18 @@ export const AuthInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: 
 
     return next(request).pipe(
         catchError((error: HttpErrorResponse) => {
-            // Ignorar 401 en login para evitar loop/logout innecesario
+            // No expulsar al usuario automáticamente para mantenerlo en el dashboard
             if (error.status === 401 && !req.url.includes('/auth/login')) {
-                authService.logout();
-                router.navigate(['/login']);
+                console.warn('⚠️ [HTTP 401] No autorizado en:', req.url);
+                const currentUser = authService.currentUser();
+                if (!currentUser) {
+                    router.navigate(['/login']);
+                }
             }
             
-            // Manejar error 403 Forbidden
+            // Manejar error 403 Forbidden sin redirigir abruptamente
             if (error.status === 403) {
-                console.error('⛔ Acceso prohibido:', req.url);
-                router.navigate(['/admin/error/403']);
+                console.warn('⛔ [HTTP 403] Acceso prohibido en:', req.url);
             }
 
             return throwError(() => error);

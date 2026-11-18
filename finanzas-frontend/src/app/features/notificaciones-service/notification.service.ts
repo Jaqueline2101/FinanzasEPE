@@ -38,6 +38,11 @@ export class NotificationService implements OnDestroy {
   }
 
   private connect() {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+      // En producción cloud no intentar conectar a localhost:8086
+      return;
+    }
+
     this.stompClient = new Client({
       brokerURL: this.brokerUrl,
       debug: (msg: string) => console.log('STOMP DEBUG:', msg),

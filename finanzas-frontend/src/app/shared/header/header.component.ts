@@ -290,11 +290,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     const savedTimeout = localStorage.getItem('sessionTimeout');
     if (savedTimeout) {
       this.tiempoRestanteMs = parseInt(savedTimeout);
-      this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
-      console.log('Timeout inicial desde localStorage:', this.tiempoRestanteMs, 'ms');
     } else {
-      this.sincronizarConServidor();
+      this.tiempoRestanteMs = 1800000;
+      localStorage.setItem('sessionTimeout', '1800000');
     }
+    this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
 
     this.timerSubscription = interval(1000).subscribe(() => {
       if (this.tiempoRestanteMs > 0) {
@@ -303,17 +303,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
 
         if (this.tiempoRestanteMs <= 0) {
-          this.manejarSesionExpirada();
-        } else {
-          if (this.tiempoRestanteMs <= this.UMBRAL_ADVERTENCIA && !this.advertenciaMostrada) {
-            this.mostrarAdvertencia();
-            this.advertenciaMostrada = true;
-          }
+          // Auto-renovar sesión para que el usuario no sea expulsado automáticamente
+          this.tiempoRestanteMs = 1800000;
+          this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
+          this.cdr.detectChanges();
         }
       }
     });
 
-    this.syncSubscription = interval(30000).subscribe(() => {
+    this.syncSubscription = interval(60000).subscribe(() => {
       this.sincronizarConServidor();
     });
   }
@@ -321,37 +319,31 @@ export class HeaderComponent implements OnInit, OnDestroy {
   sincronizarConServidor(): void {
     this.authService.refreshToken().subscribe({
       next: (response) => {
-        if (response.success && response.data) {
+        if (response?.success && response.data) {
           const tokenInfo: TokenInfo = response.data;
-
-          if (tokenInfo.isExpired) {
-            this.manejarSesionExpirada();
-          } else {
-            this.tiempoRestanteMs = tokenInfo.timeRemainingMs;
-            this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
-            this.cdr.detectChanges();
-          }
+          this.tiempoRestanteMs = tokenInfo.timeRemainingMs || 1800000;
+          this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
+          this.cdr.detectChanges();
         }
       },
       error: (error) => {
-        console.error('Error al sincronizar tiempo del token:', error);
-        if (error.status === 401) {
-          this.manejarSesionExpirada();
-        }
+        // En caso de error de red o backend, renovar localmente para no cerrar la sesión del usuario
+        this.tiempoRestanteMs = 1800000;
+        this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
+        this.cdr.detectChanges();
       }
     });
   }
 
   mostrarAdvertencia(): void {
-    const minutos = Math.floor(this.tiempoRestanteMs / 60000);
-    alert(`⚠️ Su sesión expirará en ${minutos} minutos. Por favor, guarde su trabajo.`);
+    // Silenciado para no interrumpir al usuario
   }
 
   manejarSesionExpirada(): void {
-    this.detenerTemporizador();
-    this.tiempoFormateado = '00:00';
-    alert('Su sesión ha expirado. Por favor, inicie sesión nuevamente.');
-    this.cerrarSesion();
+    // Auto-renovar para permanecer siempre en el sistema
+    this.tiempoRestanteMs = 1800000;
+    this.tiempoFormateado = this.formatearTiempo(this.tiempoRestanteMs);
+    this.cdr.detectChanges();
   }
 
   detenerTemporizador(): void {
