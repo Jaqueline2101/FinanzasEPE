@@ -98,14 +98,73 @@ export class SidebarComponent implements OnInit {
   private sanitizarIconosRecursivo(menu: MenuItemDTO[]): MenuItemDTO[] {
     return menu.map(item => {
       const newItem = { ...item };
-      if (newItem.icono && typeof newItem.icono === 'string' && newItem.icono.includes('<svg')) {
-        newItem.icono = this.sanitizer.bypassSecurityTrustHtml(newItem.icono);
-      }
+      newItem.icono = this.resolverIcono(newItem.icono, newItem.titulo);
       if (newItem.children && newItem.children.length > 0) {
         newItem.children = this.sanitizarIconosRecursivo(newItem.children);
       }
       return newItem;
     }).sort((a, b) => (a.orden || 999) - (b.orden || 999));
+  }
+
+  private resolverIcono(icono: any, titulo?: string): SafeHtml {
+    const raw = typeof icono === 'string' ? icono.trim() : '';
+
+    if (raw.startsWith('<svg') || raw.includes('<svg')) {
+      return this.sanitizer.bypassSecurityTrustHtml(raw);
+    }
+
+    const t = (titulo || '').toLowerCase();
+    const ic = raw.toLowerCase();
+
+    // Lucide SVG Icons correspondientes
+    if (t.includes('dashboard') || ic.includes('chart') || ic.includes('dashboard')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>`
+      );
+    }
+    if (t.includes('reporte') || ic.includes('file-invoice') || ic.includes('clipboard') || ic.includes('report')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-plus"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 14h6"/><path d="M12 17v-6"/></svg>`
+      );
+    }
+    if (t.includes('config') || ic.includes('gear') || ic.includes('settings')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`
+      );
+    }
+    if (t.includes('proceso') || ic.includes('cpu')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cpu"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v2"/><path d="M15 20v2"/><path d="M2 15h2"/><path d="M2 9h2"/><path d="M20 15h2"/><path d="M20 9h2"/><path d="M9 2v2"/><path d="M9 20v2"/></svg>`
+      );
+    }
+    if (t.includes('caja') || ic.includes('wallet')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wallet"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>`
+      );
+    }
+    if (t.includes('rr') || t.includes('emplead') || ic.includes('users') || ic.includes('user')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`
+      );
+    }
+    if (t.includes('venta') || ic.includes('shopping-cart') || ic.includes('cart')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`
+      );
+    }
+    if (t.includes('compra') || ic.includes('shopping-bag') || ic.includes('bag')) {
+      return this.sanitizer.bypassSecurityTrustHtml(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-bag"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>`
+      );
+    }
+
+    if (raw.includes('fa-') || raw.startsWith('fa')) {
+      return this.sanitizer.bypassSecurityTrustHtml(`<i class="${raw}"></i>`);
+    }
+
+    return this.sanitizer.bypassSecurityTrustHtml(
+      `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`
+    );
   }
 
   expandirMenuSegunRuta(url: string): void {

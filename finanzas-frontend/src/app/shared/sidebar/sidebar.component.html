@@ -43,84 +43,104 @@
     <!-- MENÚ DINÁMICO COMPLETO -->
     <nav class="flex-1 px-2 py-4 space-y-1">
 
-        <!-- Iterar sobre los grupos principales (CONFIGURACIONES, PROCESOS, REPORTES) -->
+        <!-- Iterar sobre los grupos principales (CONFIGURACIONES, PROCESOS, REPORTES, ETC.) -->
         <ng-container *ngFor="let grupo of menuDinamicoSanitizado">
             <div class="space-y-0 mx-0.5">
-                <!-- Botón del grupo principal -->
-                <button (click)="toggleGrupo(grupo.id)" [class.bg-slate-50]="grupoExpandido[grupo.id]"
-                    [class.dark:bg-slate-800]="grupoExpandido[grupo.id]"
-                    class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 group">
 
-                    <div class="flex items-center gap-3">
-                        <!-- Icono dinámico del grupo (SVG) -->
-                        <span class="dark:text-blue-400 text-[#0b4165] flex items-center justify-center">
-                            <span [innerHTML]="grupo.icono" class="w-5 h-5 block [&>svg]:w-full [&>svg]:h-full"></span>
-                        </span>
-                        <span class="text-sm font-medium text-[#0b4165] dark:text-slate-200">{{ grupo.titulo }}</span>
-                    </div>
+                <!-- Si el elemento principal es de tipo ITEM (ej: Dashboard) o no tiene hijos -->
+                <ng-container *ngIf="grupo.tipo === 'ITEM' || (!grupo.children || grupo.children.length === 0)">
+                    <button (click)="navegarA(grupo.ruta)"
+                        [class.bg-blue-50]="rutaActual === grupo.ruta"
+                        [class.dark:bg-slate-800]="rutaActual === grupo.ruta"
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 group text-left">
+                        <div class="flex items-center gap-3">
+                            <span class="dark:text-blue-400 text-[#0b4165] flex items-center justify-center shrink-0">
+                                <span [innerHTML]="grupo.icono" class="w-5 h-5 flex items-center justify-center overflow-hidden shrink-0 [&>svg]:w-full [&>svg]:h-full [&>svg]:block [&>i]:text-base"></span>
+                            </span>
+                            <span class="text-sm font-medium text-[#0b4165] dark:text-slate-200"
+                                  [class.font-bold]="rutaActual === grupo.ruta">{{ grupo.titulo }}</span>
+                        </div>
+                    </button>
+                </ng-container>
 
-                    <svg class="w-4 h-4 transition-transform duration-300 text-slate-400 dark:text-slate-500"
-                        [ngClass]="grupoExpandido[grupo.id] ? 'rotate-0' : '-rotate-90'"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
-                    </svg>
-                </button>
+                <!-- Si el elemento es un GRUPO desplegable con hijos -->
+                <ng-container *ngIf="grupo.tipo !== 'ITEM' && grupo.children && grupo.children.length > 0">
+                    <!-- Botón del grupo principal -->
+                    <button (click)="toggleGrupo(grupo.id)" [class.bg-slate-50]="grupoExpandido[grupo.id]"
+                        [class.dark:bg-slate-800]="grupoExpandido[grupo.id]"
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-all duration-200 group">
 
-                <!-- Contenido del grupo cuando está expandido -->
-                <div *ngIf="grupoExpandido[grupo.id]" class="relative mt-0" @slideDown>
-                    <div class="ml-[14px]">
-                        <!-- Línea vertical principal que conecta los ítems (GROSOR MEDIO) -->
-                        <div class="absolute left-[25px] top-[14px] w-[1.5px] bg-[#394e60] dark:bg-slate-600 z-0"
-                            [style.height]="'calc(100% - 28px)'"></div>
+                        <div class="flex items-center gap-3">
+                            <!-- Icono dinámico del grupo (SVG) -->
+                            <span class="dark:text-blue-400 text-[#0b4165] flex items-center justify-center shrink-0">
+                                <span [innerHTML]="grupo.icono" class="w-5 h-5 flex items-center justify-center overflow-hidden shrink-0 [&>svg]:w-full [&>svg]:h-full [&>svg]:block [&>i]:text-base"></span>
+                            </span>
+                            <span class="text-sm font-medium text-[#0b4165] dark:text-slate-200">{{ grupo.titulo }}</span>
+                        </div>
 
-                        <!-- Iterar sobre los hijos del grupo (pueden ser SUBMENús o ITEMs) -->
-                        <ng-container *ngFor="let child of grupo.children; let f = first; let l = last">
+                        <svg class="w-4 h-4 transition-transform duration-300 text-slate-400 dark:text-slate-500"
+                            [ngClass]="grupoExpandido[grupo.id] ? 'rotate-0' : '-rotate-90'"
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
 
-                            <!-- Si es un SUBMENU (ej: SEGURIDAD con sus items tipo CATEGORÍAS) -->
-                            <div *ngIf="child.tipo === 'SUBMENU'" class="relative ml-1">
-                                <!-- Botón del submenu con círculo MÁS PEQUEÑO -->
-                                <button (click)="toggleSubmenu(child.id)"
-                                    class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group text-left">
-                                    <div class="flex items-center gap-1.5">
-                                        <!-- Círculo TAMAÑO MEDIO -->
-                                        <div class="w-2.5 h-2.5 rounded-full flex items-center justify-center shrink-0"
-                                            style="background-color: #34577D;">
-                                            <!-- Mostrar los 3 puntitos SOLO cuando hay un item activo dentro del submenu -->
-                                            <span *ngIf="verificarSubmenuActivo(child)"
-                                                class="text-white text-[6.5px] font-bold leading-none">•••</span>
+                    <!-- Contenido del grupo cuando está expandido -->
+                    <div *ngIf="grupoExpandido[grupo.id]" class="relative mt-0" @slideDown>
+                        <div class="ml-[14px]">
+                            <!-- Línea vertical principal que conecta los ítems (GROSOR MEDIO) -->
+                            <div class="absolute left-[25px] top-[14px] w-[1.5px] bg-[#394e60] dark:bg-slate-600 z-0"
+                                [style.height]="'calc(100% - 28px)'"></div>
+
+                            <!-- Iterar sobre los hijos del grupo (pueden ser SUBMENús o ITEMs) -->
+                            <ng-container *ngFor="let child of grupo.children; let f = first; let l = last">
+
+                                <!-- Si es un SUBMENU (ej: SEGURIDAD con sus items tipo CATEGORÍAS) -->
+                                <div *ngIf="child.tipo === 'SUBMENU'" class="relative ml-1">
+                                    <!-- Botón del submenu con círculo MÁS PEQUEÑO -->
+                                    <button (click)="toggleSubmenu(child.id)"
+                                        class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group text-left">
+                                        <div class="flex items-center gap-1.5">
+                                            <!-- Círculo TAMAÑO MEDIO -->
+                                            <div class="w-2.5 h-2.5 rounded-full flex items-center justify-center shrink-0"
+                                                style="background-color: #34577D;">
+                                                <!-- Mostrar los 3 puntitos SOLO cuando hay un item activo dentro del submenu -->
+                                                <span *ngIf="verificarSubmenuActivo(child)"
+                                                    class="text-white text-[6.5px] font-bold leading-none">•••</span>
+                                            </div>
+                                            <span class="text-[0.75rem] font-body text-[#0b4165] dark:text-slate-200 uppercase">
+                                                {{ child.titulo }}
+                                            </span>
                                         </div>
-                                        <span class="text-[0.75rem] font-body text-[#0b4165] dark:text-slate-200 uppercase">
-                                            {{ child.titulo }}
-                                        </span>
-                                    </div>
-                                    <i class="fas fa-chevron-right text-xs text-slate-400 dark:text-slate-500 transition-transform duration-200"
-                                        [class.rotate-90]="submenuExpandido[child.id]"></i>
-                                </button>
+                                        <i class="fas fa-chevron-right text-xs text-slate-400 dark:text-slate-500 transition-transform duration-200"
+                                            [class.rotate-90]="submenuExpandido[child.id]"></i>
+                                    </button>
 
-                                <!-- Items del submenu con conexión directa al grupo principal -->
-                                <div *ngIf="submenuExpandido[child.id]" class="relative mt-1 ml-2">
-                                    <!-- Línea vertical GROSOR MEDIO para items del submenu -->
-                                    <div class="absolute left-[11px] top-[12px] w-[1.5px] bg-[#394e60] dark:bg-slate-600 z-0"
-                                        [style.height]="'calc(100% - 28px)'"></div>
+                                    <!-- Items del submenu con conexión directa al grupo principal -->
+                                    <div *ngIf="submenuExpandido[child.id]" class="relative mt-1 ml-2">
+                                        <!-- Línea vertical GROSOR MEDIO para items del submenu -->
+                                        <div class="absolute left-[11px] top-[12px] w-[1.5px] bg-[#394e60] dark:bg-slate-600 z-0"
+                                            [style.height]="'calc(100% - 28px)'"></div>
 
-                                    <ng-container *ngFor="let subItem of child.children; let sf = first; let sl = last">
-                                        <ng-container
-                                            *ngTemplateOutlet="navLink; context: { item: subItem, isFirst: sf, isLast: sl }">
+                                        <ng-container *ngFor="let subItem of child.children; let sf = first; let sl = last">
+                                            <ng-container
+                                                *ngTemplateOutlet="navLink; context: { item: subItem, isFirst: sf, isLast: sl }">
+                                            </ng-container>
                                         </ng-container>
-                                    </ng-container>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Si es un ITEM directo (sin submenu) -->
-                            <ng-container *ngIf="child.tipo === 'ITEM'">
-                                <ng-container
-                                    *ngTemplateOutlet="navLink; context: { item: child, isFirst: f, isLast: l }">
+                                <!-- Si es un ITEM directo (sin submenu) -->
+                                <ng-container *ngIf="child.tipo === 'ITEM'">
+                                    <ng-container
+                                        *ngTemplateOutlet="navLink; context: { item: child, isFirst: f, isLast: l }">
+                                    </ng-container>
                                 </ng-container>
-                            </ng-container>
 
-                        </ng-container>
+                            </ng-container>
+                        </div>
                     </div>
-                </div>
+                </ng-container>
             </div>
         </ng-container>
 
