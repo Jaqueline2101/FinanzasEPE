@@ -57,9 +57,15 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("🚀 Starting Clean Professional System Seeding (JSON-Driven)...");
+        log.info("🚀 Verificando inicialización del sistema...");
 
         fixSchemaIfNeeded();
+
+        // Si el usuario admin ya existe, la BD ya fue inicializada: omitir el re-seeding pesado para inicio instantáneo
+        if (userRepo.findByLogin("admin").isPresent()) {
+            log.info("✅ Sistema ya inicializado con superadministrador. Omitiendo re-seeding masivo para optimizar arranque y memoria.");
+            return;
+        }
 
         // Cargar datos desde JSON
         JsonNode root;

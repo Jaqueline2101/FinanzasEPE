@@ -23,4 +23,4 @@ EXPOSE 10000
 EXPOSE 8080
 
 # Control de memoria JVM optimizado para el plan gratuito de Render (512MB RAM)
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:+UseSerialGC", "-Xms64m", "-Xmx200m", "-XX:MaxMetaspaceSize=200m", "-XX:ReservedCodeCacheSize=48m", "-Xss512k", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:+UseSerialGC", "-Xms64m", "-Xmx160m", "-XX:MaxMetaspaceSize=160m", "-XX:ReservedCodeCacheSize=32m", "-Xss256k", "-jar", "app.jar"]

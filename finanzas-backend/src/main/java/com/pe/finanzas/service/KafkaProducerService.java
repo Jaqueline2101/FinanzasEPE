@@ -2,8 +2,8 @@ package com.pe.finanzas.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -11,14 +11,21 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class KafkaProducerService {
 
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    @Autowired(required = false)
+    private KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private static final String TOPIC = "sistema.notificaciones";
 
     public void enviarNotificacion(String userId, String modulo, String titulo, Object contenido, String tipo) {
+        if (kafkaTemplate == null) {
+            log.debug("Kafka no está habilitado, omitiendo notificación.");
+            return;
+        }
         Map<String, Object> message = Map.of(
                 "userId", userId != null ? userId : "",
                 "modulo", modulo,
