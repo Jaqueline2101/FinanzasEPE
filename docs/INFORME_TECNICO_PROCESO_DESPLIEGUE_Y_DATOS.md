@@ -90,31 +90,46 @@ El sistema opera bajo una arquitectura desacoplada en desarrollo y empaquetada c
 
 ---
 
-## 4. Sembrado Masivo de Datos en el Sistema
+## 4. Sembrado Masivo de Datos en el Sistema (Mínimo 20 Registros por Ambiente)
 
-Para asegurar que todos los módulos y reportes muestren información relevante, se implementó el componente `DemoDataInitializer.java`, el cual se ejecuta en el arranque del servidor verificando y poblando las siguientes tablas:
+Para garantizar una experiencia completa y profesional en todas las ventanas, reportes y vistas del sistema, se implementó el componente `DemoDataInitializer.java`. 
 
-| Módulo | Entidades Afectadas | Descripción y Detalle de los Datos Sembrados |
-| :--- | :--- | :--- |
-| **Sucursales** | `sucursal` | Sede Principal ("SEDE PRINCIPAL", Av. Arequipa 1420, Lima) en estado activo. |
-| **Puntos de Venta** | `punto` | Punto oficial `01-Caja 1 - 207` configurado como terminal de cobranza. |
-| **Series y Correlativos** | `serie_correlativo` | Series `B001` (Boletas), `F001` (Facturas), `T001` (Tickets) y `NC01` (Notas de Crédito). |
-| **Niveles de Servicio** | `nivel` | 4 centros de costo: Laboratorio Clínico, Diagnóstico por Imágenes, Consultas Médicas y Farmacia. |
-| **Catálogo Médico** | `catalogo` | 12 prestaciones médicas y farmacéuticas (Hemograma Automatizado, Perfil Lipídico, Glucosa, Ecografía Abdominal, Radiografía Digital, Consultas y Medicamentos). |
-| **Inventario y Stock** | `producto` | Existencias reales en stock para cada producto (350 a 1000 unidades) con stock de seguridad. |
-| **Proveedores** | `proveedor` | 5 proveedores farmacéuticos: Medifarma S.A., Laboratorios Roche, B. Braun Medical, Siemens Healthcare y Abbott. |
-| **Compras** | `compra`, `detalle_compra` | Facturas de compra distribuidas a lo largo del año 2026 y noviembre 2026 con subtotales, IGV y totales calculados. |
-| **Ventas y Correlatividad** | `venta_registro`, `venta_detalle` | Más de 44 registros de venta emitidos a lo largo de 2026 con correlativos consecutivos del 00000001 al 00000024 en Noviembre 2026, vinculados a cuenta corriente y cajero. |
-| **Descuentos Autorizados** | `autorizacion_descuento` | Solicitudes de descuento clínico con estados `APROBADO`, `PENDIENTE` y `RECHAZADO` con justificaciones médicas. |
-| **Honorarios Médicos** | `pago_comprobante` | Recibos de honorarios de médicos especialistas (Cardiología, Pediatría, Traumatología, Ginecología) para noviembre 2026. |
-| **Planilla y Nómina** | `pago_comprobante` | Pagos de remuneración mensual para personal de enfermería, laboratorio, recepción y sistemas. |
-| **Caja Chica** | `caja_chica`, `caja_chica_movimiento` | Caja chica abierta con saldo inicial de S/. 1,500.00 y movimientos sustentados de egresos y reposiciones. |
-| **Arqueos de Caja** | `arqueo_caja` | Cierres de caja diarios conforme a turno mañana y turno tarde con saldo físico verificado y sin descuadre. |
-| **Kardex** | `kardex` | Movimientos valorizados de entrada de reactivos y medicamentos vinculados a facturas de compra. |
-| **Auditoría** | `lab_auditoria` | Registros de eventos de seguridad (Login, Emisión de Comprobantes, Apertura de Caja, Autorización de Descuento). |
-| **Paquetes Preventivos** | `paquetes` | 4 combos médicos: Chequeo Clínico Preventivo, Perfil Ejecutivo Cardiovascular, Control Materno Prenatal y Paquete Pediátrico. |
-| **Caja General** | `caja_general` | Caja general central con saldo activo de S/. 35,000.00. |
-| **Activos Fijos** | `activos_fijos` | Equipamiento médico de alta gama (Ecógrafo Doppler 4D, Rayos X Digital) operativos y con depreciación calculada. |
+### 4.1. Política de Inserción No Destructiva (Preservación de Datos de Render)
+* **Regla Estricta:** El sembrador **no** ejecuta `deleteAll()`, ni `truncate`, ni sobreescribe los registros ingresados previamente en Render ni las inserciones manuales de los usuarios.
+* **Mecanismo:** Para cada entidad, se realiza una comprobación del conteo actual de registros (`repository.count()`). Si el ambiente ya cuenta con registros, el inicializador únicamente añade la diferencia necesaria para garantizar al menos **20 registros completos y relacionados**, preservando el 100% de los datos previos.
+* **Coherencia Relacional:** Todos los datos se interconectan lógicamente entre sí: las ventas referencian pacientes, puntos de venta y cuentas corrientes existentes; las compras se asocian a proveedores del catálogo y generan movimientos de Kardex valorizado; las notas de crédito y solicitudes de anulación enlazan comprobantes válidos; y los arqueos cuadran con los movimientos de caja chica y terminales POS.
+
+### 4.2. Detalle de los 27 Módulos y Ambientes Poblados
+
+| # | Módulo / Ventana | Entidades Afectadas | Mín. Registros | Descripción y Coherencia de Datos |
+| :-: | :--- | :--- | :-: | :--- |
+| **1** | **Pacientes / Clientes** | `datos_personales` | 25 | Pacientes con DNI verificado de 8 dígitos, nombres, correos y teléfonos reales. |
+| **2** | **Sucursales y Sedes** | `sucursal` | 20 | Red de 20 sedes en distritos de Lima y Callao (Centro, San Isidro, Miraflores, Surco, Los Olivos, etc.). |
+| **3** | **Puntos de Venta (POS)** | `punto` | 20 | Cajas de cobranza y farmacia vinculadas por clave foránea a cada sucursal (`01-Caja 1`, `02-Caja 2`, etc.). |
+| **4** | **Series de Comprobantes** | `serie_correlativo` | 80+ | Series oficiales correlativas (`B001`, `F001`, `T001`, `NC01`) asignadas a cada una de las sucursales. |
+| **5** | **Centros de Costo / Niveles**| `nivel` | 20 | 20 áreas jerárquicas y centros de costo (Laboratorio, Imágenes, Farmacia, Cardiología, Pediatría, etc.). |
+| **6** | **Catálogo Médico y Servicios**| `catalogo` | 25 | 25 prestaciones médicas, análisis clínicos, radiografías y medicamentos con tarifas e IGV calculados. |
+| **7** | **Inventario y Stock** | `producto` | 25 | Stock real en almacén (entre 300 y 1,000 unidades) con stock mínimo de seguridad por cada producto. |
+| **8** | **Proveedores y Droguerías** | `proveedor` | 20 | Proveedores farmacéuticos y médicos con RUC de 11 dígitos, dirección fiscal, teléfono y contacto. |
+| **9** | **Órdenes de Compra** | `ordenes_compra` | 20 | Órdenes de compra correlativas (`OC-2026-0001` a `0020`) con subtotal, IGV y total calculados. |
+| **10** | **Registro de Compras** | `compra`, `detalle_compra` | 25 | Facturas de compra distribuidas en 2026 y noviembre 2026 vinculadas a proveedores y catálogo. |
+| **11** | **Ventas y Correlatividad** | `venta_registro`, `venta_detalle` | 50+ | Comprobantes de Boletas, Facturas y Tickets con más de 24 emitidos en Noviembre 2026 con correlativo correlacionado. |
+| **12** | **Solicitudes de Anulación** | `solicitud_anulacion` | 20 | Solicitudes de anulación justificadas con motivos comerciales y estados `APROBADO` y `PENDIENTE`. |
+| **13** | **Notas de Crédito** | `nota_credito` | 20 | Comprobantes `NC01` emitidos conforme a SUNAT referenciando ventas preexistentes. |
+| **14** | **Descuentos Autorizados** | `autorizacion_descuento` | 20 | Solicitudes de descuento clínico con porcentaje aplicado, justificación médica y firma de doctor. |
+| **15** | **Honorarios Médicos** | `pago_comprobante` | 20 | Recibos por honorarios de 20 especialistas médicos (RUC, retención de 4ta categoría y neto a pagar). |
+| **16** | **Planilla y Personal** | `pago_comprobante` | 20 | Remuneraciones del personal de salud, enfermería, recepción, laboratorio y sistemas para 2026. |
+| **17** | **Otros Pagos y Servicios** | `pago_comprobante` | 20 | Comprobantes de servicios básicos (Luz del Sur, Sedapal, Telefónica, licencias de software, seguros). |
+| **18** | **Caja Chica y Movimientos** | `caja_chica`, `caja_chica_movimiento` | 20 | Fondos fijos de caja chica con saldo de S/. 2,500.00 y 20 movimientos justificados de ingresos y egresos. |
+| **19** | **Caja General Bancaria** | `caja_general` | 20 | Cuentas bancarias corporativas (BCP, BBVA, Interbank, Scotiabank) en soles y dólares. |
+| **20** | **Arqueos de Caja Diarios** | `arqueo_caja` | 20 | Cierres y cuadres de caja por turno (mañana y tarde) en cada punto de venta con saldo verificado. |
+| **21** | **Cuentas Corrientes** | `cuentas_corrientes` | 20 | Cuentas corrientes financieras asignadas con líneas de crédito y saldos en soles y dólares. |
+| **22** | **Kardex Valorizado** | `kardex` | 25 | Registro valorizado PEPS de movimientos de entrada y salida de medicamentos y reactivos. |
+| **23** | **Paquetes Preventivos** | `paquetes` | 20 | Planes y programas de salud integral (Chequeo Oncológico, Riesgo Cardiovascular, Perfil Geriátrico, etc.). |
+| **24** | **Empresas Corporativas** | `empresas` | 20 | Clientes institucionales y empresas con convenios corporativos activos y RUC validado. |
+| **25** | **Convenios y Aseguradoras** | `cred_planes` | 20 | Planes de aseguramiento médico (Rímac Seguros, Pacífico, Mapfre, La Positiva, Sanitas, etc.). |
+| **26** | **Activos Fijos Médicos** | `activos_fijos` | 20 | Equipamiento de laboratorio y radiología con código de activo, costo histórico y depreciación. |
+| **27** | **Auditoría del Sistema** | `lab_auditoria` | 25 | Trazabilidad de seguridad (Login, Creación de Comprobantes, Anulación, Apertura de Caja, Modificaciones). |
 
 ---
 
@@ -168,3 +183,4 @@ PORT=10000
 
 ---
 *Informe técnico generado y validado automáticamente para el equipo de Finanzas EPE.*
+
